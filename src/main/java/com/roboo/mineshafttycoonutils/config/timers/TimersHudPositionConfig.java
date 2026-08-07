@@ -9,10 +9,10 @@ public class TimersHudPositionConfig {
     @Expose
     @ConfigOption(name = "Timers HUD X Position", desc = "Horizontal position of the timers HUD")
     @ConfigEditorSlider(minValue = 0f, maxValue = 1920f, minStep = 1f)
-    public int timersHudX = 10;
+    public int timersHudX = 70;
 
     @Expose
     @ConfigOption(name = "Timers HUD Y Position", desc = "Vertical position of the timers HUD")
     @ConfigEditorSlider(minValue = 0f, maxValue = 1080f, minStep = 1f)
-    public int timersHudY = 90;
+    public int timersHudY = 20;
 }
