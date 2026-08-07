@@ -30,6 +30,13 @@ A Fabric client-side mod that adds quality-of-life tools on MineshaftTycoon — 
 - Numbers can be shown in full or shortened (e.g. `489.39T` instead of `489,390,000,000,000`).
 - Reset anytime with `/mstu resetprofittracker`.
 
+### Timers/Durations HU
+- Reads time remaining of different potions/buffs from `/potsoff` menu
+- Reads both `/potsdur` and hologram for PetAd timer
+- Reads Il's restock timer from `Il's Wares`menu
+- TODO - Add grown plant status (Will be very basic "Plot #: Growing|Grown")
+- TODO - Forge/Compactor/Other useful timers
+
 ### Chat Message Hider
 Individually toggleable filters to cut down on chat spam:
 - T1–T4 join/welcome-back messages
