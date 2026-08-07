@@ -1,0 +1,76 @@
+plugins {
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+	id 'com.gradleup.shadow' version "${shadow_version}"
+	id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = "mineshafttycoonutils"
+}
+
+repositories {
+	maven { url "https://maven.notenoughupdates.org/releases/" }
+}
+
+configurations {
+	shadowModImpl
+	modImplementation.extendsFrom shadowModImpl
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	// MoulConfig's common module is partly written in Kotlin, so this is needed at runtime.
+	modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+
+	shadowModImpl("org.notenoughupdates.moulconfig:modern-1.21.11:${project.moulconfig_version}") {
+		exclude group: "org.jetbrains.kotlin"
+		exclude group: "org.jetbrains.kotlinx"
+	}
+}
+
+processResources {
+	def version = project.version
+	inputs.property "version", version
+	filesMatching("fabric.mod.json") {
+		expand "version": version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+}
+
+java {
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+shadowJar {
+	configurations = [project.configurations.shadowModImpl]
+	// Relocated so MoulConfig doesn't clash with other mods that also bundle it.
+	relocate "io.github.notenoughupdates.moulconfig", "com.roboo.mineshafttycoonutils.deps.moulconfig"
+	archiveClassifier.set("dev-shadow")
+	exclude "META-INF/versions/**"
+	mergeServiceFiles()
+}
+
+remapJar {
+	dependsOn tasks.shadowJar
+	inputFile.set(tasks.shadowJar.archiveFile)
+	archiveClassifier.set("")
+}
+
+publishing {
+	publications {
+		create("mavenJava", MavenPublication) {
+			from components.java
+		}
+	}
+}

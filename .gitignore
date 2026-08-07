@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Run/output directories (common in Forge/Fabric mod dev)
+run/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
