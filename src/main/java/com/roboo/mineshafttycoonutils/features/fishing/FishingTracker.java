@@ -69,11 +69,15 @@ public class FishingTracker {
             Pattern.compile("(?i)^\\*\\s*double hook!$");
 
     public static void init() {
-        ClientReceiveMessageEvents.GAME.register((msg, overlay) ->
-                handleMessage(msg.getString()));
+        ClientReceiveMessageEvents.ALLOW_GAME.register((msg, overlay) -> {
+            handleMessage(msg.getString());
+            return true;
+        });
 
-        ClientReceiveMessageEvents.CHAT.register((msg, signed, sender, params, timestamp) ->
-                handleMessage(msg.getString()));
+        ClientReceiveMessageEvents.ALLOW_CHAT.register((msg, signed, sender, params, timestamp) -> {
+            handleMessage(msg.getString());
+            return true;
+        });
     }
 
     private static void handleMessage(String msg) {

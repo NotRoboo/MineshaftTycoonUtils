@@ -10,7 +10,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.regex.Matcher;
@@ -21,7 +23,8 @@ public class ProfitTracker {
     private static final Minecraft mc = Minecraft.getInstance();
 
     private static final double FORTUNE_PER_DROP = 100.0;
-    private static final double DECAY_SECONDS = 15.0;
+    private static final long WINDOW_MS = 10_000;
+    private static final long DISPLAY_UPDATE_INTERVAL_MS = 2_000;
 
     private static final Pattern FORTUNE_PATTERN = Pattern.compile("([0-9,]+)✥");
 
@@ -92,11 +95,14 @@ public class ProfitTracker {
         }
     }
 
+    private record Gain(long time, long amount) {}
+
     private static long fortune = 0;
     private static long totalProfit = 0;
+    private static final Deque<Gain> recentGains = new ArrayDeque<>();
 
-    private static double decayedGains = 0.0;
-    private static long lastDecayUpdate = System.currentTimeMillis();
+    private static long cachedProfitPerHour = 0;
+    private static long lastDisplayUpdate = 0;
 
     private static BlockPos watchedPos = null;
     private static TrackedOre watchedOre = null;
@@ -150,9 +156,7 @@ public class ProfitTracker {
         long drops = Math.round(fortune / FORTUNE_PER_DROP);
         long gained = drops * value;
         totalProfit += gained;
-
-        decay();
-        decayedGains += gained;
+        recentGains.addLast(new Gain(System.currentTimeMillis(), gained));
     }
 
     public static long getTotalProfit() {
@@ -160,18 +164,24 @@ public class ProfitTracker {
     }
 
     public static long getProfitPerHour() {
-        decay();
-        return Math.round(decayedGains / DECAY_SECONDS * 3600.0);
+        long now = System.currentTimeMillis();
+        if (now - lastDisplayUpdate >= DISPLAY_UPDATE_INTERVAL_MS) {
+            lastDisplayUpdate = now;
+            cachedProfitPerHour = computeProfitPerHour();
+        }
+        return cachedProfitPerHour;
     }
 
-    private static void decay() {
+    private static long computeProfitPerHour() {
         long now = System.currentTimeMillis();
-        double elapsedSec = (now - lastDecayUpdate) / 1000.0;
-        lastDecayUpdate = now;
-        if (elapsedSec <= 0) return;
+        while (!recentGains.isEmpty() && now - recentGains.peekFirst().time() > WINDOW_MS) {
+            recentGains.pollFirst();
+        }
 
-        decayedGains *= Math.exp(-elapsedSec / DECAY_SECONDS);
-        if (decayedGains < 0.01) decayedGains = 0.0;
+        long sum = 0;
+        for (Gain g : recentGains) sum += g.amount();
+
+        return Math.round(sum / (WINDOW_MS / 1000.0) * 3600.0);
     }
 
     public static List<String> getMissingOreNames() {
@@ -188,7 +198,8 @@ public class ProfitTracker {
 
     public static void clear() {
         totalProfit = 0;
-        decayedGains = 0.0;
-        lastDecayUpdate = System.currentTimeMillis();
+        recentGains.clear();
+        cachedProfitPerHour = 0;
+        lastDisplayUpdate = 0;
     }
 }

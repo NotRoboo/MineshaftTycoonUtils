@@ -3,6 +3,7 @@ package com.roboo.mineshafttycoonutils.features.profit;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.profit.ProfitCategory;
 import com.roboo.mineshafttycoonutils.utils.FishingZones;
+import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
@@ -27,38 +28,55 @@ public class ProfitHud {
                     if (mc.player == null || !cfg.profitTrackerEnabled) return;
                     if (cfg.onlyShowWhenMining && FishingZones.isInZone(mc.player.blockPosition())) return;
 
-                    int x = cfg.hudPosition.ProfitHudX;
-                    int y = cfg.hudPosition.ProfitHudY;
                     int lineHeight = 10;
-                    int line = 0;
+                    LinkedHashMap<String, Integer> breakdown = OreDropTracker.getBreakdown();
+                    int totalLines = countTotalLines(cfg, breakdown);
+                    int totalHeight = totalLines * lineHeight;
 
-                    graphics.drawString(mc.font, "§e§lProfit Tracker", x, y, 0xFFFFFFFF, true);
+                    int x = HudTextUtils.clampX(cfg.hudPosition.ProfitHudX);
+                    int y = HudTextUtils.clampY(cfg.hudPosition.ProfitHudY, totalHeight);
+                    int line = 0;
+                    boolean rightAligned = HudTextUtils.isRightAligned(x);
+
+                    HudTextUtils.drawLine(graphics, "§e§lProfit Tracker", x, y, rightAligned);
                     line++;
 
                     if (ProfitTracker.needsRamLevel()) {
-                        graphics.drawString(mc.font, "§7Boosts: §c(Open refinery & /pets)", x, y + (lineHeight * line++), 0xFFFFFFFF, true);
+                        HudTextUtils.drawLine(graphics, "§7Boosts: §c(Open refinery & /pets)", x, y + (lineHeight * line++), rightAligned);
                     }
 
-                    graphics.drawString(mc.font, "§7$/Hour: §e$" + format(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr",
-                            x, y + (lineHeight * line++), 0xFFFFFFFF, true);
-                    graphics.drawString(mc.font, "§7Total: §e$" + format(ProfitTracker.getTotalProfit(), cfg.shortenNumbers),
-                            x, y + (lineHeight * line++), 0xFFFFFFFF, true);
+                    HudTextUtils.drawLine(graphics, "§7$/Hour: §e$" + format(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr",
+                            x, y + (lineHeight * line++), rightAligned);
+                    HudTextUtils.drawLine(graphics, "§7Total: §e$" + format(ProfitTracker.getTotalProfit(), cfg.shortenNumbers),
+                            x, y + (lineHeight * line++), rightAligned);
 
                     if (cfg.showOreDrops) {
-                        graphics.drawString(mc.font, "§e§lOres", x, y + (lineHeight * line++), 0xFFFFFFFF, true);
+                        HudTextUtils.drawLine(graphics, "§e§lOres", x, y + (lineHeight * line++), rightAligned);
 
-                        LinkedHashMap<String, Integer> breakdown = OreDropTracker.getBreakdown();
                         if (breakdown.isEmpty()) {
-                            graphics.drawString(mc.font, "§7- None", x, y + (lineHeight * line++), 0xFFFFFFFF, true);
+                            HudTextUtils.drawLine(graphics, "§7- None", x, y + (lineHeight * line++), rightAligned);
                         } else {
                             for (var entry : breakdown.entrySet()) {
-                                graphics.drawString(mc.font, "§7- " + entry.getKey() + " §7(§e" + entry.getValue() + "§7)",
-                                        x, y + (lineHeight * line++), 0xFFFFFFFF, true);
+                                HudTextUtils.drawLine(graphics, "§7- " + entry.getKey() + " §7(§e" + entry.getValue() + "§7)",
+                                        x, y + (lineHeight * line++), rightAligned);
                             }
                         }
                     }
                 }
         );
+    }
+
+    private static int countTotalLines(ProfitCategory cfg, LinkedHashMap<String, Integer> breakdown) {
+        int total = 1; // header
+        if (ProfitTracker.needsRamLevel()) total++;
+        total += 2; // $/Hour, Total
+
+        if (cfg.showOreDrops) {
+            total++; // "Ores" header
+            total += breakdown.isEmpty() ? 1 : breakdown.size();
+        }
+
+        return total;
     }
 
     private static String format(long value, boolean shorten) {

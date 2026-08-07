@@ -28,4 +28,8 @@ public class MSTUConfig extends Config {
     @Expose
     @Category(name = "Chat", desc = "Chat message filtering settings")
     public ChatCategory chat = new ChatCategory();
+
+    @Expose
+    @Category(name = "Timers", desc = "Buff, Petad, and Il's Restock timer settings")
+    public TimersCategory timers = new TimersCategory();
 }

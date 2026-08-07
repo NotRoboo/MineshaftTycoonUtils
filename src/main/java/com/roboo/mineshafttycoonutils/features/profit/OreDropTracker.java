@@ -27,8 +27,15 @@ public class OreDropTracker {
     private static final Map<String, Integer> counts = new LinkedHashMap<>();
 
     public static void init() {
-        ClientReceiveMessageEvents.GAME.register((msg, overlay) -> handleMessage(msg.getString()));
-        ClientReceiveMessageEvents.CHAT.register((msg, signed, sender, params, timestamp) -> handleMessage(msg.getString()));
+        ClientReceiveMessageEvents.ALLOW_GAME.register((msg, overlay) -> {
+            handleMessage(msg.getString());
+            return true;
+        });
+
+        ClientReceiveMessageEvents.ALLOW_CHAT.register((msg, signed, sender, params, timestamp) -> {
+            handleMessage(msg.getString());
+            return true;
+        });
     }
 
     private static void handleMessage(String msg) {
