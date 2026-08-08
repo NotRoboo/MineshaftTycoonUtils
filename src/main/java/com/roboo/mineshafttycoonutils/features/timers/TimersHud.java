@@ -85,7 +85,7 @@ public class TimersHud {
     }
 
     private static String renderIlsRestock(TimersCategory cfg) {
-        if (!IlsRestockTracker.isKnown()) return "§7Il's Restock: §c(Talk to Il to enable timer)";
+        if (!IlsRestockTracker.isKnown()) return "§7Il's Restock: §c(Talk to Il)";
 
         long secondsLeft = IlsRestockTracker.getSecondsLeft();
         return "§7Il's Restock: §e" + formatDuration(secondsLeft, cfg);
