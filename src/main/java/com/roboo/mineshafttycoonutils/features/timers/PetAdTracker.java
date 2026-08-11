@@ -17,9 +17,13 @@ public class PetAdTracker {
     private static final double PETAD_X = 4;
     private static final double PETAD_Y = 93;
     private static final double PETAD_Z = 10;
+    private static final double NEARBY_RANGE = 32.0;
     private static final double HOLOGRAM_SEARCH_RADIUS = 5;
     private static final long ANCHOR_THRESHOLD_MS = 1500;
-    private static final int SCAN_INTERVAL_TICKS = 30;
+    private static final int SCAN_INTERVAL_TICKS = 10;
+
+    private static final Pattern TIMER_NOW_PATTERN =
+            Pattern.compile("(?i)adventure timer?\\s*is now\\s*(?:(\\d+)h\\s*)?(?:(\\d+)m\\s*)?(?:(\\d+)s)?");
 
     private static final Pattern CHAT_PATTERN =
             Pattern.compile("(?i)adventure time left:\\s*(?:(\\d+)h\\s*)?(?:(\\d+)m\\s*)?(?:(\\d+)s)?");
@@ -56,14 +60,34 @@ public class PetAdTracker {
             return;
         }
 
+        if (lower.contains("is back from its adventure") && lower.contains("meet me to pick it up")) {
+            applyReading(0);
+            return;
+        }
+
         Matcher m = CHAT_PATTERN.matcher(stripped);
         if (m.find() && lower.contains("adventure time left:")) {
             applyReading(parseSeconds(m));
+            return;
+        }
+
+        if (lower.contains("adventure time") && lower.contains("is now")) {
+            Matcher nowMatcher = TIMER_NOW_PATTERN.matcher(stripped);
+            if (nowMatcher.find()) {
+                applyReading(parseSeconds(nowMatcher));
+            }
         }
     }
 
     private static void onTick() {
         if (mc.player == null || mc.level == null) return;
+
+        double distSq = mc.player.position().distanceToSqr(PETAD_X, PETAD_Y, PETAD_Z);
+        if (distSq > NEARBY_RANGE * NEARBY_RANGE) {
+            tickCounter = 0;
+            return;
+        }
+
         if (++tickCounter < SCAN_INTERVAL_TICKS) return;
         tickCounter = 0;
 
@@ -77,9 +101,9 @@ public class PetAdTracker {
             String lower = name.toLowerCase(Locale.ROOT);
             if (!lower.contains("adventure time:")) continue;
 
-            Matcher m = HOLOGRAM_PATTERN.matcher(name);
-            if (m.find()) {
-                applyReading(parseSeconds(m));
+            Matcher hologramMatcher = HOLOGRAM_PATTERN.matcher(name);
+            if (hologramMatcher.find()) {
+                applyReading(parseSeconds(hologramMatcher));
                 break;
             }
         }

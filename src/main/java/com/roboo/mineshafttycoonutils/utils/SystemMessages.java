@@ -20,8 +20,8 @@ public class SystemMessages {
         MutableComponent result = Component.empty();
 
         for (int i = 0; i < full.length(); i++) {
-            float t = full.length() == 1 ? 0f : (float) i / (full.length() - 1);
-            int color = lerp(GRADIENT_START, GRADIENT_END, t);
+            float t = (float) i / (full.length() - 1);
+            int color = blendColor(t);
             boolean bold = i < PREFIX.length();
             result.append(colored(String.valueOf(full.charAt(i)), color, bold));
         }
@@ -29,10 +29,10 @@ public class SystemMessages {
         return result;
     }
 
-    private static int lerp(int start, int end, float t) {
-        int r = (int) (((start >> 16) & 0xFF) * (1 - t) + ((end >> 16) & 0xFF) * t);
-        int g = (int) (((start >> 8) & 0xFF) * (1 - t) + ((end >> 8) & 0xFF) * t);
-        int b = (int) ((start & 0xFF) * (1 - t) + (end & 0xFF) * t);
+    private static int blendColor(float t) {
+        int r = (int) (((GRADIENT_START >> 16) & 0xFF) * (1 - t) + ((GRADIENT_END >> 16) & 0xFF) * t);
+        int g = (int) (((GRADIENT_START >> 8) & 0xFF) * (1 - t) + ((GRADIENT_END >> 8) & 0xFF) * t);
+        int b = (int) ((GRADIENT_START & 0xFF) * (1 - t) + (GRADIENT_END & 0xFF) * t);
         return (r << 16) | (g << 8) | b;
     }
 

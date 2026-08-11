@@ -34,8 +34,6 @@ A Fabric client-side mod that adds quality-of-life tools on MineshaftTycoon — 
 - Reads time remaining of different potions/buffs from `/potsoff` menu
 - Reads both `/potsdur` and hologram for PetAd timer
 - Reads Il's restock timer from `Il's Wares`menu
-- TODO - Add grown plant status (Will be very basic "Plot #: Growing|Grown")
-- TODO - Forge/Compactor/Other useful timers
 
 ### Chat Message Hider
 Individually toggleable filters to cut down on chat spam:
@@ -71,3 +69,8 @@ Individually toggleable filters to cut down on chat spam:
 - This is a **client-side** mod.
 - The Warp Helper and Pet Helper is allowed by MST Staff, however it does technically automate clicks - use at your own risk.
 - Refinery/Dune Ram auto-detection work by reading menu contents you open normally, so they should auto update as you upgrade.
+
+## Future Plans
+- TODO - Add grown plant status (Will be very basic "Plot #: Growing|Grown")
+- TODO - Forge/Compactor/Other useful timers
+- TODO - Kraken when Soul is done

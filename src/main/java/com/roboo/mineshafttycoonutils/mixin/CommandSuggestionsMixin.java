@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.EditBox;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,8 +22,12 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(CommandSuggestions.class)
 public abstract class CommandSuggestionsMixin {
 
+    @Unique
     private static final String WARP_PREFIX = "/warp ";
+    @Unique
     private static final String PETS_PREFIX = "/pets ";
+    @Unique
+    private static final String PET_PREFIX = "/pet ";
 
     @Shadow @Final EditBox input;
     @Shadow private CompletableFuture<Suggestions> pendingSuggestions;
@@ -41,8 +46,9 @@ public abstract class CommandSuggestionsMixin {
             prefix = WARP_PREFIX;
             if (cursor < prefix.length()) return;
             matches = WarpHelper.matchingArgs(text.substring(prefix.length(), cursor).toLowerCase(Locale.ROOT));
-        } else if (ConfigManager.config.general.petsHelperEnabled && lower.startsWith(PETS_PREFIX)) {
-            prefix = PETS_PREFIX;
+        } else if (ConfigManager.config.general.petsHelperEnabled
+                && (lower.startsWith(PETS_PREFIX) || lower.startsWith(PET_PREFIX))) {
+            prefix = lower.startsWith(PETS_PREFIX) ? PETS_PREFIX : PET_PREFIX;
             if (cursor < prefix.length()) return;
             matches = PetsHelper.matchingArgs(text.substring(prefix.length(), cursor).toLowerCase(Locale.ROOT));
         } else {

@@ -118,10 +118,14 @@ public class WarpHelper {
 
     private static final String PREVIOUS_PAGE_NAME = "Previous Page";
     private static final int RETRY_DELAY_TICKS = 5;
+    private static final int INITIAL_ATTEMPT_DELAY_TICKS = 3;
+    private static final int NAV_RETRIES = 2;
+    private static final int TARGET_RETRIES = 3;
 
     private static WarpEntry pendingEntry = null;
     private static int retryTicks = -1;
-    private static int retriesLeft = 0;
+    private static int navRetriesLeft = 0;
+    private static int targetRetriesLeft = 0;
 
     private static final SuggestionProvider<net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource> SUGGESTIONS =
             (ctx, builder) -> {
@@ -164,8 +168,7 @@ public class WarpHelper {
 
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             if (pendingEntry != null && WarpMenu.fromScreen(screen) != null) {
-                retryTicks = -1;
-                attemptClick();
+                retryTicks = INITIAL_ATTEMPT_DELAY_TICKS;
             }
         });
 
@@ -188,7 +191,8 @@ public class WarpHelper {
         }
 
         pendingEntry = (enabled && key != null) ? WARP_ITEMS.get(key) : null;
-        retriesLeft = 1;
+        navRetriesLeft = NAV_RETRIES;
+        targetRetriesLeft = TARGET_RETRIES;
         retryTicks = -1;
 
         sendRawCommand("warp");
@@ -215,9 +219,16 @@ public class WarpHelper {
                 pendingEntry = null;
                 return;
             }
+
+            if (targetRetriesLeft-- > 0) {
+                retryTicks = RETRY_DELAY_TICKS;
+            } else {
+                pendingEntry = null;
+            }
+            return;
         }
 
-        if (retriesLeft-- > 0) {
+        if (navRetriesLeft-- > 0) {
             Integer prevPageSlot = findSlot(menu, PREVIOUS_PAGE_NAME);
             if (prevPageSlot != null) clickSlot(prevPageSlot, ClickType.PICKUP, 0);
             retryTicks = RETRY_DELAY_TICKS;

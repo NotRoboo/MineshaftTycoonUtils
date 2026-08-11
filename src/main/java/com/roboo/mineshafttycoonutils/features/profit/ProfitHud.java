@@ -54,7 +54,7 @@ public class ProfitHud {
                         HudTextUtils.drawLine(graphics, "§e§lOres", x, y + (lineHeight * line++), rightAligned);
 
                         if (breakdown.isEmpty()) {
-                            HudTextUtils.drawLine(graphics, "§7- None", x, y + (lineHeight * line++), rightAligned);
+                            HudTextUtils.drawLine(graphics, "§7- None", x, y + (lineHeight * line), rightAligned);
                         } else {
                             for (var entry : breakdown.entrySet()) {
                                 HudTextUtils.drawLine(graphics, "§7- " + entry.getKey() + " §7(§e" + entry.getValue() + "§7)",

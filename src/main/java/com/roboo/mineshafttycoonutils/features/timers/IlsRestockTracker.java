@@ -42,7 +42,7 @@ public class IlsRestockTracker {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (pendingTicks > 0 && --pendingTicks == 0) {
-                if (pendingScreen != null && pendingScreen == client.screen
+                if (pendingScreen == client.screen
                         && pendingScreen instanceof AbstractContainerScreen<?> containerScreen) {
                     readContainer(containerScreen.getMenu());
                 }

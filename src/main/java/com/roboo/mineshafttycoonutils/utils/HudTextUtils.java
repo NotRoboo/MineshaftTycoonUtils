@@ -13,13 +13,13 @@ public class HudTextUtils {
 
     public static int clampX(int x) {
         int screenWidth = Minecraft.getInstance().getWindow().getGuiScaledWidth();
-        return Math.max(0, Math.min(x, screenWidth));
+        return Math.clamp(x, 0, screenWidth);
     }
 
     public static int clampY(int y, int totalHeight) {
         int screenHeight = Minecraft.getInstance().getWindow().getGuiScaledHeight();
         int maxY = Math.max(0, screenHeight - totalHeight);
-        return Math.max(0, Math.min(y, maxY));
+        return Math.clamp(y, 0, maxY);
     }
 
     public static void drawLine(GuiGraphics graphics, String text, int x, int y, boolean rightAligned) {

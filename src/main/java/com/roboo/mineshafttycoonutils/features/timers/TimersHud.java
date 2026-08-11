@@ -40,7 +40,8 @@ public class TimersHud {
 
                     boolean rightAligned = HudTextUtils.isRightAligned(x);
 
-                    HudTextUtils.drawLine(graphics, "§e§lTimers", x, y + (lineHeight * line++), rightAligned);
+                    HudTextUtils.drawLine(graphics, "§e§lTimers", x, y, rightAligned);
+                    line++;
                     for (String l : lines) {
                         HudTextUtils.drawLine(graphics, l, x, y + (lineHeight * line++), rightAligned);
                     }
