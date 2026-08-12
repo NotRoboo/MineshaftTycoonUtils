@@ -1,7 +1,6 @@
 package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
-import com.roboo.mineshafttycoonutils.config.profit.ProfitCategory;
 import io.github.notenoughupdates.moulconfig.Config;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText;

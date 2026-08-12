@@ -8,6 +8,11 @@ public class HudTextUtils {
     private HudTextUtils() {}
 
     public static boolean isRightAligned(int x) {
+        return isRightAligned(x, false);
+    }
+
+    public static boolean isRightAligned(int x, boolean disableFlip) {
+        if (disableFlip) return false;
         return x > Minecraft.getInstance().getWindow().getGuiScaledWidth() / 2;
     }
 

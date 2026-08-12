@@ -2,10 +2,13 @@ package com.roboo.mineshafttycoonutils.features.timers;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.TimersCategory;
+import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
+import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
@@ -14,8 +17,57 @@ import java.util.List;
 public class TimersHud {
 
     private static final Minecraft mc = Minecraft.getInstance();
+    private static final int LINE_HEIGHT = 10;
+
+    private static final MovableHud MOVABLE = new MovableHud() {
+        @Override
+        public String getDisplayName() {
+            return "Timers";
+        }
+
+        @Override
+        public boolean isMasterEnabled() {
+            return ConfigManager.config.timers.hudEnabled;
+        }
+
+        @Override
+        public int getX() {
+            TimersCategory cfg = ConfigManager.config.timers;
+            int anchorX = cfg.timersHudX;
+            return HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip) ? anchorX - getWidth() : anchorX;
+        }
+
+        @Override
+        public int getY() {
+            return ConfigManager.config.timers.timersHudY;
+        }
+
+        @Override
+        public int getWidth() {
+            return computeWidth();
+        }
+
+        @Override
+        public int getHeight() {
+            return computeHeight();
+        }
+
+        @Override
+        public void setPosition(int x, int y) {
+            ConfigManager.config.timers.timersHudX = x;
+            ConfigManager.config.timers.timersHudY = y;
+        }
+
+        @Override
+        public void render(GuiGraphics graphics) {
+            TimersCategory cfg = ConfigManager.config.timers;
+            drawContent(graphics, cfg.timersHudX, cfg.timersHudY);
+        }
+    };
 
     public static void init() {
+        HudEditorRegistry.register(MOVABLE);
+
         HudElementRegistry.attachElementBefore(
                 VanillaHudElements.CHAT,
                 Identifier.fromNamespaceAndPath("mineshafttycoonutils", "timers_hud"),
@@ -23,30 +75,53 @@ public class TimersHud {
                     TimersCategory cfg = ConfigManager.config.timers;
                     if (mc.player == null || !cfg.hudEnabled) return;
 
-                    List<String> lines = new ArrayList<>();
-                    for (TimersCategory.Entry entry : cfg.order) {
-                        String rendered = renderEntry(entry, cfg);
-                        if (rendered != null) lines.add(rendered);
-                    }
+                    List<String> lines = computeLines(cfg);
                     if (lines.isEmpty()) return;
 
-                    int lineHeight = 10;
-                    int totalLines = lines.size() + 1; // +1 for header
-                    int totalHeight = totalLines * lineHeight;
+                    int totalHeight = (lines.size() + 1) * LINE_HEIGHT;
 
-                    int x = HudTextUtils.clampX(cfg.hudPosition.timersHudX);
-                    int y = HudTextUtils.clampY(cfg.hudPosition.timersHudY, totalHeight);
-                    int line = 0;
+                    int x = HudTextUtils.clampX(cfg.timersHudX);
+                    int y = HudTextUtils.clampY(cfg.timersHudY, totalHeight);
 
-                    boolean rightAligned = HudTextUtils.isRightAligned(x);
-
-                    HudTextUtils.drawLine(graphics, "§e§lTimers", x, y, rightAligned);
-                    line++;
-                    for (String l : lines) {
-                        HudTextUtils.drawLine(graphics, l, x, y + (lineHeight * line++), rightAligned);
-                    }
+                    drawContent(graphics, x, y);
                 }
         );
+    }
+
+    private static void drawContent(GuiGraphics graphics, int anchorX, int y) {
+        TimersCategory cfg = ConfigManager.config.timers;
+        List<String> lines = computeLines(cfg);
+        boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
+
+        HudTextUtils.drawLine(graphics, "§e§lTimers", anchorX, y, rightAligned);
+        int line = 1;
+        for (String l : lines) {
+            HudTextUtils.drawLine(graphics, l, anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+        }
+    }
+
+    private static List<String> computeLines(TimersCategory cfg) {
+        List<String> lines = new ArrayList<>();
+        for (TimersCategory.Entry entry : cfg.order) {
+            String rendered = renderEntry(entry, cfg);
+            if (rendered != null) lines.add(rendered);
+        }
+        return lines;
+    }
+
+    private static int computeWidth() {
+        TimersCategory cfg = ConfigManager.config.timers;
+        int width = mc.font.width("§e§lTimers");
+        for (String line : computeLines(cfg)) {
+            width = Math.max(width, mc.font.width(line));
+        }
+        return width;
+    }
+
+    private static int computeHeight() {
+        List<String> lines = computeLines(ConfigManager.config.timers);
+        if (lines.isEmpty()) return LINE_HEIGHT;
+        return (lines.size() + 1) * LINE_HEIGHT;
     }
 
     private static String renderEntry(TimersCategory.Entry entry, TimersCategory cfg) {

@@ -1,7 +1,6 @@
-package com.roboo.mineshafttycoonutils.config.profit;
+package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -38,8 +37,15 @@ public class ProfitCategory {
     public boolean noDuneRamPet = false;
 
     @Expose
-    @Category(name = "HUD Position", desc = "Position of the profit tracker HUD overlay")
-    public ProfitHudPositionConfig hudPosition = new ProfitHudPositionConfig();
+    @ConfigOption(name = "Disable Right-Align Flip", desc = "Keep this HUD's text left-aligned even when positioned past the middle of the screen, instead of automatically flipping to right-aligned")
+    @ConfigEditorBoolean
+    public boolean disableRightAlignFlip = false;
+
+    @Expose
+    public int profitHudX = 10;
+
+    @Expose
+    public int profitHudY = 50;
 
     // Auto-detected by opening the Refinery
     @Expose

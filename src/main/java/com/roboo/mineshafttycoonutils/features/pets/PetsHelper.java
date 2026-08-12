@@ -80,7 +80,7 @@ public class PetsHelper {
 
     private static final int RETRY_DELAY_TICKS = 5;
     private static final int MAX_RETRIES = 3;
-    private static final int CLOSE_DELAY_TICKS = 3;
+    private static final int CLOSE_DELAY_TICKS = 4;
 
     private static PetEntry pendingEntry = null;
     private static int retryTicks = -1;
@@ -226,7 +226,12 @@ public class PetsHelper {
     }
 
     private static void closeMenu() {
-        mc.setScreen(null);
+        var player = mc.player;
+        if (player != null) {
+            player.closeContainer();
+        } else {
+            mc.setScreen(null);
+        }
     }
 
     private static Integer findSlot(AbstractContainerMenu menu, Pattern pattern) {

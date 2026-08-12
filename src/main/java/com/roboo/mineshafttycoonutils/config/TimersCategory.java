@@ -1,8 +1,6 @@
 package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
-import com.roboo.mineshafttycoonutils.config.timers.TimersHudPositionConfig;
-import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -24,13 +22,20 @@ public class TimersCategory {
     public boolean hideSecondsUntilFinalMinute = false;
 
     @Expose
+    @ConfigOption(name = "Disable Right-Align Flip", desc = "Keep this HUD's text left-aligned even when positioned past the middle of the screen, instead of automatically flipping to right-aligned")
+    @ConfigEditorBoolean
+    public boolean disableRightAlignFlip = false;
+
+    @Expose
     @ConfigOption(name = "Timer Order", desc = "Drag to reorder timers shown on the HUD. Remove an entry to hide it; it will still be tracked.")
     @ConfigEditorDraggableList
     public List<Entry> order = new ArrayList<>(Arrays.asList(Entry.values()));
 
     @Expose
-    @Category(name = "HUD Position", desc = "Position of the timers HUD overlay")
-    public TimersHudPositionConfig hudPosition = new TimersHudPositionConfig();
+    public int timersHudX = 70;
+
+    @Expose
+    public int timersHudY = 20;
 
     public enum Entry {
         T4_POTION("T4 Potion"),
