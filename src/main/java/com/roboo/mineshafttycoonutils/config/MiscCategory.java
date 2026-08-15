@@ -19,12 +19,17 @@ public class MiscCategory {
     public int toggleUseKeybind = GLFW.GLFW_KEY_UNKNOWN;
 
     @Expose
-    @ConfigOption(name = "Night Vision Blocker", desc = "Automatically removes the Night Vision effect the moment it's applied")
+    @ConfigOption(
+            name = "Night Vision Blocker",
+            desc = "Automatically removes the Night Vision effect the moment it's applied")
     @ConfigEditorBoolean
     public boolean nightVisionBlockerEnabled = false;
 
     @Expose
-    @ConfigOption(name = "Force Tab List Sort", desc = "Reorders the tab list: staff rank, then tier, then Hypixel rank, then A-Z")
+    @ConfigOption(
+            name = "Force Tab List Sort",
+            desc = "Reorders the tab list when its broken. Note: Will only reorder visible players, " +
+                    "those not on tab list will still be hidden")
     @ConfigEditorBoolean
     public boolean forceTabListSort = false;
 

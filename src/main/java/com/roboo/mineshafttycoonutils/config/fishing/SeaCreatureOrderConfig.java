@@ -12,12 +12,16 @@ import java.util.List;
 public class SeaCreatureOrderConfig {
 
     @Expose
-    @ConfigOption(name = "Breakdown", desc = "Show the per-creature breakdown list for sea creatures on the HUD")
+    @ConfigOption(
+            name = "Breakdown",
+            desc = "Show the per-creature breakdown list for sea creatures on the HUD")
     @ConfigEditorBoolean
     public boolean breakdownEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Order", desc = "Drag to reorder sea creatures shown on the HUD. Remove an entry to hide it; it will still be tracked.")
+    @ConfigOption(
+            name = "Order",
+            desc = "Drag to reorder sea creatures shown on the HUD. Remove an entry to hide it; it will still be tracked.")
     @ConfigEditorDraggableList
     public List<Entry> order = new ArrayList<>(Arrays.asList(Entry.values()));
 

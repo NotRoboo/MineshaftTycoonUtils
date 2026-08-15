@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class GlyphTextUtils {
 
-    private static final Pattern BRACKET_TAG = Pattern.compile("§(.)(?:§l)?\\[([A-Za-z0-9+]+)]");
+    private static final Pattern BRACKET_TAG = Pattern.compile("§(.)(?:§l)?\\[([^]]+)]");
 
     private GlyphTextUtils() {}
 

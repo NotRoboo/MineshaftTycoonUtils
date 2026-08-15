@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.mixin;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.config.chat.GlyphCategory;
 import com.roboo.mineshafttycoonutils.features.tablist.TabListEntryParser;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
 import com.roboo.mineshafttycoonutils.utils.RankTierData;
@@ -18,56 +19,95 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * TODO verify both @Inject targets against your decompiled PlayerTabOverlay.
- * In recent Mojang-mapped 1.21.x these are commonly named getNameForDisplay(PlayerInfo)
- * and getPlayerInfos() (used by render(...) to build the sorted visible list),
- * but exact names/signatures can shift between versions — right-click the
- * class in your IDE and pick "Show decompiled" to confirm, then adjust the
- * method strings below if needed.
- */
 @Mixin(PlayerTabOverlay.class)
 public class PlayerTabOverlayMixin {
 
     @Unique
-    private static int mineshaftUtils$loggedDisplay = 0;
+    private static List<PlayerInfo> mineshaftUtils$cachedSorted = new ArrayList<>();
     @Unique
-    private static int mineshaftUtils$loggedSort = 0;
+    private static long mineshaftUtils$lastSortTime = 0L;
+    @Unique
+    private static final long mineshaftUtils$SORT_INTERVAL_MS = 500L;
 
     @Inject(method = "getNameForDisplay", at = @At("RETURN"), cancellable = true)
     private void mineshaftUtils$rewriteDisplayName(PlayerInfo info, CallbackInfoReturnable<Component> cir) {
         if (!ConfigManager.config.playerMessages.glyph.tablistGlyphs) return;
 
-        Component original = cir.getReturnValue();
-        if (original == null) return;
+        TabListEntryParser.Parsed parsed = mineshaftUtils$parse(info);
+        if (parsed == null) return;
+        if (parsed.rankTag() == null && parsed.tierTag() == null) return;
 
-        String raw = ComponentTextUtils.formattedText(original);
+        MutableComponent result = Component.empty();
+        boolean first = true;
 
-        if (mineshaftUtils$loggedDisplay < 5 && raw.contains("[")) {
-            mineshaftUtils$loggedDisplay++;
-            System.out.println("[MTU DEBUG][getNameForDisplay] raw=" + raw.replace("\u00A7", "&"));
+        for (GlyphCategory.TabListPart part : ConfigManager.config.playerMessages.glyph.tabListPartOrder) {
+            String segment = switch (part) {
+                case RANK -> mineshaftUtils$rankSegment(parsed);
+                case TIER -> mineshaftUtils$tierSegment(parsed);
+                case USERNAME -> mineshaftUtils$nameColor(info, parsed) + parsed.username();
+            };
+
+            if (segment == null) continue;
+            if (!first) result.append(Component.literal(" "));
+            result.append(Component.literal(segment));
+            first = false;
         }
 
-        TabListEntryParser.Parsed parsed = TabListEntryParser.parse(raw);
-        if (parsed == null || parsed.tierTag() == null) return;
-
-        String glyphKey = RankTierData.glyphKeyFor(parsed.tierColor(), parsed.tierTag());
-        String glyph = RankTierData.glyphFor(glyphKey);
-        if (glyph == null) return;
-
-        String nameColor = parsed.usernameColorCode() != null ? parsed.usernameColorCode() : "§f";
-        MutableComponent result = Component.literal("§f" + glyph + " " + nameColor + parsed.username());
         cir.setReturnValue(result);
     }
 
     @Inject(method = "getPlayerInfos", at = @At("RETURN"), cancellable = true)
     private void mineshaftUtils$forceSort(CallbackInfoReturnable<List<PlayerInfo>> cir) {
         if (!ConfigManager.config.misc.forceTabListSort) return;
-        if (cir.getReturnValue() == null) return;
 
-        List<PlayerInfo> sorted = new ArrayList<>(cir.getReturnValue());
-        sorted.sort(mineshaftUtils$comparator());
-        cir.setReturnValue(sorted);
+        List<PlayerInfo> source = cir.getReturnValue();
+        if (source == null) return;
+
+        long now = System.currentTimeMillis();
+        if (now - mineshaftUtils$lastSortTime >= mineshaftUtils$SORT_INTERVAL_MS
+                || mineshaftUtils$cachedSorted.size() != source.size()) {
+            List<PlayerInfo> resorted = new ArrayList<>(source);
+            resorted.sort(mineshaftUtils$comparator());
+            mineshaftUtils$cachedSorted = resorted;
+            mineshaftUtils$lastSortTime = now;
+        }
+
+        cir.setReturnValue(mineshaftUtils$cachedSorted);
+    }
+
+    @Unique
+    private static String mineshaftUtils$rankSegment(TabListEntryParser.Parsed parsed) {
+        if (parsed.rankTag() == null) return null;
+        String color = parsed.rankColor() != ' ' ? "§" + parsed.rankColor() : "§7";
+        return color + "[" + parsed.rankTag() + "]";
+    }
+
+    @Unique
+    private static String mineshaftUtils$tierSegment(TabListEntryParser.Parsed parsed) {
+        if (parsed.tierTag() == null) return null;
+        String glyphKey = RankTierData.glyphKeyFor(parsed.tierColor(), parsed.tierTag());
+        String glyph = RankTierData.glyphFor(glyphKey);
+        if (glyph != null) return "§f" + glyph;
+        return "§" + parsed.tierColor() + "[" + parsed.tierTag() + "]";
+    }
+
+    @Unique
+    private static String mineshaftUtils$nameColor(PlayerInfo info, TabListEntryParser.Parsed parsed) {
+        if (info.getTeam() != null && info.getTeam().getColor() != null && info.getTeam().getColor().isColor()) {
+            return "§" + info.getTeam().getColor().getChar();
+        }
+        if (parsed.usernameColorCode() != null) return parsed.usernameColorCode();
+        return "§7";
+    }
+
+    @Unique
+    private static String mineshaftUtils$withTeamAffixes(PlayerInfo info, Component name) {
+        String raw = ComponentTextUtils.formattedText(name);
+        if (info.getTeam() == null) return raw;
+
+        String prefix = ComponentTextUtils.formattedText(info.getTeam().getPlayerPrefix());
+        String suffix = ComponentTextUtils.formattedText(info.getTeam().getPlayerSuffix());
+        return prefix + raw + suffix;
     }
 
     @Unique
@@ -75,17 +115,7 @@ public class PlayerTabOverlayMixin {
         Component name = info.getTabListDisplayName() != null
                 ? info.getTabListDisplayName()
                 : Component.literal(info.getProfile().name());
-        String raw = ComponentTextUtils.formattedText(name);
-
-        if (mineshaftUtils$loggedSort < 5 && (raw.contains("[") || info.getTeam() != null)) {
-            mineshaftUtils$loggedSort++;
-            String teamInfo = info.getTeam() == null ? "no team" :
-                    "team=" + info.getTeam().getName()
-                    + " prefix=" + ComponentTextUtils.formattedText(info.getTeam().getPlayerPrefix()).replace("\u00A7", "&")
-                    + " suffix=" + ComponentTextUtils.formattedText(info.getTeam().getPlayerSuffix()).replace("\u00A7", "&");
-            System.out.println("[MTU DEBUG][sort-path] raw=" + raw.replace("\u00A7", "&") + " | " + teamInfo);
-        }
-
+        String raw = mineshaftUtils$withTeamAffixes(info, name);
         return TabListEntryParser.parse(raw);
     }
 

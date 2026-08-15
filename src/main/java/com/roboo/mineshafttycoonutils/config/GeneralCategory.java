@@ -16,12 +16,16 @@ public class GeneralCategory {
     public Runnable editHudPositions = HudEditScreen::open;
 
     @Expose
-    @ConfigOption(name = "Warp Helper", desc = "Use at own risk - Typing /warp <name> opens the warp menu and automatically clicks the matching warp")
+    @ConfigOption(
+            name = "Warp Helper",
+            desc = "Use at own risk - Typing /warp <name> opens the warp menu and automatically clicks the matching warp")
     @ConfigEditorBoolean
     public boolean warpHelperEnabled = false;
 
     @Expose
-    @ConfigOption(name = "Pets Helper", desc = "Use at own risk - Typing /pets <name> opens the pets menu and automatically clicks the matching pet")
+    @ConfigOption(
+            name = "Pets Helper",
+            desc = "Use at own risk - Typing /pets <name> opens the pets menu and automatically clicks the matching pet")
     @ConfigEditorBoolean
     public boolean petsHelperEnabled = false;
 }

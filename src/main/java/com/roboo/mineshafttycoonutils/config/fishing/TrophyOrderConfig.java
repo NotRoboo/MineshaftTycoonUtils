@@ -12,12 +12,14 @@ import java.util.List;
 public class TrophyOrderConfig {
 
     @Expose
-    @ConfigOption(name = "Breakdown", desc = "Show the per-tier breakdown list for trophy fish on the HUD")
+    @ConfigOption(name = "Breakdown", desc = "Show the per-item breakdown list for trophy fish on the HUD")
     @ConfigEditorBoolean
     public boolean breakdownEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Order", desc = "Drag to reorder trophy fish shown on the HUD. Remove an entry to hide it; it will still be tracked.")
+    @ConfigOption(
+            name = "Order",
+            desc = "Drag to reorder trophy fish shown on the HUD. Remove an entry to hide it; it will still be tracked.")
     @ConfigEditorDraggableList
     public List<Entry> order = new ArrayList<>(Arrays.asList(Entry.values()));
 

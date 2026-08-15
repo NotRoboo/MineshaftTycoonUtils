@@ -23,16 +23,21 @@ public class MessageHider {
         String lower = stripped.toLowerCase(Locale.ROOT);
         var cfg = ConfigManager.config.chat;
 
-        if (cfg.joinMessages.hideT1JoinMessages && (lower.contains("welcome back [t1]") || lower.contains("welcome! [t1]"))) {
+        if (cfg.joinMessages.hideT1JoinMessages && (lower.contains("welcome back [t1]")
+                || lower.contains("welcome! [t1]") || lower.contains("welcome back" + "\uE001")
+                || lower.contains("welcome!" + "\uE001"))) {
             return true;
         }
-        if (cfg.joinMessages.hideT2JoinMessages && lower.contains("welcome back [t2]")) {
+        if (cfg.joinMessages.hideT2JoinMessages && lower.contains("welcome back [t2]")
+                || lower.contains("welcome back" + "\uE002")) {
             return true;
         }
-        if (cfg.joinMessages.hideT3JoinMessages && lower.contains("welcome back [t3]")) {
+        if (cfg.joinMessages.hideT3JoinMessages && lower.contains("welcome back [t3]")
+                || lower.contains("welcome back" + "\uE003")) {
             return true;
         }
-        if (cfg.joinMessages.hideT4JoinMessages && lower.contains("welcome back [t4]")) {
+        if (cfg.joinMessages.hideT4JoinMessages && lower.contains("welcome back [t4]")
+                || lower.contains("welcome back" + "\uE004")) {
             return true;
         }
         if (cfg.hidePetXP && lower.contains("+1 xp for your")) {

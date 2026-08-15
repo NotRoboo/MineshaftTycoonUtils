@@ -9,10 +9,11 @@ import java.util.regex.Pattern;
 public class TabListEntryParser {
 
     private static final Pattern TAB_ENTRY_PATTERN = Pattern.compile(
-            "^(?:(§.)(?:§l)?\\[([^]]+)]\\s)?(§.)?([^\\s§]+)(?:\\s(§.)(?:§l)?\\[([^]]+)])?$"
+            "^(?:(§.)(?:§l)?\\[([^]]+)]\\s*)?(§.)?([^\\s§]+)(?:\\s*(§.)(?:§l)?\\[([^]]+)])?$"
     );
 
     public record Parsed(
+            char rankColor,
             String rankTag,
             char tierColor,
             String tierTag,
@@ -28,6 +29,7 @@ public class TabListEntryParser {
         Matcher m = TAB_ENTRY_PATTERN.matcher(rawFormattedText.trim());
         if (!m.matches()) return null;
 
+        char rankColor = m.group(1) != null ? m.group(1).charAt(1) : ' ';
         String rankTag = m.group(2);
         String usernameColor = m.group(3);
         String username = m.group(4);
@@ -37,7 +39,7 @@ public class TabListEntryParser {
         String resolvedTier = tierRawTag != null ? RankTierData.resolveTag(tierRawTag) : null;
         boolean isStaff = resolvedTier != null && RankTierData.isStaff(resolvedTier);
 
-        return new Parsed(rankTag, tierColor, resolvedTier, isStaff, username, usernameColor);
+        return new Parsed(rankColor, rankTag, tierColor, resolvedTier, isStaff, username, usernameColor);
     }
 
     public static HypixelRank hypixelRank(Parsed parsed) {

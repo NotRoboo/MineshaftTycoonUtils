@@ -18,22 +18,26 @@ public class PlayerMessagesCategory {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Part Order", desc = "Drag to reorder the parts of a chat message. Remove a part to hide it entirely.")
+    @ConfigOption(
+            name = "Part Order",
+            desc = "Drag to reorder the parts of a chat message. Remove a part to hide it entirely.")
     @ConfigEditorDraggableList
     public List<Part> partOrder = new ArrayList<>(Arrays.asList(Part.values()));
 
     @Expose
-    @ConfigOption(name = "Player Rank Hider", desc = "Hide player ranks (e.g. [VIP], [MVP+]) in all chat messages")
+    @ConfigOption(name = "Hypixel Rank Hider", desc = "Hide player ranks (e.g. [VIP], [MVP+]) in chat messages")
     @ConfigEditorBoolean
     public boolean rankHider = false;
 
     @Expose
-    @ConfigOption(name = "Same Chat Color", desc = "Make all chat messages (including party chat) white regardless of rank")
+    @ConfigOption(name = "Nons White Chat", desc = "Make all nons chat messages white instead of grey")
     @ConfigEditorBoolean
     public boolean sameChatColor = false;
 
     @Expose
-    @ConfigOption(name = "Custom Name Color", desc = "Color every player's name with a custom color instead of their rank color")
+    @ConfigOption(
+            name = "Custom Name Color",
+            desc = "Color every player's name with a custom color instead of their rank color")
     @ConfigEditorBoolean
     public boolean customNameColor = false;
 

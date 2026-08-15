@@ -17,12 +17,17 @@ public class InformationCategory {
     public boolean hudEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Disable Right-Align Flip", desc = "Keep this HUD's text left-aligned even when positioned past the middle of the screen, instead of automatically flipping to right-aligned")
+    @ConfigOption(
+            name = "Disable Right-Align Flip",
+            desc = "Keep this HUD's text left-aligned even when positioned past the middle of the screen, " +
+                    "instead of automatically flipping to right-aligned")
     @ConfigEditorBoolean
     public boolean disableRightAlignFlip = false;
 
     @Expose
-    @ConfigOption(name = "Line Order", desc = "Drag to reorder the lines shown on the information HUD. Remove an entry to hide it entirely.")
+    @ConfigOption(
+            name = "Line Order",
+            desc = "Drag to reorder the lines shown on the information HUD. Remove an entry to hide it entirely.")
     @ConfigEditorDraggableList
     public List<Entry> order = new ArrayList<>(Arrays.asList(Entry.values()));
 

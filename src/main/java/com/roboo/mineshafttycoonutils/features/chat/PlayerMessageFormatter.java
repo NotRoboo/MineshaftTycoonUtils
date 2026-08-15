@@ -9,9 +9,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,24 +25,6 @@ public class PlayerMessageFormatter {
     private static final Pattern PARTY_CHAT_MESSAGE_PATTERN = Pattern.compile(
             "^(§9Party §8> .*)(§.): (.*)$"
     );
-
-    private static final Map<Character, Character> GREEK_HOMOGLYPHS = new LinkedHashMap<>();
-    static {
-        GREEK_HOMOGLYPHS.put('Α', 'A');
-        GREEK_HOMOGLYPHS.put('Β', 'B');
-        GREEK_HOMOGLYPHS.put('Ε', 'E');
-        GREEK_HOMOGLYPHS.put('Ζ', 'Z');
-        GREEK_HOMOGLYPHS.put('Η', 'H');
-        GREEK_HOMOGLYPHS.put('Ι', 'I');
-        GREEK_HOMOGLYPHS.put('Κ', 'K');
-        GREEK_HOMOGLYPHS.put('Μ', 'M');
-        GREEK_HOMOGLYPHS.put('Ν', 'N');
-        GREEK_HOMOGLYPHS.put('Ο', 'O');
-        GREEK_HOMOGLYPHS.put('Ρ', 'P');
-        GREEK_HOMOGLYPHS.put('Τ', 'T');
-        GREEK_HOMOGLYPHS.put('Υ', 'Y');
-        GREEK_HOMOGLYPHS.put('Χ', 'X');
-    }
 
     private PlayerMessageFormatter() {}
 
@@ -84,13 +63,12 @@ public class PlayerMessageFormatter {
 
     private static Component rebuild(PlayerMessagesCategory cfg, Matcher m, Style interactiveStyle) {
         char tierColorChar = m.group(1).charAt(0);
-        String tierRaw = normalizeGreekHomoglyphs(normalizeFullwidth(m.group(2)).toUpperCase(Locale.ROOT).trim());
         String rankSegment = m.group(3);
         String name = m.group(4);
         String colonColor = m.group(5);
         String message = m.group(6);
 
-        String tierTag = RankTierData.resolveTag(tierRaw);
+        String tierTag = RankTierData.resolveTag(m.group(2));
         String glyphKey = RankTierData.glyphKeyFor(tierColorChar, tierTag);
 
         char rankColor = rankSegment.charAt(1);
@@ -148,29 +126,5 @@ public class PlayerMessageFormatter {
 
     private static int chromaToHex(ChromaColour color) {
         return color.getEffectiveColourRGB() & 0x00FFFFFF;
-    }
-
-    private static String normalizeGreekHomoglyphs(String input) {
-        StringBuilder sb = new StringBuilder(input.length());
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            sb.append(GREEK_HOMOGLYPHS.getOrDefault(c, c));
-        }
-        return sb.toString();
-    }
-
-    private static String normalizeFullwidth(String input) {
-        StringBuilder sb = new StringBuilder(input.length());
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            if (c >= 0xFF01 && c <= 0xFF5E) {
-                sb.append((char) (c - 0xFEE0));
-            } else if (c == 0x3000) {
-                sb.append(' ');
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
     }
 }
