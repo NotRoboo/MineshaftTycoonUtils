@@ -23,4 +23,9 @@ public class MiscCategory {
     @ConfigEditorBoolean
     public boolean nightVisionBlockerEnabled = false;
 
+    @Expose
+    @ConfigOption(name = "Force Tab List Sort", desc = "Reorders the tab list: staff rank, then tier, then Hypixel rank, then A-Z")
+    @ConfigEditorBoolean
+    public boolean forceTabListSort = false;
+
 }

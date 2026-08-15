@@ -1,11 +1,9 @@
 package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.config.chat.GlyphCategory;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.*;
 
 
 import java.util.ArrayList;
@@ -45,9 +43,8 @@ public class PlayerMessagesCategory {
     public ChromaColour nameColor = ChromaColour.fromStaticRGB(255, 255, 255, 255);
 
     @Expose
-    @ConfigOption(name = "Pixel Art Tier Glyphs", desc = "Replace [T5]-style tier tags with glyphs from a pixel art tag pack. Falls back to normal [T5] text for any tag without a mapped glyph. Requires a matching resource pack font to actually render as art.")
-    @ConfigEditorBoolean
-    public boolean pixelArtTags = false;
+    @Category(name = "Glyph Ranks", desc = "Use custom rank images")
+    public GlyphCategory glyph = new GlyphCategory();
 
     @Expose
     public double savedChatLineSpacing = -1.0;

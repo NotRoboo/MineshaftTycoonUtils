@@ -16,7 +16,7 @@ public class MinecraftOptionUtils {
     private static boolean lastToggleUseKeyDown = false;
 
     public static void init() {
-        lastPixelArtTags = ConfigManager.config.playerMessages.pixelArtTags;
+        lastPixelArtTags = ConfigManager.config.playerMessages.glyph.playerMessageGlyphs;
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             handleChatLineSpacing();
@@ -26,7 +26,7 @@ public class MinecraftOptionUtils {
 
     private static void handleChatLineSpacing() {
         var cfg = ConfigManager.config.playerMessages;
-        boolean enabled = cfg.pixelArtTags;
+        boolean enabled = cfg.glyph.playerMessageGlyphs;
         if (enabled == lastPixelArtTags) return;
         lastPixelArtTags = enabled;
 
