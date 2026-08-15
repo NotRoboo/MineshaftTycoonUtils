@@ -1,7 +1,7 @@
 package com.roboo.mineshafttycoonutils.mixin;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
-import com.roboo.mineshafttycoonutils.config.chat.GlyphCategory;
+import com.roboo.mineshafttycoonutils.config.GlyphCategory;
 import com.roboo.mineshafttycoonutils.features.tablist.TabListEntryParser;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
 import com.roboo.mineshafttycoonutils.utils.RankTierData;
@@ -31,7 +31,7 @@ public class PlayerTabOverlayMixin {
 
     @Inject(method = "getNameForDisplay", at = @At("RETURN"), cancellable = true)
     private void mineshaftUtils$rewriteDisplayName(PlayerInfo info, CallbackInfoReturnable<Component> cir) {
-        if (!ConfigManager.config.playerMessages.glyph.tablistGlyphs) return;
+        if (!ConfigManager.config.glyph.tablistGlyphs) return;
 
         TabListEntryParser.Parsed parsed = mineshaftUtils$parse(info);
         if (parsed == null) return;
@@ -40,7 +40,7 @@ public class PlayerTabOverlayMixin {
         MutableComponent result = Component.empty();
         boolean first = true;
 
-        for (GlyphCategory.TabListPart part : ConfigManager.config.playerMessages.glyph.tabListPartOrder) {
+        for (GlyphCategory.TabListPart part : ConfigManager.config.glyph.tabListPartOrder) {
             String segment = switch (part) {
                 case RANK -> mineshaftUtils$rankSegment(parsed);
                 case TIER -> mineshaftUtils$tierSegment(parsed);

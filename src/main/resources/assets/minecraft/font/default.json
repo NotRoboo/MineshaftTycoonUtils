@@ -44,6 +44,13 @@
         },
         {
             "type": "bitmap",
+            "file": "minecraft:ranks/system.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE016"]
+        },
+        {
+            "type": "bitmap",
             "file": "minecraft:ranks/t1.png",
             "ascent": 8,
             "height": 9,

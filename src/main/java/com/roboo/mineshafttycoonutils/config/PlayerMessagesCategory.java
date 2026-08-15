@@ -1,7 +1,6 @@
 package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
-import com.roboo.mineshafttycoonutils.config.chat.GlyphCategory;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.annotations.*;
 
@@ -45,10 +44,6 @@ public class PlayerMessagesCategory {
     @ConfigOption(name = "Name Color", desc = "Custom color used for player names when Custom Name Color is enabled")
     @ConfigEditorColour
     public ChromaColour nameColor = ChromaColour.fromStaticRGB(255, 255, 255, 255);
-
-    @Expose
-    @Category(name = "Glyph Ranks", desc = "Use custom rank images")
-    public GlyphCategory glyph = new GlyphCategory();
 
     @Expose
     public double savedChatLineSpacing = -1.0;

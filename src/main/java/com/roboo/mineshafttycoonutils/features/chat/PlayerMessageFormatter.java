@@ -81,7 +81,7 @@ public class PlayerMessageFormatter {
         for (PlayerMessagesCategory.Part part : cfg.partOrder) {
             Component segment = switch (part) {
                 case TIER -> {
-                    String glyph = cfg.glyph.playerMessageGlyphs ? RankTierData.glyphFor(glyphKey) : null;
+                    String glyph = ConfigManager.config.glyph.playerMessageGlyphs ? RankTierData.glyphFor(glyphKey) : null;
                     if (glyph != null) {
                         yield Component.literal("§f" + glyph);
                     }

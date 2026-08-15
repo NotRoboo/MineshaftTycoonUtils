@@ -24,6 +24,7 @@ public class RankTierData {
         STAFF_RANKS.put("BUILD", new StaffRank("Builder", 0xFDE047));
         STAFF_RANKS.put("MOD", new StaffRank("Mod", 0x5B1771));
         STAFF_RANKS.put("HELPER", new StaffRank("Helper", 0x15803D));
+        STAFF_RANKS.put("SYSTEM", new StaffRank("System", 0x555555));
     }
 
     public static final Map<String, String> TAG_DISPLAY_ALIASES = new LinkedHashMap<>();
@@ -49,10 +50,11 @@ public class RankTierData {
         TIER_GLYPHS.put("Builder", "\uE013");
         TIER_GLYPHS.put("Mod", "\uE014");
         TIER_GLYPHS.put("Helper", "\uE015");
+        TIER_GLYPHS.put("System", "\uE016");
     }
 
     public static final List<String> TIER_SORT_ORDER = List.of(
-            "OWNER", "MANAGER", "ADMIN", "DEV", "BUILD", "MOD", "HELPER",
+            "OWNER", "MANAGER", "ADMIN", "DEV", "BUILD", "MOD", "HELPER", "SYSTEM",
             "4T5", "6T5", "7T5",
             "9T4", "3T4",
             "cT3", "eT2", "aT1"

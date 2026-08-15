@@ -17,7 +17,7 @@ import net.minecraft.world.item.component.ItemLore;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class InformationHud {
@@ -25,8 +25,6 @@ public class InformationHud {
     private static final Minecraft mc = Minecraft.getInstance();
     private static final int LINE_HEIGHT = 10;
     private static final int HOTBAR_PET_SLOT = 8;
-
-    private static final Pattern PET_PATTERN = Pattern.compile("(?i)^\\[Lvl (\\d{1,3})]\\s*(.+)$");
 
     private static final MovableHud MOVABLE = new MovableHud() {
         @Override
@@ -184,7 +182,7 @@ public class InformationHud {
         ItemLore lore = stack.get(DataComponents.LORE);
         if (lore == null || lore.lines().isEmpty()) return "§7Pet: §c(None)";
         String firstLine = ChatFormatting.stripFormatting(lore.lines().getFirst().getString()).trim();
-        if (firstLine.isEmpty()) return "§7Pet: §c(None)";
+        if (firstLine.isEmpty() || !firstLine.toLowerCase(Locale.ROOT).contains("pet")) return "§7Pet: §c(None)";
         if (firstLine.endsWith(" Pet")) {
             firstLine = firstLine.substring(0, firstLine.length() - 4).trim();
         }

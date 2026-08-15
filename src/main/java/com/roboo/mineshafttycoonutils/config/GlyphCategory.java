@@ -1,4 +1,4 @@
-package com.roboo.mineshafttycoonutils.config.chat;
+package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;

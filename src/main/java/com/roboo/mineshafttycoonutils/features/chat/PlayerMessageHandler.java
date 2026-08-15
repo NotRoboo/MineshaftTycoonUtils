@@ -26,12 +26,14 @@ public class PlayerMessageHandler {
 
     private static boolean handle(Component message) {
         PlayerMessagesCategory cfg = ConfigManager.config.playerMessages;
-        if (!cfg.enabled && !cfg.sameChatColor && !cfg.glyph.otherMessageGlyphs) return true;
+        if (!cfg.enabled && !cfg.sameChatColor && !ConfigManager.config.glyph.otherMessageGlyphs) return true;
         if (message == null) return true;
 
         Style interactiveStyle = ComponentTextUtils.findInteractiveStyle(message);
         String raw = ComponentTextUtils.stripHypixelMessage(ComponentTextUtils.formattedText(message));
         if (raw.isEmpty()) return true;
+
+        if (MessageHider.shouldHide(raw)) return true;
 
         if (cfg.enabled || cfg.sameChatColor) {
             Component formatted = PlayerMessageFormatter.format(raw, interactiveStyle);
@@ -41,7 +43,7 @@ public class PlayerMessageHandler {
             }
         }
 
-        if (cfg.glyph.otherMessageGlyphs) {
+        if (ConfigManager.config.glyph.otherMessageGlyphs) {
             String replaced = GlyphTextUtils.substituteTierTags(raw, true);
             if (!replaced.equals(raw)) {
                 mc.gui.getChat().addMessage(withInteractivity(Component.literal(replaced), interactiveStyle));

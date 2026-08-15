@@ -24,7 +24,9 @@ public class GlyphTextUtils {
             String glyph = RankTierData.glyphFor(glyphKey);
             if (glyph == null) continue;
 
-            out.append(rawWithCodes, last, m.start()).append("§f").append(glyph);
+            out.append(rawWithCodes, last, m.start())
+                    .append("§f").append(glyph)
+                    .append("§").append(colorChar);
             last = m.end();
         }
         out.append(rawWithCodes.substring(last));

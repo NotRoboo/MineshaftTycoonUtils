@@ -17,6 +17,13 @@ public class GeneralCategory {
 
     @Expose
     @ConfigOption(
+            name = "Check for Updates",
+            desc = "Automatically check for new releases on GitHub each time you join a world or server")
+    @ConfigEditorBoolean
+    public boolean checkForUpdates = true;
+
+    @Expose
+    @ConfigOption(
             name = "Warp Helper",
             desc = "Use at own risk - Typing /warp <name> opens the warp menu and automatically clicks the matching warp")
     @ConfigEditorBoolean

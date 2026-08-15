@@ -12,19 +12,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * TODO verify against your decompiled sources: this assumes
- * EntityRenderer#getNameTag(T) is the method building the Component that gets
- * drawn above an entity's head. Some mapping sets/versions put the equivalent
- * logic elsewhere (e.g. directly in PlayerRenderer). Adjust @Mixin target and
- * method name if "getNameTag" doesn't exist on EntityRenderer in your workspace.
- */
 @Mixin(EntityRenderer.class)
 public class NameTagGlyphMixin<T extends Entity> {
 
     @Inject(method = "getNameTag", at = @At("RETURN"), cancellable = true)
     private void mineshaftUtils$substituteGlyphs(T entity, CallbackInfoReturnable<Component> cir) {
-        if (!ConfigManager.config.playerMessages.glyph.nametagGlyphs) return;
+        if (!ConfigManager.config.glyph.nametagGlyphs) return;
 
         Component original = cir.getReturnValue();
         if (original == null) return;

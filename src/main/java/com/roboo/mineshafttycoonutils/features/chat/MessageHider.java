@@ -14,7 +14,7 @@ public class MessageHider {
         ClientReceiveMessageEvents.ALLOW_CHAT.register((msg, signed, sender, params, timestamp) -> !shouldHide(msg.getString()));
     }
 
-    private static boolean shouldHide(String rawMessage) {
+    public static boolean shouldHide(String rawMessage) {
         if (rawMessage == null) return false;
 
         String stripped = ChatFormatting.stripFormatting(rawMessage).trim();
@@ -24,20 +24,16 @@ public class MessageHider {
         var cfg = ConfigManager.config.chat;
 
         if (cfg.joinMessages.hideT1JoinMessages && (lower.contains("welcome back [t1]")
-                || lower.contains("welcome! [t1]") || lower.contains("welcome back" + "\uE001")
-                || lower.contains("welcome!" + "\uE001"))) {
+                || lower.contains("welcome! [t1]"))) {
             return true;
         }
-        if (cfg.joinMessages.hideT2JoinMessages && lower.contains("welcome back [t2]")
-                || lower.contains("welcome back" + "\uE002")) {
+        if (cfg.joinMessages.hideT2JoinMessages && lower.contains("welcome back [t2]")) {
             return true;
         }
-        if (cfg.joinMessages.hideT3JoinMessages && lower.contains("welcome back [t3]")
-                || lower.contains("welcome back" + "\uE003")) {
+        if (cfg.joinMessages.hideT3JoinMessages && lower.contains("welcome back [t3]")) {
             return true;
         }
-        if (cfg.joinMessages.hideT4JoinMessages && lower.contains("welcome back [t4]")
-                || lower.contains("welcome back" + "\uE004")) {
+        if (cfg.joinMessages.hideT4JoinMessages && lower.contains("welcome back [t4]")) {
             return true;
         }
         if (cfg.hidePetXP && lower.contains("+1 xp for your")) {
