@@ -25,10 +25,22 @@ public class MSTUConfig extends Config {
     public FishingCategory fishing = new FishingCategory();
 
     @Expose
-    @Category(name = "Chat", desc = "Chat message filtering settings")
+    @Category(name = "Chat Filters", desc = "Chat message filtering settings")
     public ChatCategory chat = new ChatCategory();
+
+    @Expose
+    @Category(name = "Player Messages", desc = "Change formatting of player messages")
+    public PlayerMessagesCategory playerMessages = new PlayerMessagesCategory();
 
     @Expose
     @Category(name = "Timers", desc = "Buff, Petad, and Il's Restock timer settings")
     public TimersCategory timers = new TimersCategory();
+
+    @Expose
+    @Category(name = "Information Hud", desc = "Information HUD settings")
+    public InformationCategory information = new InformationCategory();
+
+    @Expose
+    @Category(name = "Misc", desc = "Miscellaneous quality-of-life settings")
+    public MiscCategory misc = new MiscCategory();
 }

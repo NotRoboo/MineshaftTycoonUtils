@@ -3,8 +3,11 @@ package com.roboo.mineshafttycoonutils;
 import com.roboo.mineshafttycoonutils.config.ConfigGuiManager;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.features.chat.MessageHider;
+import com.roboo.mineshafttycoonutils.features.chat.PlayerMessageHandler;
 import com.roboo.mineshafttycoonutils.features.fishing.FishingHud;
 import com.roboo.mineshafttycoonutils.features.fishing.FishingTracker;
+import com.roboo.mineshafttycoonutils.features.informationhud.InformationHud;
+import com.roboo.mineshafttycoonutils.features.misc.NightVisionBlocker;
 import com.roboo.mineshafttycoonutils.features.pets.PetsHelper;
 import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitHud;
@@ -15,6 +18,7 @@ import com.roboo.mineshafttycoonutils.features.timers.IlsRestockTracker;
 import com.roboo.mineshafttycoonutils.features.timers.PetAdTracker;
 import com.roboo.mineshafttycoonutils.features.timers.TimersHud;
 import com.roboo.mineshafttycoonutils.features.warp.WarpHelper;
+import com.roboo.mineshafttycoonutils.utils.MinecraftOptionUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 
@@ -31,8 +35,10 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         OreDropTracker.init();
         PetAdTracker.init();
         MessageHider.init();
+        PlayerMessageHandler.init();
 
         FishingHud.init();
+        InformationHud.init();
         PetsHelper.init();
         ProfitHud.init();
         ProfitTracker.init();
@@ -41,6 +47,8 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         BuffTracker.init();
         IlsRestockTracker.init();
         TimersHud.init();
+        MinecraftOptionUtils.init();
+        NightVisionBlocker.init();
         ConfigGuiManager.init();
         Commands.init();
 

@@ -50,7 +50,7 @@ public class FishingCategory {
     public int hudX = 10;
 
     @Expose
-    public int hudY = 50;
+    public int hudY = 70;
 
     @Expose
     @Category(name = "Treasure", desc = "Treasure and plate drop tracking settings")

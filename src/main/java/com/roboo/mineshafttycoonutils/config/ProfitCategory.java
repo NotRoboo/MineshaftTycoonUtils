@@ -45,7 +45,7 @@ public class ProfitCategory {
     public int profitHudX = 10;
 
     @Expose
-    public int profitHudY = 50;
+    public int profitHudY = 70;
 
     // Auto-detected by opening the Refinery
     @Expose

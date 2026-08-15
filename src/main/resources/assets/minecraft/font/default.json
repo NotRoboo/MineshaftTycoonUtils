@@ -1,0 +1,102 @@
+{
+    "providers": [
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/manager.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE010"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/dev.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE011"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/admin.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE012"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/builder.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE013"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/mod.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE014"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/helper.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE015"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/t1.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE001"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/t2.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE002"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/t3.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE003"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/t4v2.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE004"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/t4v1.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE005"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/t5p1.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE006"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/t5p2.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE007"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/t5p3.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE008"]
+        }
+    ]
+}
