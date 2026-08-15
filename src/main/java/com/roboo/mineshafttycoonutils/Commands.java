@@ -61,7 +61,7 @@ public class Commands {
                             return 1;
                         })
                 )
-                .then(ClientCommandManager.literal("resethudpositions")
+                .then(ClientCommandManager.literal("hudpositionsreset")
                         .executes(ctx -> {
                             ConfigManager.config.fishing.hudX = DEFAULT_FISHING_HUD_X;
                             ConfigManager.config.fishing.hudY = DEFAULT_FISHING_HUD_Y;

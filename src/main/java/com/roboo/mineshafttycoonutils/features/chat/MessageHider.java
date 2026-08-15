@@ -14,7 +14,7 @@ public class MessageHider {
         ClientReceiveMessageEvents.ALLOW_CHAT.register((msg, signed, sender, params, timestamp) -> !shouldHide(msg.getString()));
     }
 
-    private static boolean shouldHide(String rawMessage) {
+    public static boolean shouldHide(String rawMessage) {
         if (rawMessage == null) return false;
 
         String stripped = ChatFormatting.stripFormatting(rawMessage).trim();
@@ -23,7 +23,8 @@ public class MessageHider {
         String lower = stripped.toLowerCase(Locale.ROOT);
         var cfg = ConfigManager.config.chat;
 
-        if (cfg.joinMessages.hideT1JoinMessages && (lower.contains("welcome back [t1]") || lower.contains("welcome! [t1]"))) {
+        if (cfg.joinMessages.hideT1JoinMessages && (lower.contains("welcome back [t1]")
+                || lower.contains("welcome! [t1]"))) {
             return true;
         }
         if (cfg.joinMessages.hideT2JoinMessages && lower.contains("welcome back [t2]")) {

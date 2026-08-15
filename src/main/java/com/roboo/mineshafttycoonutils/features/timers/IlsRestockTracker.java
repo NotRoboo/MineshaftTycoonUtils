@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.timers;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,6 +21,8 @@ public class IlsRestockTracker {
     private static final String CONTAINER_TITLE = "Il's Wares";
     private static final String ITEM_NAME = "Il's Restock Timer";
     private static final int READ_DELAY_TICKS = 5;
+    private static final long RESTOCK_MESSAGE_HOURS = 15;
+    private static final String RESTOCK_MESSAGE = "I've restocked my wares.";
 
     private static final Pattern TIME_PATTERN =
             Pattern.compile("(?i)time until restock:\\s*(?:(\\d+)h\\s*)?(?:(\\d+)m\\s*)?(?:(\\d+)s)?");
@@ -49,6 +52,25 @@ public class IlsRestockTracker {
                 pendingScreen = null;
             }
         });
+
+        ClientReceiveMessageEvents.ALLOW_GAME.register((msg, overlay) -> {
+            handleChatMessage(msg.getString());
+            return true;
+        });
+
+        ClientReceiveMessageEvents.ALLOW_CHAT.register((msg, signed, sender, params, timestamp) -> {
+            handleChatMessage(msg.getString());
+            return true;
+        });
+    }
+
+    private static void handleChatMessage(String msg) {
+        if (msg == null) return;
+        String stripped = ChatFormatting.stripFormatting(msg).trim();
+        if (stripped.contains(RESTOCK_MESSAGE)) {
+            known = true;
+            endTime = System.currentTimeMillis() + RESTOCK_MESSAGE_HOURS * 3600L * 1000L;
+        }
     }
 
     private static void readContainer(AbstractContainerMenu menu) {

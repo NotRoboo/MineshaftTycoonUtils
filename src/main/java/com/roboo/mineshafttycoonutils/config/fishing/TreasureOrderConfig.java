@@ -17,17 +17,24 @@ public class TreasureOrderConfig {
     public boolean breakdownEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Order", desc = "Drag to reorder treasure and plate drops shown on the HUD. Remove an entry to hide it; it will still be tracked.")
+    @ConfigOption(
+            name = "Order",
+            desc = "Drag to reorder treasure and plate drops shown on the HUD. " +
+                    "Remove an entry to hide it; it will still be tracked.")
     @ConfigEditorDraggableList
     public List<Entry> order = new ArrayList<>(Arrays.asList(Entry.values()));
 
     @Expose
-    @ConfigOption(name = "Show Fortune Frags Total", desc = "Show the total Fortune Fragments obtained next to the catch count, e.g. Fortune Frags: 4 (495)")
+    @ConfigOption(
+            name = "Show Fortune Frags Total",
+            desc = "Show the total Fortune Fragments obtained next to the catch count, e.g. Fortune Frags: 4 (495)")
     @ConfigEditorBoolean
     public boolean showFortuneFragmentsTotal = true;
 
     @Expose
-    @ConfigOption(name = "Show Plate Drops Total", desc = "Show the total plates obtained next to the catch count, e.g. Coal: 5 (7)")
+    @ConfigOption(
+            name = "Show Plate Drops Total",
+            desc = "Show the total plates obtained next to the catch count, e.g. Coal: 5 (7)")
     @ConfigEditorBoolean
     public boolean showPlateTotal = true;
 

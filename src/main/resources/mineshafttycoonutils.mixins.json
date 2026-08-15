@@ -3,7 +3,9 @@
   "package": "com.roboo.mineshafttycoonutils.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "CommandSuggestionsMixin"
+    "CommandSuggestionsMixin",
+    "NameTagGlyphMixin",
+    "PlayerTabOverlayMixin"
   ],
   "injectors": {
     "defaultRequire": 1

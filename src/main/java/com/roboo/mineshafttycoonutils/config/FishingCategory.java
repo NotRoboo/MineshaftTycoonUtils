@@ -27,22 +27,33 @@ public class FishingCategory {
     public boolean onlyShowWhenFishing = true;
 
     @Expose
-    @ConfigOption(name = "Use Colored Names", desc = "Color code rare sea creatures, crates, plates, and trophy fish in the HUD")
+    @ConfigOption(
+            name = "Use Colored Names",
+            desc = "Color sea creatures, crates, plates, and trophy fish based off their rarity in the HUD")
     @ConfigEditorBoolean
     public boolean coloredNamesEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Show Double Hook Count", desc = "Show the double hook count next to Total on the HUD. The Total line always subtracts double hooks either way.")
+    @ConfigOption(
+            name = "Show Double Hook Count",
+            desc = "Show the double hook count next to Total on the HUD. " +
+                    "Note: The Total line always subtracts double hooks either way.")
     @ConfigEditorBoolean
     public boolean showDoubleHookCount = true;
 
     @Expose
-    @ConfigOption(name = "Disable Right-Align Flip", desc = "Keep this HUD's text left-aligned even when positioned past the middle of the screen, instead of automatically flipping to right-aligned")
+    @ConfigOption(
+            name = "Disable Right-Align Flip",
+            desc = "Keep this HUD's text left-aligned even when positioned past the middle of the screen, " +
+                    "instead of automatically flipping to right-aligned")
     @ConfigEditorBoolean
     public boolean disableRightAlignFlip = false;
 
     @Expose
-    @ConfigOption(name = "HUD Line Order", desc = "Drag to reorder the sections shown on the fishing HUD. Remove an entry to hide that section entirely; it will still be tracked.")
+    @ConfigOption(
+            name = "HUD Line Order",
+            desc = "Drag to reorder the sections shown on the fishing HUD. " +
+                    "Remove an entry to hide that section entirely; it will still be tracked.")
     @ConfigEditorDraggableList
     public List<LineEntry> hudLineOrder = new ArrayList<>(Arrays.asList(LineEntry.values()));
 

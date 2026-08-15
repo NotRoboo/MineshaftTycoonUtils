@@ -17,7 +17,9 @@ public class CrateOrderConfig {
     public boolean breakdownEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Order", desc = "Drag to reorder crates shown on the HUD. Remove an entry to hide it; it will still be tracked.")
+    @ConfigOption(
+            name = "Order",
+            desc = "Drag to reorder crates shown on the HUD. Remove an entry to hide it; it will still be tracked.")
     @ConfigEditorDraggableList
     public List<Entry> order = new ArrayList<>(Arrays.asList(Entry.values()));
 

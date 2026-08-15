@@ -33,6 +33,10 @@ public class MSTUConfig extends Config {
     public PlayerMessagesCategory playerMessages = new PlayerMessagesCategory();
 
     @Expose
+    @Category(name = "Glyph Ranks", desc = "Use custom rank images")
+    public GlyphCategory glyph = new GlyphCategory();
+
+    @Expose
     @Category(name = "Timers", desc = "Buff, Petad, and Il's Restock timer settings")
     public TimersCategory timers = new TimersCategory();
 

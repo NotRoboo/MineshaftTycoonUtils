@@ -17,6 +17,7 @@ import com.roboo.mineshafttycoonutils.features.timers.BuffTracker;
 import com.roboo.mineshafttycoonutils.features.timers.IlsRestockTracker;
 import com.roboo.mineshafttycoonutils.features.timers.PetAdTracker;
 import com.roboo.mineshafttycoonutils.features.timers.TimersHud;
+import com.roboo.mineshafttycoonutils.features.update.UpdateChecker;
 import com.roboo.mineshafttycoonutils.features.warp.WarpHelper;
 import com.roboo.mineshafttycoonutils.utils.MinecraftOptionUtils;
 import net.fabricmc.api.ClientModInitializer;
@@ -49,6 +50,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         TimersHud.init();
         MinecraftOptionUtils.init();
         NightVisionBlocker.init();
+        UpdateChecker.init();
         ConfigGuiManager.init();
         Commands.init();
 

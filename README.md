@@ -14,6 +14,26 @@ A Fabric client-side mod that adds quality-of-life tools on MineshaftTycoon — 
 
 ## Features
 
+### Player Message Formatting
+- Ability to rearrange player messages for example turn `[T5] [VIP] Roboo` to `[T5] Roboo` or `[VIP] Roboo [T5]`
+- Ability to give non-rank players white chat messages
+- Ability to hide Hypixel ranks
+- Ability to give everyone a custom name color (solid between all players)
+
+### Glyph Ranks
+- Glyph ranks in chat requires Player Message Formatting to be turned on
+- Ability to toggle on Glyph Ranks, which give a custom pixel art image instead of `[T#]` or `[StaffRank]`
+- Glyphs in normal chat like `Welcome Back [T#] Player`
+- Glyph in tab list
+- Glyphs in nametags & holograms
+- Ability to reorder how names are displayed in the tab list, similar to how player messages are formatted 
+
+### Information HUD
+- Sprint status (Toggle Sprint support)
+- Left/Right click status (Shows if its toggled, or being held)
+- Your currently equip pet
+- All HUDs have the ability to drag a line into the trash can in config if you wish to not have it, or you can turn off the entire feature.
+
 ### Fishing Tracker & HUD
 - Tracks sea creatures, treasure drops, plates, crates, trophy fish, double hooks, and Fortune Fragments as you fish.
 - On-screen HUD with a fully draggable section order (Total, Treasure Drops, Trophy Fish, Sea Creatures, Crates) — remove a section from the order to hide it without losing the underlying count.
@@ -30,12 +50,12 @@ A Fabric client-side mod that adds quality-of-life tools on MineshaftTycoon — 
 - Numbers can be shown in full or shortened (e.g. `489.39T` instead of `489,390,000,000,000`).
 - Reset anytime with `/mstu resetprofittracker`.
 
-### Timers/Durations HU
+### Timers/Durations HUD
 - Reads time remaining of different potions/buffs from `/potsoff` menu
 - Reads both `/potsdur` and hologram for PetAd timer
 - Reads Il's restock timer from `Il's Wares`menu
 
-### Chat Message Hider
+### Chat Filters
 Individually toggleable filters to cut down on chat spam:
 - T1–T4 join/welcome-back messages
 - Pet XP messages
@@ -50,16 +70,23 @@ Individually toggleable filters to cut down on chat spam:
 - Tab-completion suggests short warp names as you type.
 - Disabled by default — enable it in the config first, and use at your own risk since it interacts with the server's menu automatically.
 
+### Misc
+- Ability to bind a keybind to "ToggleAttack" and "ToggleUse" minecraft settings, allowing you to hit a simple keybind instead of going into settings to enable/disable
+- Night Vision Blocker - Removes night vision effect that messes with modern FullBright mods
+- Force Tab List Sort - Sort the tab list in the correct order when server reboots and tab list breaks. Note: This only reorders shown players, any player not shown before resort will still be hidden
+
 ### Config GUI
 - Open the full settings menu at any time, with an optional search query to jump straight to a setting.
 
 ## Commands
 
-| Command | Description |
-|---|---|
-| `/mstu` | Opens the config GUI |
-| `/mstu <search term>` | Opens the config GUI with that term pre-searched |
-| `/mstu resetfishinghud` | Resets all fishing tracker counts |
+| Command                    | Description |
+|----------------------------|---|
+| `/mstu`                    | Opens the config GUI |
+| `/mstu <search term>`      | Opens the config GUI with that term pre-searched |
+| `/mstu edithud`            | Opens the HUD position editor |
+| `/mstu hudpositionsreset`  | Resets all HUD positions to their default locations |
+| `/mstu resetfishinghud`    | Resets all fishing tracker counts |
 | `/mstu resetprofittracker` | Resets the profit tracker and ore drop counts |
 
 `/mineshafttycoonutils` and `/mstutils` work as full aliases for `/mstu`.
@@ -67,7 +94,7 @@ Individually toggleable filters to cut down on chat spam:
 ## Notes
 
 - This is a **client-side** mod.
-- The Warp Helper and Pet Helper is allowed by MST Staff, however it does technically automate clicks - use at your own risk.
+- The Warp Helper and Pet Helper is allowed by MST Staff, however since it does technically automate clicks - use at your own risk.
 - Refinery/Dune Ram auto-detection work by reading menu contents you open normally, so they should auto update as you upgrade.
 
 ## Future Plans

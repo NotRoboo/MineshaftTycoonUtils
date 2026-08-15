@@ -32,7 +32,7 @@ public class TimersCategory {
     public List<Entry> order = new ArrayList<>(Arrays.asList(Entry.values()));
 
     @Expose
-    public int timersHudX = 70;
+    public int timersHudX = 100;
 
     @Expose
     public int timersHudY = 20;
