@@ -1,7 +1,9 @@
 package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -15,6 +17,11 @@ public class InformationCategory {
     @ConfigOption(name = "Show Information HUD", desc = "Show the information HUD overlay")
     @ConfigEditorBoolean
     public boolean hudEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Title Color", desc = "Color used for the Information HUD title")
+    @ConfigEditorColour
+    public ChromaColour titleColor = ChromaColour.fromStaticRGB(255, 255, 85, 255);
 
     @Expose
     @ConfigOption(

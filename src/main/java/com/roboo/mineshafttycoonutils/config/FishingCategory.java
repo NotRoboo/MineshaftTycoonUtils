@@ -5,10 +5,8 @@ import com.roboo.mineshafttycoonutils.config.fishing.CrateOrderConfig;
 import com.roboo.mineshafttycoonutils.config.fishing.SeaCreatureOrderConfig;
 import com.roboo.mineshafttycoonutils.config.fishing.TreasureOrderConfig;
 import com.roboo.mineshafttycoonutils.config.fishing.TrophyOrderConfig;
-import io.github.notenoughupdates.moulconfig.annotations.Category;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.ChromaColour;
+import io.github.notenoughupdates.moulconfig.annotations.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +18,11 @@ public class FishingCategory {
     @ConfigOption(name = "Show Fishing HUD", desc = "Show the fishing tracker HUD overlay")
     @ConfigEditorBoolean
     public boolean hudEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Title Color", desc = "Color used for the Fishing Tracker HUD title")
+    @ConfigEditorColour
+    public ChromaColour titleColor = ChromaColour.fromStaticRGB(255, 255, 85, 255);
 
     @Expose
     @ConfigOption(name = "Only Show In Ocean", desc = "Only show the fishing HUD while inside a designated fishing area")
@@ -61,7 +64,7 @@ public class FishingCategory {
     public int hudX = 10;
 
     @Expose
-    public int hudY = 70;
+    public int hudY = 80;
 
     @Expose
     @Category(name = "Treasure", desc = "Treasure and plate drop tracking settings")

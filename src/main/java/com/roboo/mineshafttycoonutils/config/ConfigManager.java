@@ -2,6 +2,7 @@ package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis;
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver;
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor;
@@ -15,7 +16,12 @@ import java.nio.charset.StandardCharsets;
 public class ConfigManager {
 
     private static final File configFile = new File("config/mineshafttycoonutils/mineshafttycoonutils.json");
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+    private static final Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .excludeFieldsWithoutExposeAnnotation()
+            .registerTypeAdapter(ChromaColour.class, new ChromaColourAdapter())
+            .create();
 
     public static MSTUConfig config;
     public MoulConfigProcessor<MSTUConfig> processor;

@@ -46,7 +46,7 @@ public class PlayerMessageHandler {
         if (ConfigManager.config.glyph.otherMessageGlyphs) {
             String replaced = GlyphTextUtils.substituteTierTags(raw, true);
             if (!replaced.equals(raw)) {
-                mc.gui.getChat().addMessage(withInteractivity(Component.literal(replaced), interactiveStyle));
+                mc.gui.getChat().addMessage(preserveClickAndHover(Component.literal(replaced), interactiveStyle));
                 return false;
             }
         }
@@ -54,7 +54,7 @@ public class PlayerMessageHandler {
         return true;
     }
 
-    private static Component withInteractivity(Component comp, Style interactiveStyle) {
+    private static Component preserveClickAndHover(Component comp, Style interactiveStyle) {
         if (interactiveStyle == null) return comp;
         if (interactiveStyle.getClickEvent() == null && interactiveStyle.getHoverEvent() == null) return comp;
 

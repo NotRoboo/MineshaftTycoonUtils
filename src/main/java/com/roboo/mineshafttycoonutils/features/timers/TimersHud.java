@@ -88,12 +88,14 @@ public class TimersHud {
         );
     }
 
+    private static final String TITLE_TEXT = "§lTimers";
+
     private static void drawContent(GuiGraphics graphics, int anchorX, int y) {
         TimersCategory cfg = ConfigManager.config.timers;
         List<String> lines = computeLines(cfg);
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
 
-        HudTextUtils.drawLine(graphics, "§e§lTimers", anchorX, y, rightAligned);
+        HudTextUtils.drawLine(graphics, TITLE_TEXT, anchorX, y, rightAligned, HudTextUtils.chromaToArgb(cfg.titleColor));
         int line = 1;
         for (String l : lines) {
             HudTextUtils.drawLine(graphics, l, anchorX, y + (LINE_HEIGHT * line++), rightAligned);
@@ -111,7 +113,7 @@ public class TimersHud {
 
     private static int computeWidth() {
         TimersCategory cfg = ConfigManager.config.timers;
-        int width = mc.font.width("§e§lTimers");
+        int width = mc.font.width(TITLE_TEXT);
         for (String line : computeLines(cfg)) {
             width = Math.max(width, mc.font.width(line));
         }

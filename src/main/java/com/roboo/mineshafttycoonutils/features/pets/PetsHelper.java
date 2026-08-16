@@ -35,7 +35,7 @@ public class PetsHelper {
 
     private static final Minecraft mc = Minecraft.getInstance();
 
-    private static final String PETS_TITLE = "Pets";
+    private static final String PETS_CONTAINER_NAME = "Pets";
     private static final int HOTBAR_PET_SLOT = 8;
 
     private static final String MARKER_SELECTED = "§3§lUN§6§lLOCKED";
@@ -172,7 +172,7 @@ public class PetsHelper {
 
     private static boolean isPetsMenu(Screen screen) {
         if (!(screen instanceof AbstractContainerScreen<?>)) return false;
-        return PETS_TITLE.equalsIgnoreCase(screen.getTitle().getString().trim());
+        return PETS_CONTAINER_NAME.equalsIgnoreCase(screen.getTitle().getString().trim());
     }
 
     private static void runPets(String target) {

@@ -198,6 +198,10 @@ public class FishingTracker {
             return "Zephyr";
         }
 
+        if (clean.contains("you would have caught a legendary sea creature")) {
+            return "Locked LSC";
+        }
+
         return null;
     }
 

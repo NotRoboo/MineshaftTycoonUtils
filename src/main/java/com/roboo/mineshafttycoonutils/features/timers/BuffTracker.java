@@ -86,10 +86,10 @@ public class BuffTracker {
                     enabledFound = true;
                 }
 
-                Matcher m = TIME_LEFT_PATTERN.matcher(text);
-                if (m.find()) {
+                Matcher timeLeft = TIME_LEFT_PATTERN.matcher(text);
+                if (timeLeft.find()) {
                     try {
-                        secondsLeft = Long.parseLong(m.group(1).replace(",", ""));
+                        secondsLeft = Long.parseLong(timeLeft.group(1).replace(",", ""));
                         timeFound = true;
                     } catch (NumberFormatException ignored) {}
                 }

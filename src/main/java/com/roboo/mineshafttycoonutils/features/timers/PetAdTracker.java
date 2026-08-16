@@ -50,6 +50,7 @@ public class PetAdTracker {
         ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
     }
 
+    // Check if petad is inactive
     private static void handleMessage(String msg) {
         if (msg == null) return;
         String stripped = msg.replaceAll("§.", "").trim();
@@ -65,9 +66,9 @@ public class PetAdTracker {
             return;
         }
 
-        Matcher m = CHAT_PATTERN.matcher(stripped);
-        if (m.find() && lower.contains("adventure time left:")) {
-            applyReading(parseSeconds(m));
+        Matcher advTime = CHAT_PATTERN.matcher(stripped);
+        if (advTime.find() && lower.contains("adventure time left:")) {
+            applyReading(parseSeconds(advTime));
             return;
         }
 
@@ -79,6 +80,7 @@ public class PetAdTracker {
         }
     }
 
+    // read petad time from hologram
     private static void onTick() {
         if (mc.player == null || mc.level == null) return;
 
@@ -109,10 +111,10 @@ public class PetAdTracker {
         }
     }
 
-    private static int parseSeconds(Matcher m) {
-        int hours = m.group(1) != null ? Integer.parseInt(m.group(1)) : 0;
-        int minutes = m.group(2) != null ? Integer.parseInt(m.group(2)) : 0;
-        int seconds = m.group(3) != null ? Integer.parseInt(m.group(3)) : 0;
+    private static int parseSeconds(Matcher time) {
+        int hours = time.group(1) != null ? Integer.parseInt(time.group(1)) : 0;
+        int minutes = time.group(2) != null ? Integer.parseInt(time.group(2)) : 0;
+        int seconds = time.group(3) != null ? Integer.parseInt(time.group(3)) : 0;
         return hours * 3600 + minutes * 60 + seconds;
     }
 

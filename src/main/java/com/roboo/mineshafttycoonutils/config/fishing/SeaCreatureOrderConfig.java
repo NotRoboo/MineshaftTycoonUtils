@@ -37,6 +37,7 @@ public class SeaCreatureOrderConfig {
         ATTACK_SQUID("Attack Squid"),
         PHANTOM_FISHER("Phantom Fisher"),
         CAPTAIN_BARBOSSA("Captain Barbossa"),
+        LOCKED_LSC("Locked LSC"),
         ZEPHYR("Zephyr");
 
         private final String displayName;

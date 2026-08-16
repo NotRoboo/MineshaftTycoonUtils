@@ -4,6 +4,9 @@ import com.roboo.mineshafttycoonutils.MineshaftTycoonUtils;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import org.lwjgl.glfw.GLFW;
 
 public class MinecraftOptionUtils {
@@ -43,6 +46,12 @@ public class MinecraftOptionUtils {
     }
 
     private static void handleKeybinds() {
+        if (mc.screen != null) {
+            lastToggleAttackKeyDown = false;
+            lastToggleUseKeyDown = false;
+            return;
+        }
+
         var misc = ConfigManager.config.misc;
 
         boolean attackDown = isKeyDown(misc.toggleAttackKeybind);
@@ -50,7 +59,7 @@ public class MinecraftOptionUtils {
             boolean newState = !mc.options.toggleAttack().get();
             mc.options.toggleAttack().set(newState);
             mc.options.save();
-            msg("Toggle Left Click: " + (newState ? "Enabled" : "Disabled"));
+            msg("Toggle Left Click", newState);
         }
         lastToggleAttackKeyDown = attackDown;
 
@@ -59,15 +68,21 @@ public class MinecraftOptionUtils {
             boolean newState = !mc.options.toggleUse().get();
             mc.options.toggleUse().set(newState);
             mc.options.save();
-            msg("Toggle Right Click: " + (newState ? "Enabled" : "Disabled"));
+            msg("Toggle Right Click", newState);
         }
         lastToggleUseKeyDown = useDown;
     }
 
-    private static void msg(String text) {
-        if (mc.player != null) {
-            mc.player.displayClientMessage(SystemMessages.get(text), false);
-        }
+    private static void msg(String label, boolean enabled) {
+        if (mc.player == null) return;
+
+        MutableComponent message = Component.literal(" " + label + ": ")
+                .withStyle(Style.EMPTY.withColor(0xAAAAAA));
+
+        message.append(Component.literal(enabled ? "Enabled" : "Disabled")
+                .withStyle(Style.EMPTY.withColor(enabled ? 0x55FF55 : 0xFF5555)));
+
+        mc.player.displayClientMessage(SystemMessages.get().append(message), false);
     }
 
     private static boolean isKeyDown(int glfwKey) {

@@ -13,17 +13,22 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 
 public class Commands {
 
     private static final Minecraft mc = Minecraft.getInstance();
 
     private static final int DEFAULT_FISHING_HUD_X = 10;
-    private static final int DEFAULT_FISHING_HUD_Y = 50;
+    private static final int DEFAULT_FISHING_HUD_Y = 80;
     private static final int DEFAULT_PROFIT_HUD_X = 10;
-    private static final int DEFAULT_PROFIT_HUD_Y = 50;
-    private static final int DEFAULT_TIMERS_HUD_X = 70;
+    private static final int DEFAULT_PROFIT_HUD_Y = 80;
+    private static final int DEFAULT_TIMERS_HUD_X = 180;
     private static final int DEFAULT_TIMERS_HUD_Y = 20;
+    private static final int DEFAULT_INFORMATION_HUD_X = 10;
+    private static final int DEFAULT_INFORMATION_HUD_Y = 10;
 
     public static void init() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
@@ -49,7 +54,7 @@ public class Commands {
                 .then(ClientCommandManager.literal("resetfishinghud")
                         .executes(ctx -> {
                             FishingTracker.reset();
-                            msg("Fishing tracker has been reset.");
+                            resetMsg("Fishing Tracker");
                             return 1;
                         })
                 )
@@ -57,7 +62,7 @@ public class Commands {
                         .executes(ctx -> {
                             ProfitTracker.clear();
                             OreDropTracker.reset();
-                            msg("Profit tracker has been reset.");
+                            resetMsg("Profit Tracker");
                             return 1;
                         })
                 )
@@ -69,8 +74,10 @@ public class Commands {
                             ConfigManager.config.profit.profitHudY = DEFAULT_PROFIT_HUD_Y;
                             ConfigManager.config.timers.timersHudX = DEFAULT_TIMERS_HUD_X;
                             ConfigManager.config.timers.timersHudY = DEFAULT_TIMERS_HUD_Y;
+                            ConfigManager.config.information.informationHudX = DEFAULT_INFORMATION_HUD_X;
+                            ConfigManager.config.information.informationHudY = DEFAULT_INFORMATION_HUD_Y;
                             MineshaftTycoonUtils.configManager.saveConfig();
-                            msg("HUD positions have been reset to default.");
+                            resetMsg("HUD positions");
                             return 1;
                         })
                 )
@@ -83,8 +90,15 @@ public class Commands {
         );
     }
 
-    private static void msg(String text) {
-        if (mc.player != null)
-            mc.player.displayClientMessage(SystemMessages.get(text), false);
+    private static void resetMsg(String label) {
+        if (mc.player == null) return;
+
+        MutableComponent message = Component.literal(" " + label + " has been ")
+                .withStyle(Style.EMPTY.withColor(0xAAAAAA));
+
+        message.append(Component.literal("Reset!")
+                .withStyle(Style.EMPTY.withColor(0xFF5555)));
+
+        mc.player.displayClientMessage(SystemMessages.get().append(message), false);
     }
 }

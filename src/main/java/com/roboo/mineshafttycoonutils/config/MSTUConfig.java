@@ -17,12 +17,20 @@ public class MSTUConfig extends Config {
     public GeneralCategory general = new GeneralCategory();
 
     @Expose
+    @Category(name = "Information Hud", desc = "Information HUD settings")
+    public InformationCategory information = new InformationCategory();
+
+    @Expose
     @Category(name = "Profit Tracker", desc = "Refinery profit tracking settings")
     public ProfitCategory profit = new ProfitCategory();
 
     @Expose
     @Category(name = "Fishing", desc = "Fishing tracker and HUD settings")
     public FishingCategory fishing = new FishingCategory();
+
+    @Expose
+    @Category(name = "Timers", desc = "Buff, Petad, and Il's Restock timer settings")
+    public TimersCategory timers = new TimersCategory();
 
     @Expose
     @Category(name = "Chat Filters", desc = "Chat message filtering settings")
@@ -35,14 +43,6 @@ public class MSTUConfig extends Config {
     @Expose
     @Category(name = "Glyph Ranks", desc = "Use custom rank images")
     public GlyphCategory glyph = new GlyphCategory();
-
-    @Expose
-    @Category(name = "Timers", desc = "Buff, Petad, and Il's Restock timer settings")
-    public TimersCategory timers = new TimersCategory();
-
-    @Expose
-    @Category(name = "Information Hud", desc = "Information HUD settings")
-    public InformationCategory information = new InformationCategory();
 
     @Expose
     @Category(name = "Misc", desc = "Miscellaneous quality-of-life settings")

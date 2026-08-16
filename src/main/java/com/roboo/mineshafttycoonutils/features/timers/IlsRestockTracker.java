@@ -86,11 +86,11 @@ public class IlsRestockTracker {
 
             for (Component loreLine : loreLines) {
                 String text = ChatFormatting.stripFormatting(loreLine.getString()).trim();
-                Matcher m = TIME_PATTERN.matcher(text);
-                if (m.find() && (m.group(1) != null || m.group(2) != null || m.group(3) != null)) {
-                    int hours = m.group(1) != null ? Integer.parseInt(m.group(1)) : 0;
-                    int minutes = m.group(2) != null ? Integer.parseInt(m.group(2)) : 0;
-                    int seconds = m.group(3) != null ? Integer.parseInt(m.group(3)) : 0;
+                Matcher time = TIME_PATTERN.matcher(text);
+                if (time.find() && (time.group(1) != null || time.group(2) != null || time.group(3) != null)) {
+                    int hours = time.group(1) != null ? Integer.parseInt(time.group(1)) : 0;
+                    int minutes = time.group(2) != null ? Integer.parseInt(time.group(2)) : 0;
+                    int seconds = time.group(3) != null ? Integer.parseInt(time.group(3)) : 0;
                     long totalSeconds = hours * 3600L + minutes * 60L + seconds;
 
                     known = true;

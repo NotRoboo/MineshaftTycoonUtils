@@ -7,6 +7,9 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 
@@ -18,8 +21,8 @@ public class RefineryPetTracker {
 
     private static final Minecraft mc = Minecraft.getInstance();
 
-    private static final String REFINERY_TITLE = "Refinery";
-    private static final String PETS_TITLE = "Pets";
+    private static final String REFINERY_CONTAINER_NAME = "Refinery";
+    private static final String PETS_CONTAINER_NAME = "Pets";
 
     private static final Pattern REFINERY_ITEM_PATTERN =
             Pattern.compile("(?i)^Refined (.+?)\\s*\\[(\\d{1,2})/10]$");
@@ -33,15 +36,15 @@ public class RefineryPetTracker {
 
             String title = containerScreen.getTitle().getString().trim();
 
-            if (REFINERY_TITLE.equalsIgnoreCase(title)) {
-                ScreenEvents.remove(screen).register(s -> readRefinery(containerScreen.getMenu()));
-            } else if (PETS_TITLE.equalsIgnoreCase(title)) {
-                ScreenEvents.remove(screen).register(s -> readPets(containerScreen.getMenu()));
+            if (REFINERY_CONTAINER_NAME.equalsIgnoreCase(title)) {
+                ScreenEvents.remove(screen).register(s -> grabRefineryLvl(containerScreen.getMenu()));
+            } else if (PETS_CONTAINER_NAME.equalsIgnoreCase(title)) {
+                ScreenEvents.remove(screen).register(s -> duneRamLvlFind(containerScreen.getMenu()));
             }
         });
     }
 
-    private static void readRefinery(AbstractContainerMenu menu) {
+    private static void grabRefineryLvl(AbstractContainerMenu menu) {
         var state = ConfigManager.config.profit.state;
         boolean changed = false;
 
@@ -50,11 +53,11 @@ public class RefineryPetTracker {
             if (stack.isEmpty()) continue;
 
             String name = ChatFormatting.stripFormatting(stack.getHoverName().getString()).trim();
-            Matcher m = REFINERY_ITEM_PATTERN.matcher(name);
-            if (!m.matches()) continue;
+            Matcher refineryLvl = REFINERY_ITEM_PATTERN.matcher(name);
+            if (!refineryLvl.matches()) continue;
 
-            String oreKey = m.group(1).trim().toLowerCase(Locale.ROOT).replace(" ", "");
-            int level = Integer.parseInt(m.group(2));
+            String oreKey = refineryLvl.group(1).trim().toLowerCase(Locale.ROOT).replace(" ", "");
+            int level = Integer.parseInt(refineryLvl.group(2));
 
             switch (oreKey) {
                 case "basalt" -> changed |= apply(level, state.basaltLevel, v -> state.basaltLevel = v);
@@ -70,11 +73,11 @@ public class RefineryPetTracker {
 
         if (changed) {
             MineshaftTycoonUtils.configManager.saveConfig();
-            msg("Refinery level updated.");
+            updateLvlMsg("Refinery level");
         }
     }
 
-    private static void readPets(AbstractContainerMenu menu) {
+    private static void duneRamLvlFind(AbstractContainerMenu menu) {
         var state = ConfigManager.config.profit.state;
 
         for (var slot : menu.slots) {
@@ -82,14 +85,14 @@ public class RefineryPetTracker {
             if (stack.isEmpty()) continue;
 
             String name = ChatFormatting.stripFormatting(stack.getHoverName().getString()).trim();
-            Matcher m = DUNE_RAM_PATTERN.matcher(name);
-            if (!m.matches()) continue;
+            Matcher duneRam = DUNE_RAM_PATTERN.matcher(name);
+            if (!duneRam.matches()) continue;
 
-            int level = Integer.parseInt(m.group(1));
+            int level = Integer.parseInt(duneRam.group(1));
             if (level != state.duneRamLevel) {
                 state.duneRamLevel = level;
                 MineshaftTycoonUtils.configManager.saveConfig();
-                msg("Ram level updated.");
+                updateLvlMsg("Ram level");
             }
             return;
         }
@@ -101,8 +104,15 @@ public class RefineryPetTracker {
         return true;
     }
 
-    private static void msg(String text) {
+    private static void updateLvlMsg(String label) {
         if (mc.player == null) return;
-        mc.execute(() -> mc.player.displayClientMessage(SystemMessages.get(text), false));
+
+        MutableComponent message = Component.literal(" " + label + " ")
+                .withStyle(Style.EMPTY.withColor(0xAAAAAA));
+
+        message.append(Component.literal("UPDATED!")
+                .withStyle(Style.EMPTY.withColor(0x55FF55)));
+
+        mc.execute(() -> mc.player.displayClientMessage(SystemMessages.get().append(message), false));
     }
 }

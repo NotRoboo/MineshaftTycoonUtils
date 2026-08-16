@@ -92,12 +92,14 @@ public class FishingHud {
         return ConfigManager.config.fishing;
     }
 
+    private static final String TITLE_TEXT = "§lFishing Tracker";
+
     private static void drawContent(GuiGraphics graphics, int anchorX, int y) {
         FishingCategory cfg = cfg();
         List<String> lines = computeLines(cfg);
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
 
-        HudTextUtils.drawLine(graphics, "§e§lFishing Tracker", anchorX, y, rightAligned);
+        HudTextUtils.drawLine(graphics, TITLE_TEXT, anchorX, y, rightAligned, HudTextUtils.chromaToArgb(cfg.titleColor));
         int line = 1;
         for (String l : lines) {
             HudTextUtils.drawLine(graphics, l, anchorX, y + (LINE_HEIGHT * line++), rightAligned);
@@ -185,14 +187,6 @@ public class FishingHud {
             }
         }
 
-        for (Map.Entry<String, Integer> entry : breakdown.entrySet()) {
-            if (!orderList.contains(entry.getKey()) && entry.getValue() > 0
-                    && !FishingTracker.PLATE_ORDER.contains(entry.getKey())) {
-                String colorCode = getColorForName(entry.getKey());
-                result.add("  §7- " + colorCode + entry.getKey() + "§7: §e" + entry.getValue());
-            }
-        }
-
         return result;
     }
 
@@ -206,7 +200,7 @@ public class FishingHud {
 
     private static int computeWidth() {
         FishingCategory cfg = cfg();
-        int width = mc.font.width("§e§lFishing Tracker");
+        int width = mc.font.width(TITLE_TEXT);
         for (String line : computeLines(cfg)) {
             width = Math.max(width, mc.font.width(line));
         }
@@ -226,7 +220,7 @@ public class FishingHud {
 
             case "phantom fisher", "captain barbossa", "epic crate", "kraken scale", "puffer fish" -> "§5";
 
-            case "zephyr", "legendary crate", "golden crate", "fortune fragments", "golden coral",
+            case "zephyr", "locked lsc", "legendary crate", "golden crate", "fortune fragments", "golden coral",
                  "gold", "royal fish" -> "§6";
 
             case "common crate", "coal" -> "§7";

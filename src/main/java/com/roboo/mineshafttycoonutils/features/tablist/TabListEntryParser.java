@@ -26,23 +26,23 @@ public class TabListEntryParser {
 
     public static Parsed parse(String rawFormattedText) {
         if (rawFormattedText == null) return null;
-        Matcher m = TAB_ENTRY_PATTERN.matcher(rawFormattedText.trim());
-        if (!m.matches()) return null;
+        Matcher match = TAB_ENTRY_PATTERN.matcher(rawFormattedText.trim());
+        if (!match.matches()) return null;
 
-        char rankColor = m.group(1) != null ? m.group(1).charAt(1) : ' ';
-        String rankTag = m.group(2);
-        String usernameColor = m.group(3);
-        String username = m.group(4);
-        char tierColor = m.group(5) != null ? m.group(5).charAt(1) : ' ';
-        String tierRawTag = m.group(6);
+        char rankColor = match.group(1) != null ? match.group(1).charAt(1) : ' ';
+        String rankTag = match.group(2);
+        String usernameColor = match.group(3);
+        String username = match.group(4);
+        char tierColor = match.group(5) != null ? match.group(5).charAt(1) : ' ';
+        String rawTierTag = match.group(6);
 
-        String resolvedTier = tierRawTag != null ? RankTierData.resolveTag(tierRawTag) : null;
+        String resolvedTier = rawTierTag != null ? RankTierData.resolveTag(rawTierTag) : null;
         boolean isStaff = resolvedTier != null && RankTierData.isStaff(resolvedTier);
 
         return new Parsed(rankColor, rankTag, tierColor, resolvedTier, isStaff, username, usernameColor);
     }
 
-    public static HypixelRank hypixelRank(Parsed parsed) {
+    public static HypixelRank resolveHypixelRank(Parsed parsed) {
         return parsed == null ? HypixelRank.NONE : HypixelRank.parse(parsed.rankTag());
     }
 

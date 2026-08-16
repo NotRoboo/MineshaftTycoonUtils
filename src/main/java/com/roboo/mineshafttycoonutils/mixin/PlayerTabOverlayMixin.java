@@ -123,7 +123,7 @@ public class PlayerTabOverlayMixin {
     private Comparator<PlayerInfo> mineshaftUtils$comparator() {
         return Comparator
                 .comparingInt((PlayerInfo info) -> TabListEntryParser.tierSortIndex(mineshaftUtils$parse(info)))
-                .thenComparingInt(info -> TabListEntryParser.hypixelRank(mineshaftUtils$parse(info)).ordinal())
+                .thenComparingInt(info -> TabListEntryParser.resolveHypixelRank(mineshaftUtils$parse(info)).ordinal())
                 .thenComparing(info -> info.getProfile().name(), String.CASE_INSENSITIVE_ORDER);
     }
 }

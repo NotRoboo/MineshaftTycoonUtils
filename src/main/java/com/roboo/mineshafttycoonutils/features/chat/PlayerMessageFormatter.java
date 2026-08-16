@@ -14,16 +14,14 @@ import java.util.regex.Pattern;
 
 public class PlayerMessageFormatter {
 
-    private static final Pattern PLAYER_CHAT_PATTERN = Pattern.compile(
+    // other players msgs
+    private static final Pattern MST_PLAYER_PATTERN = Pattern.compile(
             "^(?:(?:§.)*\\s*\\+\\s*)?§(.)§\\1\\[([^]]+)]\\s§r(§.(?:\\[[^]]*])?)\\s?([^\\s§]+)(§.): (.*)$"
     );
 
-    private static final Pattern SELF_CHAT_PATTERN = Pattern.compile(
+    // detect the mod user msgs since hyp does weird stuff
+    private static final Pattern MOD_USERS_PATTERN = Pattern.compile(
             "^(?:(?:§.)*\\s*\\+\\s*)?§(.)\\[([^]]+)]\\s(§.(?:\\[[^]]*])?)\\s?([^\\s§]+)(§.): (.*)$"
-    );
-
-    private static final Pattern PARTY_CHAT_MESSAGE_PATTERN = Pattern.compile(
-            "^(§9Party §8> .*)(§.): (.*)$"
     );
 
     private PlayerMessageFormatter() {}
@@ -32,43 +30,36 @@ public class PlayerMessageFormatter {
         PlayerMessagesCategory cfg = ConfigManager.config.playerMessages;
         if (rawWithCodes == null) return null;
 
-        Matcher playerMatch = PLAYER_CHAT_PATTERN.matcher(rawWithCodes);
-        if (!playerMatch.matches()) {
-            playerMatch = SELF_CHAT_PATTERN.matcher(rawWithCodes);
+        Matcher messageMatch = MST_PLAYER_PATTERN.matcher(rawWithCodes);
+        if (!messageMatch.matches()) {
+            messageMatch = MOD_USERS_PATTERN.matcher(rawWithCodes);
         }
-        if (playerMatch.matches()) {
+        if (messageMatch.matches()) {
             if (cfg.enabled) {
-                return rebuild(cfg, playerMatch, interactiveStyle);
+                return assembleMessage(cfg, messageMatch, interactiveStyle);
             }
             if (cfg.sameChatColor) {
                 MutableComponent result = Component.empty();
-                Component prefix = Component.literal(rawWithCodes.substring(0, playerMatch.start(5)));
-                result.append(withInteractivity(prefix, interactiveStyle));
+                Component prefix = Component.literal(rawWithCodes.substring(0, messageMatch.start(5)));
+                result.append(preserveClickAndHover(prefix, interactiveStyle));
                 result.append(Component.literal("§f"));
-                result.append(Component.literal(rawWithCodes.substring(playerMatch.end(5))));
+                result.append(Component.literal(rawWithCodes.substring(messageMatch.end(5))));
                 return result;
             }
             return null;
         }
 
-        if (cfg.sameChatColor) {
-            Matcher partyMatch = PARTY_CHAT_MESSAGE_PATTERN.matcher(rawWithCodes);
-            if (partyMatch.matches()) {
-                return Component.literal(partyMatch.group(1) + "§f: " + partyMatch.group(3));
-            }
-        }
-
         return null;
     }
 
-    private static Component rebuild(PlayerMessagesCategory cfg, Matcher m, Style interactiveStyle) {
-        char tierColorChar = m.group(1).charAt(0);
-        String rankSegment = m.group(3);
-        String name = m.group(4);
-        String colonColor = m.group(5);
-        String message = m.group(6);
+    private static Component assembleMessage(PlayerMessagesCategory cfg, Matcher chatMatch, Style interactiveStyle) {
+        char tierColorChar = chatMatch.group(1).charAt(0);
+        String rankSegment = chatMatch.group(3);
+        String name = chatMatch.group(4);
+        String colonColor = chatMatch.group(5);
+        String message = chatMatch.group(6);
 
-        String tierTag = RankTierData.resolveTag(m.group(2));
+        String tierTag = RankTierData.resolveTag(chatMatch.group(2));
         String glyphKey = RankTierData.glyphKeyFor(tierColorChar, tierTag);
 
         char rankColor = rankSegment.charAt(1);
@@ -76,7 +67,7 @@ public class PlayerMessageFormatter {
         String messageColor = cfg.sameChatColor ? "§f" : colonColor;
 
         MutableComponent result = Component.empty();
-        boolean first = true;
+        boolean isFirstPart = true;
 
         for (PlayerMessagesCategory.Part part : cfg.partOrder) {
             Component segment = switch (part) {
@@ -89,27 +80,27 @@ public class PlayerMessageFormatter {
                 }
                 case RANK -> (!cfg.rankHider && hasRankTag) ? Component.literal(rankSegment) : null;
                 case PLAYER_NAME -> cfg.customNameColor
-                        ? coloredHex(name, chromaToHex(cfg.nameColor))
+                        ? styledWithColor(name, chromaToHex(cfg.nameColor))
                         : Component.literal("§" + rankColor + name);
                 case MESSAGE -> Component.literal(messageColor + ": " + message);
             };
 
             if (segment == null) continue;
 
-            if (part != PlayerMessagesCategory.Part.MESSAGE && !first) {
+            if (part != PlayerMessagesCategory.Part.MESSAGE && !isFirstPart) {
                 result.append(Component.literal(" "));
             }
             if (part != PlayerMessagesCategory.Part.MESSAGE) {
-                segment = withInteractivity(segment, interactiveStyle);
+                segment = preserveClickAndHover(segment, interactiveStyle);
             }
             result.append(segment);
-            first = false;
+            isFirstPart = false;
         }
 
         return result;
     }
 
-    private static Component withInteractivity(Component comp, Style interactiveStyle) {
+    private static Component preserveClickAndHover(Component comp, Style interactiveStyle) {
         if (interactiveStyle == null) return comp;
         if (interactiveStyle.getClickEvent() == null && interactiveStyle.getHoverEvent() == null) return comp;
 
@@ -120,7 +111,7 @@ public class PlayerMessageFormatter {
         return copy.setStyle(merged);
     }
 
-    private static Component coloredHex(String text, int hex) {
+    private static Component styledWithColor(String text, int hex) {
         return Component.literal(text).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(hex)));
     }
 

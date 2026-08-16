@@ -89,12 +89,16 @@ public class ProfitHud {
         );
     }
 
+    private static final String TITLE_TEXT = "§lProfit Tracker";
+    private static final String ORES_HEADER_TEXT = "§lOres";
+
     private static void drawContent(GuiGraphics graphics, int anchorX, int y) {
         ProfitCategory cfg = ConfigManager.config.profit;
         LinkedHashMap<String, Integer> breakdown = OreDropTracker.getBreakdown();
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
+        int titleColor = HudTextUtils.chromaToArgb(cfg.titleColor);
 
-        HudTextUtils.drawLine(graphics, "§e§lProfit Tracker", anchorX, y, rightAligned);
+        HudTextUtils.drawLine(graphics, TITLE_TEXT, anchorX, y, rightAligned, titleColor);
         int line = 1;
 
         if (ProfitTracker.needsRamLevel()) {
@@ -107,7 +111,7 @@ public class ProfitHud {
                 anchorX, y + (LINE_HEIGHT * line++), rightAligned);
 
         if (cfg.showOreDrops) {
-            HudTextUtils.drawLine(graphics, "§e§lOres", anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+            HudTextUtils.drawLine(graphics, ORES_HEADER_TEXT, anchorX, y + (LINE_HEIGHT * line++), rightAligned, titleColor);
 
             if (breakdown.isEmpty()) {
                 HudTextUtils.drawLine(graphics, "§7- None", anchorX, y + (LINE_HEIGHT * line), rightAligned);
@@ -136,7 +140,7 @@ public class ProfitHud {
     private static int computeWidth() {
         ProfitCategory cfg = ConfigManager.config.profit;
         LinkedHashMap<String, Integer> breakdown = OreDropTracker.getBreakdown();
-        int width = mc.font.width("§e§lProfit Tracker");
+        int width = mc.font.width(TITLE_TEXT);
 
         if (ProfitTracker.needsRamLevel()) {
             width = Math.max(width, mc.font.width("§7Boosts: §c(Open refinery & /pets)"));
@@ -145,7 +149,7 @@ public class ProfitHud {
         width = Math.max(width, mc.font.width("§7Total: §e$" + format(ProfitTracker.getTotalProfit(), cfg.shortenNumbers)));
 
         if (cfg.showOreDrops) {
-            width = Math.max(width, mc.font.width("§e§lOres"));
+            width = Math.max(width, mc.font.width(ORES_HEADER_TEXT));
             if (breakdown.isEmpty()) {
                 width = Math.max(width, mc.font.width("§7- None"));
             } else {

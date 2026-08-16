@@ -1,7 +1,9 @@
 package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ProfitCategory {
@@ -10,6 +12,11 @@ public class ProfitCategory {
     @ConfigOption(name = "Profit Tracker", desc = "Track coins/hour and ores")
     @ConfigEditorBoolean
     public boolean profitTrackerEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Title Color", desc = "Color used for the Profit Tracker HUD titles")
+    @ConfigEditorColour
+    public ChromaColour titleColor = ChromaColour.fromStaticRGB(255, 255, 85, 255);
 
     @Expose
     @ConfigOption(name = "Hide in Ocean", desc = "Hide the profit tracker HUD while inside a designated fishing area")
@@ -45,7 +52,7 @@ public class ProfitCategory {
     public int profitHudX = 10;
 
     @Expose
-    public int profitHudY = 70;
+    public int profitHudY = 80;
 
     // Auto-detected by opening the Refinery
     @Expose
