@@ -75,6 +75,7 @@ public class ProfitTracker {
                 total = baseValue;
             }
 
+            // cash register boost is applied last, after refinery and pet bonuses
             if (ConfigManager.config.profit.cashRegisterEnabled) {
                 total = Math.round(total * 1.03);
             }
@@ -108,8 +109,8 @@ public class ProfitTracker {
             if (overlay) onActionBar(msg.getString());
         });
 
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> resetTransientState());
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> resetTransientState());
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> resetSession());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> resetSession());
     }
 
     public static void onActionBar(String text) {
@@ -151,6 +152,7 @@ public class ProfitTracker {
         long value = ore.getDropValue();
         if (value < 0) return; // refinery level unknown for this ore - open Refinery to detect it
 
+        // 1 drop per 100 fortune
         long drops = Math.round(fortune / FORTUNE_PER_DROP);
         long gained = drops * value;
         totalProfit += gained;
@@ -165,12 +167,12 @@ public class ProfitTracker {
         long now = System.currentTimeMillis();
         if (now - lastDisplayUpdate >= DISPLAY_UPDATE_INTERVAL_MS) {
             lastDisplayUpdate = now;
-            cachedProfitPerHour = computeProfitPerHour();
+            cachedProfitPerHour = calcProfitPerHour();
         }
         return cachedProfitPerHour;
     }
 
-    private static long computeProfitPerHour() {
+    private static long calcProfitPerHour() {
         long now = System.currentTimeMillis();
         while (!recentGains.isEmpty() && now - recentGains.peekFirst().time() > WINDOW_MS) {
             recentGains.pollFirst();
@@ -186,7 +188,7 @@ public class ProfitTracker {
         return !ConfigManager.config.profit.noDuneRamPet && ConfigManager.config.profit.state.duneRamLevel < 0;
     }
 
-    private static void resetTransientState() {
+    private static void resetSession() {
         fortune = 0;
         watchedPos = null;
         watchedOre = null;
@@ -195,7 +197,7 @@ public class ProfitTracker {
         lastDisplayUpdate = 0;
     }
 
-    public static void clear() {
+    public static void resetProfit() {
         totalProfit = 0;
         recentGains.clear();
         cachedProfitPerHour = 0;

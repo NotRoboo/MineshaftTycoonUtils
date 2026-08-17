@@ -60,7 +60,7 @@ public class Commands {
                 )
                 .then(ClientCommandManager.literal("resetprofittracker")
                         .executes(ctx -> {
-                            ProfitTracker.clear();
+                            ProfitTracker.resetProfit();
                             OreDropTracker.reset();
                             resetMsg("Profit Tracker");
                             return 1;

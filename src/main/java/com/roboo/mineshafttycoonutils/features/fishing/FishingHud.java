@@ -22,7 +22,7 @@ public class FishingHud {
     private static final Minecraft mc = Minecraft.getInstance();
     private static final int LINE_HEIGHT = 10;
 
-    private static final MovableHud MOVABLE = new MovableHud() {
+    private static final MovableHud FISHING_BOX = new MovableHud() {
         @Override
         public String getDisplayName() {
             return "Fishing Tracker";
@@ -47,12 +47,12 @@ public class FishingHud {
 
         @Override
         public int getWidth() {
-            return computeWidth();
+            return calcWidth();
         }
 
         @Override
         public int getHeight() {
-            return computeHeight();
+            return calcHeight();
         }
 
         @Override
@@ -69,7 +69,7 @@ public class FishingHud {
     };
 
     public static void init() {
-        HudEditorRegistry.register(MOVABLE);
+        HudEditorRegistry.register(FISHING_BOX);
 
         HudElementRegistry.attachElementBefore(
                 VanillaHudElements.CHAT,
@@ -79,7 +79,7 @@ public class FishingHud {
                     if (mc.player == null || !cfg.hudEnabled) return;
                     if (cfg.onlyShowWhenFishing && !FishingZones.isInZone(mc.player.blockPosition())) return;
 
-                    int totalHeight = computeHeight();
+                    int totalHeight = calcHeight();
                     int x = HudTextUtils.clampX(cfg.hudX);
                     int y = HudTextUtils.clampY(cfg.hudY, totalHeight);
 
@@ -96,7 +96,7 @@ public class FishingHud {
 
     private static void drawContent(GuiGraphics graphics, int anchorX, int y) {
         FishingCategory cfg = cfg();
-        List<String> lines = computeLines(cfg);
+        List<String> lines = calcLines(cfg);
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
 
         HudTextUtils.drawLine(graphics, TITLE_TEXT, anchorX, y, rightAligned, HudTextUtils.chromaToArgb(cfg.titleColor));
@@ -106,7 +106,7 @@ public class FishingHud {
         }
     }
 
-    private static List<String> computeLines(FishingCategory cfg) {
+    private static List<String> calcLines(FishingCategory cfg) {
         List<String> lines = new ArrayList<>();
 
         for (FishingCategory.LineEntry entry : cfg.hudLineOrder) {
@@ -198,17 +198,17 @@ public class FishingHud {
         return result;
     }
 
-    private static int computeWidth() {
+    private static int calcWidth() {
         FishingCategory cfg = cfg();
         int width = mc.font.width(TITLE_TEXT);
-        for (String line : computeLines(cfg)) {
+        for (String line : calcLines(cfg)) {
             width = Math.max(width, mc.font.width(line));
         }
         return width;
     }
 
-    private static int computeHeight() {
-        List<String> lines = computeLines(cfg());
+    private static int calcHeight() {
+        List<String> lines = calcLines(cfg());
         return (lines.size() + 1) * LINE_HEIGHT;
     }
 

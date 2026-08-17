@@ -59,7 +59,6 @@ public class RankTierData {
             "9T4", "3T4",
             "cT3", "eT2", "aT1"
     );
-
     private static final Map<Character, Character> GREEK_HOMOGLYPHS = new LinkedHashMap<>();
     static {
         GREEK_HOMOGLYPHS.put('Α', 'A');

@@ -23,7 +23,7 @@ public class ProfitHud {
             "", "K", "M", "B", "T", "Qd", "Qn", "Sx", "Sp", "Oc", "No", "Dc"
     };
 
-    private static final MovableHud MOVABLE = new MovableHud() {
+    private static final MovableHud PROFIT_BOX = new MovableHud() {
         @Override
         public String getDisplayName() {
             return "Profit Tracker";
@@ -48,12 +48,12 @@ public class ProfitHud {
 
         @Override
         public int getWidth() {
-            return computeWidth();
+            return calcWidth();
         }
 
         @Override
         public int getHeight() {
-            return computeHeight();
+            return calcHeight();
         }
 
         @Override
@@ -70,7 +70,7 @@ public class ProfitHud {
     };
 
     public static void init() {
-        HudEditorRegistry.register(MOVABLE);
+        HudEditorRegistry.register(PROFIT_BOX);
 
         HudElementRegistry.attachElementBefore(
                 VanillaHudElements.CHAT,
@@ -80,7 +80,7 @@ public class ProfitHud {
                     if (mc.player == null || !cfg.profitTrackerEnabled) return;
                     if (cfg.onlyShowWhenMining && FishingZones.isInZone(mc.player.blockPosition())) return;
 
-                    int totalHeight = computeHeight();
+                    int totalHeight = calcHeight();
                     int x = HudTextUtils.clampX(cfg.profitHudX);
                     int y = HudTextUtils.clampY(cfg.profitHudY, totalHeight);
 
@@ -137,7 +137,7 @@ public class ProfitHud {
         return total;
     }
 
-    private static int computeWidth() {
+    private static int calcWidth() {
         ProfitCategory cfg = ConfigManager.config.profit;
         LinkedHashMap<String, Integer> breakdown = OreDropTracker.getBreakdown();
         int width = mc.font.width(TITLE_TEXT);
@@ -162,7 +162,7 @@ public class ProfitHud {
         return width;
     }
 
-    private static int computeHeight() {
+    private static int calcHeight() {
         ProfitCategory cfg = ConfigManager.config.profit;
         return countTotalLines(cfg, OreDropTracker.getBreakdown()) * LINE_HEIGHT;
     }

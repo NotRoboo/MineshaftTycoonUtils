@@ -18,7 +18,6 @@ import net.minecraft.world.item.component.ItemLore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 public class InformationHud {
 
@@ -26,7 +25,7 @@ public class InformationHud {
     private static final int LINE_HEIGHT = 10;
     private static final int HOTBAR_PET_SLOT = 8;
 
-    private static final MovableHud MOVABLE = new MovableHud() {
+    private static final MovableHud INFO_BOX = new MovableHud() {
         @Override
         public String getDisplayName() {
             return "Information";
@@ -51,12 +50,12 @@ public class InformationHud {
 
         @Override
         public int getWidth() {
-            return computeWidth();
+            return calcWidth();
         }
 
         @Override
         public int getHeight() {
-            return computeHeight();
+            return calcHeight();
         }
 
         @Override
@@ -73,7 +72,7 @@ public class InformationHud {
     };
 
     public static void init() {
-        HudEditorRegistry.register(MOVABLE);
+        HudEditorRegistry.register(INFO_BOX);
 
         HudElementRegistry.attachElementBefore(
                 VanillaHudElements.CHAT,
@@ -82,7 +81,7 @@ public class InformationHud {
                     InformationCategory cfg = ConfigManager.config.information;
                     if (mc.player == null || !cfg.hudEnabled) return;
 
-                    List<String> lines = computeLines(cfg);
+                    List<String> lines = calcLines(cfg);
 
                     int totalHeight = (lines.size() + 1) * LINE_HEIGHT;
 
@@ -98,7 +97,7 @@ public class InformationHud {
 
     private static void drawContent(GuiGraphics graphics, int anchorX, int y) {
         InformationCategory cfg = ConfigManager.config.information;
-        List<String> lines = computeLines(cfg);
+        List<String> lines = calcLines(cfg);
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
 
         HudTextUtils.drawLine(graphics, TITLE_TEXT, anchorX, y, rightAligned, HudTextUtils.chromaToArgb(cfg.titleColor));
@@ -108,7 +107,7 @@ public class InformationHud {
         }
     }
 
-    private static List<String> computeLines(InformationCategory cfg) {
+    private static List<String> calcLines(InformationCategory cfg) {
         List<String> lines = new ArrayList<>();
         for (InformationCategory.Entry entry : cfg.order) {
             lines.add(renderEntry(entry));
@@ -116,16 +115,16 @@ public class InformationHud {
         return lines;
     }
 
-    private static int computeWidth() {
+    private static int calcWidth() {
         int width = mc.font.width(TITLE_TEXT);
-        for (String line : computeLines(ConfigManager.config.information)) {
+        for (String line : calcLines(ConfigManager.config.information)) {
             width = Math.max(width, mc.font.width(line));
         }
         return width;
     }
 
-    private static int computeHeight() {
-        List<String> lines = computeLines(ConfigManager.config.information);
+    private static int calcHeight() {
+        List<String> lines = calcLines(ConfigManager.config.information);
         return (lines.size() + 1) * LINE_HEIGHT;
     }
 

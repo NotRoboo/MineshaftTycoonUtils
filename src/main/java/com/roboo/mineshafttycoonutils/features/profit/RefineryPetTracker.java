@@ -39,7 +39,7 @@ public class RefineryPetTracker {
             if (REFINERY_CONTAINER_NAME.equalsIgnoreCase(title)) {
                 ScreenEvents.remove(screen).register(s -> grabRefineryLvl(containerScreen.getMenu()));
             } else if (PETS_CONTAINER_NAME.equalsIgnoreCase(title)) {
-                ScreenEvents.remove(screen).register(s -> duneRamLvlFind(containerScreen.getMenu()));
+                ScreenEvents.remove(screen).register(s -> grabDuneRamLvl(containerScreen.getMenu()));
             }
         });
     }
@@ -60,13 +60,13 @@ public class RefineryPetTracker {
             int level = Integer.parseInt(refineryLvl.group(2));
 
             switch (oreKey) {
-                case "basalt" -> changed |= apply(level, state.basaltLevel, v -> state.basaltLevel = v);
-                case "brecca" -> changed |= apply(level, state.breccaLevel, v -> state.breccaLevel = v);
-                case "regolith" -> changed |= apply(level, state.regolithLevel, v -> state.regolithLevel = v);
-                case "amberrock" -> changed |= apply(level, state.amberRockLevel, v -> state.amberRockLevel = v);
-                case "ambercrystal" -> changed |= apply(level, state.amberCrystalLevel, v -> state.amberCrystalLevel = v);
-                case "cosmicfiber" -> changed |= apply(level, state.cosmicFiberLevel, v -> state.cosmicFiberLevel = v);
-                case "crimsonplasma" -> changed |= apply(level, state.crimsonPlasmaLevel, v -> state.crimsonPlasmaLevel = v);
+                case "basalt" -> changed |= updateLvl(level, state.basaltLevel, v -> state.basaltLevel = v);
+                case "brecca" -> changed |= updateLvl(level, state.breccaLevel, v -> state.breccaLevel = v);
+                case "regolith" -> changed |= updateLvl(level, state.regolithLevel, v -> state.regolithLevel = v);
+                case "amberrock" -> changed |= updateLvl(level, state.amberRockLevel, v -> state.amberRockLevel = v);
+                case "ambercrystal" -> changed |= updateLvl(level, state.amberCrystalLevel, v -> state.amberCrystalLevel = v);
+                case "cosmicfiber" -> changed |= updateLvl(level, state.cosmicFiberLevel, v -> state.cosmicFiberLevel = v);
+                case "crimsonplasma" -> changed |= updateLvl(level, state.crimsonPlasmaLevel, v -> state.crimsonPlasmaLevel = v);
                 default -> {}
             }
         }
@@ -77,7 +77,7 @@ public class RefineryPetTracker {
         }
     }
 
-    private static void duneRamLvlFind(AbstractContainerMenu menu) {
+    private static void grabDuneRamLvl(AbstractContainerMenu menu) {
         var state = ConfigManager.config.profit.state;
 
         for (var slot : menu.slots) {
@@ -98,7 +98,7 @@ public class RefineryPetTracker {
         }
     }
 
-    private static boolean apply(int newValue, int oldValue, java.util.function.IntConsumer setter) {
+    private static boolean updateLvl(int newValue, int oldValue, java.util.function.IntConsumer setter) {
         if (newValue == oldValue) return false;
         setter.accept(newValue);
         return true;

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 public class TabListEntryParser {
 
+    // matches something like "§c[ADMIN] §aSteve §7[T4]"
     private static final Pattern TAB_ENTRY_PATTERN = Pattern.compile(
             "^(?:(§.)(?:§l)?\\[([^]]+)]\\s*)?(§.)?([^\\s§]+)(?:\\s*(§.)(?:§l)?\\[([^]]+)])?$"
     );

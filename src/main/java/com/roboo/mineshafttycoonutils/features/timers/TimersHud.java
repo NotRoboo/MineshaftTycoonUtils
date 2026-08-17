@@ -19,7 +19,7 @@ public class TimersHud {
     private static final Minecraft mc = Minecraft.getInstance();
     private static final int LINE_HEIGHT = 10;
 
-    private static final MovableHud MOVABLE = new MovableHud() {
+    private static final MovableHud TIMER_BOX = new MovableHud() {
         @Override
         public String getDisplayName() {
             return "Timers";
@@ -44,12 +44,12 @@ public class TimersHud {
 
         @Override
         public int getWidth() {
-            return computeWidth();
+            return calcWidth();
         }
 
         @Override
         public int getHeight() {
-            return computeHeight();
+            return calcHeight();
         }
 
         @Override
@@ -66,7 +66,7 @@ public class TimersHud {
     };
 
     public static void init() {
-        HudEditorRegistry.register(MOVABLE);
+        HudEditorRegistry.register(TIMER_BOX);
 
         HudElementRegistry.attachElementBefore(
                 VanillaHudElements.CHAT,
@@ -75,7 +75,7 @@ public class TimersHud {
                     TimersCategory cfg = ConfigManager.config.timers;
                     if (mc.player == null || !cfg.hudEnabled) return;
 
-                    List<String> lines = computeLines(cfg);
+                    List<String> lines = calcLines(cfg);
                     if (lines.isEmpty()) return;
 
                     int totalHeight = (lines.size() + 1) * LINE_HEIGHT;
@@ -92,7 +92,7 @@ public class TimersHud {
 
     private static void drawContent(GuiGraphics graphics, int anchorX, int y) {
         TimersCategory cfg = ConfigManager.config.timers;
-        List<String> lines = computeLines(cfg);
+        List<String> lines = calcLines(cfg);
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
 
         HudTextUtils.drawLine(graphics, TITLE_TEXT, anchorX, y, rightAligned, HudTextUtils.chromaToArgb(cfg.titleColor));
@@ -102,7 +102,7 @@ public class TimersHud {
         }
     }
 
-    private static List<String> computeLines(TimersCategory cfg) {
+    private static List<String> calcLines(TimersCategory cfg) {
         List<String> lines = new ArrayList<>();
         for (TimersCategory.Entry entry : cfg.order) {
             String rendered = renderEntry(entry, cfg);
@@ -111,17 +111,17 @@ public class TimersHud {
         return lines;
     }
 
-    private static int computeWidth() {
+    private static int calcWidth() {
         TimersCategory cfg = ConfigManager.config.timers;
         int width = mc.font.width(TITLE_TEXT);
-        for (String line : computeLines(cfg)) {
+        for (String line : calcLines(cfg)) {
             width = Math.max(width, mc.font.width(line));
         }
         return width;
     }
 
-    private static int computeHeight() {
-        List<String> lines = computeLines(ConfigManager.config.timers);
+    private static int calcHeight() {
+        List<String> lines = calcLines(ConfigManager.config.timers);
         if (lines.isEmpty()) return LINE_HEIGHT;
         return (lines.size() + 1) * LINE_HEIGHT;
     }

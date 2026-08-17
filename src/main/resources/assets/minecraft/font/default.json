@@ -2,6 +2,13 @@
     "providers": [
         {
             "type": "bitmap",
+            "file": "minecraft:ranks/owner.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE009"]
+        },
+        {
+            "type": "bitmap",
             "file": "minecraft:ranks/manager.png",
             "ascent": 8,
             "height": 9,
