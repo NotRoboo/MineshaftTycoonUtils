@@ -7,7 +7,7 @@ public enum HypixelRank {
 
     public static HypixelRank parse(String bracketContent) {
         if (bracketContent == null) return NONE;
-        String tag = bracketContent.toUpperCase(Locale.ROOT).trim();
+        String tag = bracketContent.replaceAll("§.", "").toUpperCase(Locale.ROOT).trim();
         if (tag.startsWith("MVP++")) return MVPPP;
         if (tag.startsWith("MVP+")) return MVPP;
         if (tag.startsWith("MVP")) return MVP;
