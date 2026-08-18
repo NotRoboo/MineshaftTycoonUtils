@@ -9,6 +9,8 @@ import com.roboo.mineshafttycoonutils.features.fishing.FishingTracker;
 import com.roboo.mineshafttycoonutils.features.informationhud.InformationHud;
 import com.roboo.mineshafttycoonutils.features.misc.NightVisionBlocker;
 import com.roboo.mineshafttycoonutils.features.pets.PetsHelper;
+import com.roboo.mineshafttycoonutils.features.profit.BagHud;
+import com.roboo.mineshafttycoonutils.features.profit.BagValueTracker;
 import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitHud;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
@@ -44,6 +46,8 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         ProfitHud.init();
         ProfitTracker.init();
         RefineryPetTracker.init();
+        BagValueTracker.init();
+        BagHud.init();
         WarpHelper.init();
         BuffTracker.init();
         IlsRestockTracker.init();

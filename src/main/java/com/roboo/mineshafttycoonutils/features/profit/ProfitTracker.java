@@ -6,14 +6,11 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.function.IntSupplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,70 +23,6 @@ public class ProfitTracker {
     private static final long DISPLAY_UPDATE_INTERVAL_MS = 500;
 
     private static final Pattern FORTUNE_PATTERN = Pattern.compile("([0-9,]+)✥");
-
-    private enum TrackedOre {
-        BASALT(Blocks.GRAY_WOOL, 75_000, () -> ConfigManager.config.profit.state.basaltLevel, 1_875, true),
-        BRECCA(Blocks.WHITE_STAINED_GLASS, 40_000, () -> ConfigManager.config.profit.state.breccaLevel, 1_000, true),
-        REGOLITH(Blocks.ACACIA_PLANKS, 180_000, () -> ConfigManager.config.profit.state.regolithLevel, 4_500, true),
-        AMBER_ROCK(Blocks.ORANGE_WOOL, 88_000, () -> ConfigManager.config.profit.state.amberRockLevel, 2_200, true),
-        AMBER_CRYSTAL(Blocks.ORANGE_STAINED_GLASS, 46_000, () -> ConfigManager.config.profit.state.amberCrystalLevel, 1_150, true),
-        COSMIC_FIBER(Blocks.RED_STAINED_GLASS, 68_000, () -> ConfigManager.config.profit.state.cosmicFiberLevel, 2_375, true),
-        CRIMSON_PLASMA(Blocks.RED_WOOL, 95_000, () -> ConfigManager.config.profit.state.crimsonPlasmaLevel, 1_700, true),
-
-        LIGHT_BLUE_STAINED_GLASS(Blocks.LIGHT_BLUE_STAINED_GLASS, 10_000, () -> 0, 0, false),
-        COAL_BLOCK(Blocks.COAL_BLOCK, 11_000, () -> 0, 0, false),
-        IRON_BLOCK(Blocks.IRON_BLOCK, 12_500, () -> 0, 0, false),
-        GOLD_BLOCK(Blocks.GOLD_BLOCK, 14_000, () -> 0, 0, false),
-        EMERALD_BLOCK(Blocks.EMERALD_BLOCK, 17_000, () -> 0, 0, false),
-        DIAMOND_BLOCK(Blocks.DIAMOND_BLOCK, 20_000, () -> 0, 0, false);
-
-        private final Block block;
-        private final long baseValue;
-        private final IntSupplier levelSupplier;
-        private final long perLevel;
-        private final boolean refineryBased;
-
-        TrackedOre(Block block, long baseValue, IntSupplier levelSupplier, long perLevel, boolean refineryBased) {
-            this.block = block;
-            this.baseValue = baseValue;
-            this.levelSupplier = levelSupplier;
-            this.perLevel = perLevel;
-            this.refineryBased = refineryBased;
-        }
-
-        long getDropValue() {
-            long total;
-
-            if (refineryBased) {
-                int refineryLevel = levelSupplier.getAsInt();
-                if (refineryLevel < 0) return -1;
-
-                long refineryBonus = perLevel * refineryLevel;
-                int ramLevel = ConfigManager.config.profit.noDuneRamPet
-                        ? 0
-                        : Math.max(ConfigManager.config.profit.state.duneRamLevel, 0);
-                long ramBonus = Math.round(refineryBonus * (ramLevel * 0.02));
-
-                total = baseValue + refineryBonus + ramBonus;
-            } else {
-                total = baseValue;
-            }
-
-            // cash register boost is applied last, after refinery and pet bonuses
-            if (ConfigManager.config.profit.cashRegisterEnabled) {
-                total = Math.round(total * 1.03);
-            }
-
-            return total;
-        }
-
-        static TrackedOre fromBlock(Block block) {
-            for (TrackedOre ore : values()) {
-                if (ore.block == block) return ore;
-            }
-            return null;
-        }
-    }
 
     private record Gain(long time, long amount) {}
 
@@ -125,7 +58,7 @@ public class ProfitTracker {
     }
 
     private static void onTick() {
-        if (!ConfigManager.config.profit.profitTrackerEnabled) return;
+        if (!ConfigManager.config.profit.tracker.profitTrackerEnabled) return;
         if (mc.player == null || mc.level == null) return;
 
         HitResult hit = mc.hitResult;
@@ -185,7 +118,7 @@ public class ProfitTracker {
     }
 
     public static boolean needsRamLevel() {
-        return !ConfigManager.config.profit.noDuneRamPet && ConfigManager.config.profit.state.duneRamLevel < 0;
+        return !ConfigManager.config.profit.noDuneRamPet && ConfigManager.config.profit.tracker.state.duneRamLevel < 0;
     }
 
     private static void resetSession() {

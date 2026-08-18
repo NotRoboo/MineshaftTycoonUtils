@@ -31,19 +31,19 @@ public class ProfitHud {
 
         @Override
         public boolean isMasterEnabled() {
-            return ConfigManager.config.profit.profitTrackerEnabled;
+            return ConfigManager.config.profit.tracker.profitTrackerEnabled;
         }
 
         @Override
         public int getX() {
             ProfitCategory cfg = ConfigManager.config.profit;
-            int anchorX = cfg.profitHudX;
-            return HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip) ? anchorX - getWidth() : anchorX;
+            int anchorX = cfg.tracker.profitHudX;
+            return HudTextUtils.isRightAligned(anchorX, cfg.tracker.disableRightAlignFlip) ? anchorX - getWidth() : anchorX;
         }
 
         @Override
         public int getY() {
-            return ConfigManager.config.profit.profitHudY;
+            return ConfigManager.config.profit.tracker.profitHudY;
         }
 
         @Override
@@ -58,14 +58,14 @@ public class ProfitHud {
 
         @Override
         public void setPosition(int x, int y) {
-            ConfigManager.config.profit.profitHudX = x;
-            ConfigManager.config.profit.profitHudY = y;
+            ConfigManager.config.profit.tracker.profitHudX = x;
+            ConfigManager.config.profit.tracker.profitHudY = y;
         }
 
         @Override
         public void render(GuiGraphics graphics) {
             ProfitCategory cfg = ConfigManager.config.profit;
-            drawContent(graphics, cfg.profitHudX, cfg.profitHudY);
+            drawContent(graphics, cfg.tracker.profitHudX, cfg.tracker.profitHudY);
         }
     };
 
@@ -77,12 +77,12 @@ public class ProfitHud {
                 Identifier.fromNamespaceAndPath("mineshafttycoonutils", "profit_hud"),
                 (graphics, tickCounter) -> {
                     ProfitCategory cfg = ConfigManager.config.profit;
-                    if (mc.player == null || !cfg.profitTrackerEnabled) return;
-                    if (cfg.onlyShowWhenMining && FishingZones.isInZone(mc.player.blockPosition())) return;
+                    if (mc.player == null || !cfg.tracker.profitTrackerEnabled) return;
+                    if (cfg.tracker.onlyShowWhenMining && FishingZones.isInZone(mc.player.blockPosition())) return;
 
                     int totalHeight = calcHeight();
-                    int x = HudTextUtils.clampX(cfg.profitHudX);
-                    int y = HudTextUtils.clampY(cfg.profitHudY, totalHeight);
+                    int x = HudTextUtils.clampX(cfg.tracker.profitHudX);
+                    int y = HudTextUtils.clampY(cfg.tracker.profitHudY, totalHeight);
 
                     drawContent(graphics, x, y);
                 }
@@ -95,8 +95,8 @@ public class ProfitHud {
     private static void drawContent(GuiGraphics graphics, int anchorX, int y) {
         ProfitCategory cfg = ConfigManager.config.profit;
         LinkedHashMap<String, Integer> breakdown = OreDropTracker.getBreakdown();
-        boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
-        int titleColor = HudTextUtils.chromaToArgb(cfg.titleColor);
+        boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.tracker.disableRightAlignFlip);
+        int titleColor = HudTextUtils.chromaToArgb(cfg.tracker.titleColor);
 
         HudTextUtils.drawLine(graphics, TITLE_TEXT, anchorX, y, rightAligned, titleColor);
         int line = 1;
@@ -110,7 +110,7 @@ public class ProfitHud {
         HudTextUtils.drawLine(graphics, "§7Total: §e$" + format(ProfitTracker.getTotalProfit(), cfg.shortenNumbers),
                 anchorX, y + (LINE_HEIGHT * line++), rightAligned);
 
-        if (cfg.showOreDrops) {
+        if (cfg.tracker.showOreDrops) {
             HudTextUtils.drawLine(graphics, ORES_HEADER_TEXT, anchorX, y + (LINE_HEIGHT * line++), rightAligned, titleColor);
 
             if (breakdown.isEmpty()) {
@@ -129,7 +129,7 @@ public class ProfitHud {
         if (ProfitTracker.needsRamLevel()) total++;
         total += 2; // $/Hour, Total
 
-        if (cfg.showOreDrops) {
+        if (cfg.tracker.showOreDrops) {
             total++; // "Ores" header
             total += breakdown.isEmpty() ? 1 : breakdown.size();
         }
@@ -148,7 +148,7 @@ public class ProfitHud {
         width = Math.max(width, mc.font.width("§7$/Hour: §e$" + format(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr"));
         width = Math.max(width, mc.font.width("§7Total: §e$" + format(ProfitTracker.getTotalProfit(), cfg.shortenNumbers)));
 
-        if (cfg.showOreDrops) {
+        if (cfg.tracker.showOreDrops) {
             width = Math.max(width, mc.font.width(ORES_HEADER_TEXT));
             if (breakdown.isEmpty()) {
                 width = Math.max(width, mc.font.width("§7- None"));

@@ -45,7 +45,7 @@ public class RefineryPetTracker {
     }
 
     private static void grabRefineryLvl(AbstractContainerMenu menu) {
-        var state = ConfigManager.config.profit.state;
+        var state = ConfigManager.config.profit.tracker.state;
         boolean changed = false;
 
         for (var slot : menu.slots) {
@@ -78,7 +78,7 @@ public class RefineryPetTracker {
     }
 
     private static void grabDuneRamLvl(AbstractContainerMenu menu) {
-        var state = ConfigManager.config.profit.state;
+        var state = ConfigManager.config.profit.tracker.state;
 
         for (var slot : menu.slots) {
             ItemStack stack = slot.getItem();
@@ -110,7 +110,7 @@ public class RefineryPetTracker {
         MutableComponent message = Component.literal(" " + label + " ")
                 .withStyle(Style.EMPTY.withColor(0xAAAAAA));
 
-        message.append(Component.literal("UPDATED!")
+        message.append(Component.literal("updated!")
                 .withStyle(Style.EMPTY.withColor(0x55FF55)));
 
         mc.execute(() -> mc.player.displayClientMessage(SystemMessages.get().append(message), false));

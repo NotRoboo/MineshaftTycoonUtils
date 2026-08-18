@@ -21,7 +21,7 @@ public class MSTUConfig extends Config {
     public InformationCategory information = new InformationCategory();
 
     @Expose
-    @Category(name = "Profit Tracker", desc = "Refinery profit tracking settings")
+    @Category(name = "Profit", desc = "Settings related to profit subcategories")
     public ProfitCategory profit = new ProfitCategory();
 
     @Expose

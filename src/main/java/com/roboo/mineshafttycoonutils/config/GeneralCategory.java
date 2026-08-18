@@ -4,7 +4,9 @@ import com.google.gson.annotations.Expose;
 import com.roboo.mineshafttycoonutils.hud.HudEditScreen;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.lwjgl.glfw.GLFW;
 
 public class GeneralCategory {
 
@@ -14,6 +16,13 @@ public class GeneralCategory {
     )
     @ConfigEditorButton(buttonText = "Edit")
     public Runnable editHudPositions = HudEditScreen::open;
+
+    @Expose
+    @ConfigOption(
+            name = "Edit Container HUD Locations Keybind",
+            desc = "Press while inside the Bag menu to toggle dragging the Money in Bag HUD position")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    public int editBagHudKeybind = GLFW.GLFW_KEY_UNKNOWN;
 
     @Expose
     @ConfigOption(
