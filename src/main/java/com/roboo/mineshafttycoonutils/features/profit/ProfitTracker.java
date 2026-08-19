@@ -118,7 +118,7 @@ public class ProfitTracker {
     }
 
     public static boolean needsRamLevel() {
-        return !ConfigManager.config.profit.noDuneRamPet && ConfigManager.config.profit.tracker.state.duneRamLevel < 0;
+        return ConfigManager.config.profit.tracker.state.duneRamLevel < 0;
     }
 
     private static void resetSession() {

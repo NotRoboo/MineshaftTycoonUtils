@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.profit;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
@@ -51,6 +52,7 @@ public enum TrackedOre {
 
     private final List<Block> blocks;
     private final String bagItemName;
+    private final String displayName;
     private final long baseValue;
     private final IntSupplier levelSupplier;
     private final long perLevel;
@@ -59,6 +61,7 @@ public enum TrackedOre {
     TrackedOre(List<Block> blocks, String bagItemName, long baseValue, IntSupplier levelSupplier, long perLevel, boolean refineryBased) {
         this.blocks = blocks;
         this.bagItemName = bagItemName;
+        this.displayName = ComponentTextUtils.toTitleCase(bagItemName);
         this.baseValue = baseValue;
         this.levelSupplier = levelSupplier;
         this.perLevel = perLevel;
@@ -73,9 +76,7 @@ public enum TrackedOre {
             if (refineryLevel < 0) return -1;
 
             long refineryBonus = perLevel * refineryLevel;
-            int ramLevel = ConfigManager.config.profit.noDuneRamPet
-                    ? 0
-                    : Math.max(ConfigManager.config.profit.tracker.state.duneRamLevel, 0);
+            int ramLevel = Math.max(ConfigManager.config.profit.tracker.state.duneRamLevel, 0);
             long ramBonus = Math.round(refineryBonus * (ramLevel * 0.02));
 
             total = baseValue + refineryBonus + ramBonus;
@@ -92,6 +93,10 @@ public enum TrackedOre {
 
     public String getBagItemName() {
         return bagItemName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 
     public static TrackedOre fromBlock(Block block) {

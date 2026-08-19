@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public class ComponentTextUtils {
@@ -50,6 +51,19 @@ public class ComponentTextUtils {
         while (result.startsWith("§r")) result = result.substring(2);
         while (result.endsWith("§r")) result = result.substring(0, result.length() - 2);
         return result;
+    }
+
+    public static String toTitleCase(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        String[] words = input.toLowerCase(Locale.ROOT).split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String word : words) {
+            if (word.isEmpty()) continue;
+            if (!sb.isEmpty()) sb.append(' ');
+            sb.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
+        }
+        return sb.toString();
     }
 
     private static String legacyCodesFor(Style style) {

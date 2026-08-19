@@ -6,6 +6,7 @@ import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.FishingZones;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
+import com.roboo.mineshafttycoonutils.utils.NumberFormatUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
@@ -18,10 +19,6 @@ public class ProfitHud {
 
     private static final Minecraft mc = Minecraft.getInstance();
     private static final int LINE_HEIGHT = 10;
-
-    private static final String[] SUFFIXES = {
-            "", "K", "M", "B", "T", "Qd", "Qn", "Sx", "Sp", "Oc", "No", "Dc"
-    };
 
     private static final MovableHud PROFIT_BOX = new MovableHud() {
         @Override
@@ -105,9 +102,9 @@ public class ProfitHud {
             HudTextUtils.drawLine(graphics, "§7Boosts: §c(Open refinery & /pets)", anchorX, y + (LINE_HEIGHT * line++), rightAligned);
         }
 
-        HudTextUtils.drawLine(graphics, "§7$/Hour: §e$" + format(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr",
+        HudTextUtils.drawLine(graphics, "§7$/Hour: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr",
                 anchorX, y + (LINE_HEIGHT * line++), rightAligned);
-        HudTextUtils.drawLine(graphics, "§7Total: §e$" + format(ProfitTracker.getTotalProfit(), cfg.shortenNumbers),
+        HudTextUtils.drawLine(graphics, "§7Total: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getTotalProfit(), cfg.shortenNumbers),
                 anchorX, y + (LINE_HEIGHT * line++), rightAligned);
 
         if (cfg.tracker.showOreDrops) {
@@ -145,8 +142,8 @@ public class ProfitHud {
         if (ProfitTracker.needsRamLevel()) {
             width = Math.max(width, mc.font.width("§7Boosts: §c(Open refinery & /pets)"));
         }
-        width = Math.max(width, mc.font.width("§7$/Hour: §e$" + format(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr"));
-        width = Math.max(width, mc.font.width("§7Total: §e$" + format(ProfitTracker.getTotalProfit(), cfg.shortenNumbers)));
+        width = Math.max(width, mc.font.width("§7$/Hour: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr"));
+        width = Math.max(width, mc.font.width("§7Total: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getTotalProfit(), cfg.shortenNumbers)));
 
         if (cfg.tracker.showOreDrops) {
             width = Math.max(width, mc.font.width(ORES_HEADER_TEXT));
@@ -165,20 +162,5 @@ public class ProfitHud {
     private static int calcHeight() {
         ProfitCategory cfg = ConfigManager.config.profit;
         return countTotalLines(cfg, OreDropTracker.getBreakdown()) * LINE_HEIGHT;
-    }
-
-    private static String format(long value, boolean shorten) {
-        if (!shorten || value < 1000) {
-            return String.format("%,d", value);
-        }
-
-        int tier = 0;
-        double reduced = value;
-        while (reduced >= 1000 && tier < SUFFIXES.length - 1) {
-            reduced /= 1000.0;
-            tier++;
-        }
-
-        return String.format("%.2f%s", reduced, SUFFIXES[tier]);
     }
 }

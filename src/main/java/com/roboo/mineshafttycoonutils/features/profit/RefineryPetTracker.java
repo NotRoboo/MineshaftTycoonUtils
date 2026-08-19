@@ -2,6 +2,7 @@ package com.roboo.mineshafttycoonutils.features.profit;
 
 import com.roboo.mineshafttycoonutils.MineshaftTycoonUtils;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.utils.PetStatusUtils;
 import com.roboo.mineshafttycoonutils.utils.SystemMessages;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.ChatFormatting;
@@ -23,7 +24,6 @@ public class RefineryPetTracker {
 
     private static final String REFINERY_CONTAINER_NAME = "Refinery";
     private static final String PETS_CONTAINER_NAME = "Pets";
-
     private static final Pattern REFINERY_ITEM_PATTERN =
             Pattern.compile("(?i)^Refined (.+?)\\s*\\[(\\d{1,2})/10]$");
 
@@ -88,7 +88,10 @@ public class RefineryPetTracker {
             Matcher duneRam = DUNE_RAM_PATTERN.matcher(name);
             if (!duneRam.matches()) continue;
 
-            int level = Integer.parseInt(duneRam.group(1));
+            int level = PetStatusUtils.resolveStatus(stack) == PetStatusUtils.Status.LOCKED
+                    ? 0
+                    : Integer.parseInt(duneRam.group(1));
+
             if (level != state.duneRamLevel) {
                 state.duneRamLevel = level;
                 MineshaftTycoonUtils.configManager.saveConfig();

@@ -5,6 +5,7 @@ import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.utils.PetStatusUtils;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -37,9 +38,6 @@ public class PetsHelper {
 
     private static final String PETS_CONTAINER_NAME = "Pets";
     private static final int HOTBAR_PET_SLOT = 8;
-
-    private static final String MARKER_SELECTED = "§3§lUN§6§lLOCKED";
-    private static final String MARKER_ON_ADVENTURE = "§2§lUN§6§lLOCKED";
 
     private static final String CHAT_DENY_1 = "HAHA! No.";
     private static final String CHAT_DENY_2 = "You have not unlocked";
@@ -225,14 +223,15 @@ public class PetsHelper {
 
         if (targetSlot != null) {
             ItemStack stack = targetSlot.getItem();
+            PetStatusUtils.Status status = PetStatusUtils.resolveStatus(stack);
 
-            if (loreContains(stack, MARKER_ON_ADVENTURE)) {
+            if (status == PetStatusUtils.Status.ON_ADVENTURE) {
                 reset();
                 closeContainerNow();
                 return;
             }
 
-            if (loreContains(stack, MARKER_SELECTED)) {
+            if (status == PetStatusUtils.Status.EQUIPPED) {
                 requestClose();
                 return;
             }
@@ -305,19 +304,6 @@ public class PetsHelper {
         for (Component line : lore.lines()) {
             String text = ChatFormatting.stripFormatting(line.getString());
             if (text.toLowerCase(Locale.ROOT).contains(entry.displayName().toLowerCase(Locale.ROOT))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean loreContains(ItemStack stack, String marker) {
-        if (stack.isEmpty()) return false;
-        ItemLore lore = stack.get(DataComponents.LORE);
-        if (lore == null) return false;
-
-        for (Component line : lore.lines()) {
-            if (line.getString().contains(marker)) {
                 return true;
             }
         }
