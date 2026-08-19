@@ -39,7 +39,7 @@ public class GlyphCategory {
     public boolean nametagGlyphs = false;
 
     @Expose
-    @ConfigOption(name = "Tab List Part Order", desc = "Drag to reorder tab list name parts, left to right. Remove a part to hide it entirely.")
+    @ConfigOption(name = "Tab List Part Order", desc = "Drag to reorder tab list name parts, left to right in the tab list. Remove a part to hide it entirely.")
     @ConfigEditorDraggableList
     public List<TabListPart> tabListPartOrder = new ArrayList<>(Arrays.asList(TabListPart.values()));
 

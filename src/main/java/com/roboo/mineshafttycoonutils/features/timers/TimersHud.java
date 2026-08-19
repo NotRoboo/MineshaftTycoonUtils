@@ -150,7 +150,7 @@ public class TimersHud {
 
         String time = formatDuration(secondsLeft, cfg);
         boolean enabled = BuffTracker.isEnabled(buff);
-        return "§7" + label + "§e" + time + (enabled ? "" : " §c(Disabled)");
+        return "§7" + label + "§e" + time + (enabled ? "" : " §c(Paused)");
     }
 
     private static String renderPetad(TimersCategory cfg) {
