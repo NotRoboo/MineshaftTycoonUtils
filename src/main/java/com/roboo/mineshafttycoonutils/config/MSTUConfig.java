@@ -45,6 +45,10 @@ public class MSTUConfig extends Config {
     public GlyphCategory glyph = new GlyphCategory();
 
     @Expose
+    @Category(name = "Scoreboard", desc = "Reorder or hide lines on the in-game scoreboard")
+    public ScoreboardCategory scoreboard = new ScoreboardCategory();
+
+    @Expose
     @Category(name = "Misc", desc = "Miscellaneous quality-of-life settings")
     public MiscCategory misc = new MiscCategory();
 }

@@ -17,12 +17,13 @@ public class BagHud {
 
     private static final Minecraft mc = Minecraft.getInstance();
     private static final int LINE_HEIGHT = 10;
+    private static final String CONTAINER_TITLE = "Bag";
 
     private static final ContainerHudDragHandler dragHandler = new ContainerHudDragHandler();
 
     public static void init() {
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (!isBagScreen(screen)) return;
+            if (isNotBagScreen(screen)) return;
 
             ScreenEvents.afterRender(screen).register((s, graphics, mouseX, mouseY, tickDelta) -> render(graphics));
             ScreenEvents.remove(screen).register(s -> dragHandler.reset());
@@ -31,13 +32,13 @@ public class BagHud {
         ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
     }
 
-    private static boolean isBagScreen(Screen screen) {
-        if (!(screen instanceof AbstractContainerScreen<?>)) return false;
-        return "Bag".equalsIgnoreCase(screen.getTitle().getString().trim());
+    private static boolean isNotBagScreen(Screen screen) {
+        if (!(screen instanceof AbstractContainerScreen<?>)) return true;
+        return !CONTAINER_TITLE.equalsIgnoreCase(screen.getTitle().getString().trim());
     }
 
     private static void onTick() {
-        if (!isBagScreen(mc.screen)) {
+        if (isNotBagScreen(mc.screen)) {
             dragHandler.reset();
             return;
         }

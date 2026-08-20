@@ -8,6 +8,7 @@ import com.roboo.mineshafttycoonutils.features.fishing.FishingTracker;
 import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
 import com.roboo.mineshafttycoonutils.hud.HudEditScreen;
+import com.roboo.mineshafttycoonutils.utils.ScoreboardUtils;
 import com.roboo.mineshafttycoonutils.utils.SystemMessages;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -27,6 +28,8 @@ public class Commands {
     private static final int DEFAULT_PROFIT_HUD_Y = 80;
     private static final int DEFAULT_BAG_VALUE_HUD_X = 200;
     private static final int DEFAULT_BAG_VALUE_HUD_Y = 85;
+    private static final int DEFAULT_MAGMA_HUD_X = 200;
+    private static final int DEFAULT_MAGMA_HUD_Y = 160;
     private static final int DEFAULT_TIMERS_HUD_X = 180;
     private static final int DEFAULT_TIMERS_HUD_Y = 20;
     private static final int DEFAULT_INFORMATION_HUD_X = 10;
@@ -76,12 +79,20 @@ public class Commands {
                             ConfigManager.config.profit.tracker.profitHudY = DEFAULT_PROFIT_HUD_Y;
                             ConfigManager.config.profit.bagValue.bagValueHudX = DEFAULT_BAG_VALUE_HUD_X;
                             ConfigManager.config.profit.bagValue.bagValueHudY = DEFAULT_BAG_VALUE_HUD_Y;
+                            ConfigManager.config.profit.magma.magmaHudX = DEFAULT_MAGMA_HUD_X;
+                            ConfigManager.config.profit.magma.magmaHudY = DEFAULT_MAGMA_HUD_Y;
                             ConfigManager.config.timers.timersHudX = DEFAULT_TIMERS_HUD_X;
                             ConfigManager.config.timers.timersHudY = DEFAULT_TIMERS_HUD_Y;
                             ConfigManager.config.information.informationHudX = DEFAULT_INFORMATION_HUD_X;
                             ConfigManager.config.information.informationHudY = DEFAULT_INFORMATION_HUD_Y;
                             MineshaftTycoonUtils.configManager.saveConfig();
                             resetMsg("HUD positions");
+                            return 1;
+                        })
+                )
+                .then(ClientCommandManager.literal("printscoreboard")
+                        .executes(ctx -> {
+                            ScoreboardUtils.dumpSidebar();
                             return 1;
                         })
                 )

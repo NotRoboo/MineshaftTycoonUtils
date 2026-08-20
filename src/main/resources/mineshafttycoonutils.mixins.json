@@ -5,7 +5,8 @@
   "client": [
     "CommandSuggestionsMixin",
     "NameTagGlyphMixin",
-    "PlayerTabOverlayMixin"
+    "PlayerTabOverlayMixin",
+    "ScoreboardMixin"
   ],
   "injectors": {
     "defaultRequire": 1

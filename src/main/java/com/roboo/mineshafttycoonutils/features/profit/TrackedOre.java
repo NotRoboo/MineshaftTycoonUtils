@@ -91,10 +91,6 @@ public enum TrackedOre {
         return total;
     }
 
-    public String getBagItemName() {
-        return bagItemName;
-    }
-
     public String getDisplayName() {
         return displayName;
     }

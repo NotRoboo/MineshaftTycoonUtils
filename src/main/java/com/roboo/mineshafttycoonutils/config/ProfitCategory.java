@@ -2,6 +2,7 @@ package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
 import com.roboo.mineshafttycoonutils.config.profit.BagValueConfig;
+import com.roboo.mineshafttycoonutils.config.profit.MagmaValueConfig;
 import com.roboo.mineshafttycoonutils.config.profit.ProfitTrackerConfig;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -26,4 +27,8 @@ public class ProfitCategory {
     @Expose
     @Category(name = "Bag Value", desc = "Shows the total value of items inside the /bag")
     public BagValueConfig bagValue = new BagValueConfig();
+
+    @Expose
+    @Category(name = "Magma Value", desc = "Shows the total magma value of ores inside the Space Ores Bag")
+    public MagmaValueConfig magma = new MagmaValueConfig();
 }

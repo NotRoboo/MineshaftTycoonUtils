@@ -11,6 +11,8 @@ import com.roboo.mineshafttycoonutils.features.misc.NightVisionBlocker;
 import com.roboo.mineshafttycoonutils.features.pets.PetsHelper;
 import com.roboo.mineshafttycoonutils.features.profit.BagHud;
 import com.roboo.mineshafttycoonutils.features.profit.BagValueTracker;
+import com.roboo.mineshafttycoonutils.features.profit.MagmaHud;
+import com.roboo.mineshafttycoonutils.features.profit.MagmaValueTracker;
 import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitHud;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
@@ -48,6 +50,8 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         RefineryPetTracker.init();
         BagValueTracker.init();
         BagHud.init();
+        MagmaValueTracker.init();
+        MagmaHud.init();
         WarpHelper.init();
         BuffTracker.init();
         IlsRestockTracker.init();

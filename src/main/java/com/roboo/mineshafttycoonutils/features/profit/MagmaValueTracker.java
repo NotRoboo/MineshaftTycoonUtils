@@ -1,5 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.profit;
 
+import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.config.profit.MagmaValueConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -16,15 +18,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BagValueTracker {
+public class MagmaValueTracker {
 
-    private static final String CONTAINER_TITLE = "Bag";
+    private static final String CONTAINER_TITLE = "Space Ores Bag";
 
-    private static final Pattern QUANTITY_PATTERN =
-            Pattern.compile("(?i)quantity:\\s*([0-9,]*)");
+    private static final Pattern AMOUNT_PATTERN =
+            Pattern.compile("(?i)amount in bag:\\s*([0-9,]*)");
 
-    private static final Map<TrackedOre, Long> quantities =
-            new EnumMap<>(TrackedOre.class);
+    private static final Map<MagmaValueConfig.Entry, Long> quantities =
+            new EnumMap<>(MagmaValueConfig.Entry.class);
 
     public static void init() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
@@ -51,8 +53,8 @@ public class BagValueTracker {
             if (stack.isEmpty()) continue;
 
             String name = ChatFormatting.stripFormatting(stack.getHoverName().getString()).trim();
-            TrackedOre ore = TrackedOre.fromBagItemName(name);
-            if (ore == null) continue;
+            MagmaValueConfig.Entry entry = fromDisplayName(name);
+            if (entry == null) continue;
 
             ItemLore lore = stack.get(DataComponents.LORE);
             List<Component> loreLines = lore != null ? lore.lines() : List.of();
@@ -60,7 +62,7 @@ public class BagValueTracker {
             long quantity = -1;
             for (Component loreLine : loreLines) {
                 String text = ChatFormatting.stripFormatting(loreLine.getString()).trim();
-                Matcher m = QUANTITY_PATTERN.matcher(text);
+                Matcher m = AMOUNT_PATTERN.matcher(text);
                 if (m.find()) {
                     String raw = m.group(1).replace(",", "");
                     quantity = raw.isEmpty() ? 0 : Long.parseLong(raw);
@@ -69,32 +71,33 @@ public class BagValueTracker {
             }
 
             if (quantity > 0) {
-                quantities.put(ore, quantity);
+                quantities.put(entry, quantity);
             } else {
-                quantities.remove(ore);
+                quantities.remove(entry);
             }
         }
     }
 
-    public static long getQuantity(TrackedOre ore) {
-        Long quantity = quantities.get(ore);
+    private static MagmaValueConfig.Entry fromDisplayName(String name) {
+        for (MagmaValueConfig.Entry entry : MagmaValueConfig.Entry.values()) {
+            if (entry.getDisplayName().equalsIgnoreCase(name)) return entry;
+        }
+        return null;
+    }
+
+    public static long getQuantity(MagmaValueConfig.Entry entry) {
+        Long quantity = quantities.get(entry);
         return quantity != null ? quantity : 0;
     }
 
-    public static long getValue(TrackedOre ore) {
-        long quantity = getQuantity(ore);
-        if (quantity <= 0) return 0;
-
-        long dropValue = ore.getDropValue();
-        if (dropValue < 0) return 0;
-
-        return quantity * dropValue;
+    public static long getMagmaValue(MagmaValueConfig.Entry entry) {
+        return getQuantity(entry) * entry.getMagmaValue();
     }
 
-    public static long getTotalValue() {
+    public static long getTotalMagma() {
         long total = 0;
-        for (TrackedOre ore : TrackedOre.values()) {
-            total += getValue(ore);
+        for (MagmaValueConfig.Entry entry : ConfigManager.config.profit.magma.order) {
+            total += getMagmaValue(entry);
         }
         return total;
     }
