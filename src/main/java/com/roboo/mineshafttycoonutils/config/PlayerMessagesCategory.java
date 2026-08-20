@@ -31,7 +31,7 @@ public class PlayerMessagesCategory {
     @Expose
     @ConfigOption(name = "Nons White Chat", desc = "Make all nons chat messages white instead of grey")
     @ConfigEditorBoolean
-    public boolean sameChatColor = false;
+    public boolean sameChatColor = true;
 
     @Expose
     @ConfigOption(

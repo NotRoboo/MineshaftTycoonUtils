@@ -81,16 +81,18 @@ public class UpdateChecker {
     private static void notify(String latestVersion) {
         if (mc.player == null) return;
 
-        MutableComponent message = Component.literal(" A new update is available: ")
+        String currentVersion = currentVersion();
+
+        MutableComponent message = Component.literal(" A new update is available! You are currently on ")
                 .withStyle(Style.EMPTY.withColor(0xAAAAAA));
 
-        message.append(Component.literal(latestVersion)
+        message.append(Component.literal(currentVersion)
                 .withStyle(Style.EMPTY.withColor(0xFFFF55)));
 
         message.append(Component.literal(" (")
                 .withStyle(Style.EMPTY.withColor(0xAAAAAA)));
 
-        message.append(Component.literal("Click here")
+        message.append(Component.literal("Click here to download " + latestVersion)
                 .withStyle(Style.EMPTY
                         .withColor(0x55FFFF)
                         .withUnderlined(true)

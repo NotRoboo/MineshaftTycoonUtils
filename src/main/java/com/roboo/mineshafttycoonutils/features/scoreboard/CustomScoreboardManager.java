@@ -6,6 +6,7 @@ import com.roboo.mineshafttycoonutils.config.ScoreboardCategory;
 import net.minecraft.ChatFormatting;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -21,6 +22,8 @@ public class CustomScoreboardManager {
         ScoreboardCategory cfg = ConfigManager.config.scoreboard;
         boolean changed = false;
 
+        EnumSet<ScoreboardCategory.Line> seen = EnumSet.noneOf(ScoreboardCategory.Line.class);
+
         for (String raw : rawFormattedLines) {
             if (raw == null) continue;
             String stripped = ChatFormatting.stripFormatting(raw).trim();
@@ -29,9 +32,17 @@ public class CustomScoreboardManager {
             ScoreboardCategory.Line line = classify(stripped);
             if (line == null) continue;
 
+            seen.add(line);
+
             String previous = cfg.lastKnownLines.get(line);
             if (!raw.equals(previous)) {
                 cfg.lastKnownLines.put(line, raw);
+                changed = true;
+            }
+        }
+
+        for (ScoreboardCategory.Line line : ScoreboardCategory.Line.values()) {
+            if (line.onlyShowWhenKnown() && !seen.contains(line) && cfg.lastKnownLines.remove(line) != null) {
                 changed = true;
             }
         }
