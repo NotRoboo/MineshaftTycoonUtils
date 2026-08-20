@@ -41,6 +41,10 @@ A Fabric client-side mod that adds quality-of-life tools on MineshaftTycoon — 
 - Fortune Fragment and plate totals can show both the catch count and the raw item total (e.g. `Fortune Frags: 4 (495)`).
 - Reset anytime with `/mstu resetfishinghud`.
 
+### Magma Value & /Bag Value Huds
+- Show the value of all ores you've mined in /bag (Includes Cash Reg, Refinery & Dune Ram buffs)
+- Show total magma value in ore bag
+
 ### Profit Tracker & HUD
 - Watches ore blocks as you mine them and estimates coins/hour and total profit.
 - Understands refinery-based T5 ores and T4 ores.
@@ -69,6 +73,10 @@ Individually toggleable filters to cut down on chat spam:
 - Type `/warp <name>` or `/pet <name>` to open the warp menu and automatically click the matching warp or pet for you (covers both the Warp and Space Warp menus).
 - Tab-completion suggests short warp names as you type.
 - Disabled by default — enable it in the config first, and use at your own risk since it interacts with the server's menu automatically.
+
+### Custom Scoreboard
+- Order your scoreboard however you'd like
+- Keeps values the server swaps out, so you always have them
 
 ### Misc
 - Ability to bind a keybind to "ToggleAttack" and "ToggleUse" minecraft settings, allowing you to hit a simple keybind instead of going into settings to enable/disable
