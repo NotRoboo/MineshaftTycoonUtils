@@ -26,7 +26,9 @@ public class PlayerMessageHandler {
 
     private static boolean handle(Component message) {
         PlayerMessagesCategory cfg = ConfigManager.config.playerMessages;
-        if (!cfg.enabled && !cfg.sameChatColor && !ConfigManager.config.glyph.otherMessageGlyphs) return true;
+        boolean playerGlyphsEnabled = ConfigManager.config.glyph.playerMessageGlyphs;
+
+        if (!cfg.enabled && !cfg.sameChatColor && !playerGlyphsEnabled && !ConfigManager.config.glyph.otherMessageGlyphs) return true;
         if (message == null) return true;
 
         Style interactiveStyle = ComponentTextUtils.findInteractiveStyle(message);
@@ -35,7 +37,7 @@ public class PlayerMessageHandler {
 
         if (MessageHider.shouldHide(raw)) return true;
 
-        if (cfg.enabled || cfg.sameChatColor) {
+        if (cfg.enabled || cfg.sameChatColor || playerGlyphsEnabled) {
             Component formatted = PlayerMessageFormatter.format(raw, interactiveStyle);
             if (formatted != null) {
                 mc.gui.getChat().addMessage(formatted);

@@ -14,8 +14,7 @@ public class GlyphCategory {
     @Expose
     @ConfigOption(
             name = "Glyphs in Player Messages",
-            desc = "Replace MST tags with pixel art glyphs in formatted player chat lines. " +
-                    "THIS REQUIRES PLAYER MESSAGING FORMATTING TO BE ENABLED")
+            desc = "Replace MST tags with pixel art glyphs in player chat lines")
     @ConfigEditorBoolean
     public boolean playerMessageGlyphs = false;
 

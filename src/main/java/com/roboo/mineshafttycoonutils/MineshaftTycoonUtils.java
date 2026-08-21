@@ -18,6 +18,7 @@ import com.roboo.mineshafttycoonutils.features.profit.ProfitHud;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
 import com.roboo.mineshafttycoonutils.features.profit.RefineryPetTracker;
 import com.roboo.mineshafttycoonutils.features.timers.BuffTracker;
+import com.roboo.mineshafttycoonutils.features.timers.GreenhouseTracker;
 import com.roboo.mineshafttycoonutils.features.timers.IlsRestockTracker;
 import com.roboo.mineshafttycoonutils.features.timers.PetAdTracker;
 import com.roboo.mineshafttycoonutils.features.timers.TimersHud;
@@ -55,6 +56,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         WarpHelper.init();
         BuffTracker.init();
         IlsRestockTracker.init();
+        GreenhouseTracker.init();
         TimersHud.init();
         MinecraftOptionUtils.init();
         NightVisionBlocker.init();

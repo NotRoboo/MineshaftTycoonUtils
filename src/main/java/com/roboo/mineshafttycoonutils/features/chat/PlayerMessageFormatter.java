@@ -34,19 +34,14 @@ public class PlayerMessageFormatter {
         if (!messageMatch.matches()) {
             messageMatch = MOD_USERS_PATTERN.matcher(rawWithCodes);
         }
-        if (messageMatch.matches()) {
-            if (cfg.enabled) {
-                return assembleMessage(cfg, messageMatch, interactiveStyle);
-            }
-            if (cfg.sameChatColor) {
-                MutableComponent result = Component.empty();
-                Component prefix = Component.literal(rawWithCodes.substring(0, messageMatch.start(5)));
-                result.append(preserveClickAndHover(prefix, interactiveStyle));
-                result.append(Component.literal("§f"));
-                result.append(Component.literal(rawWithCodes.substring(messageMatch.end(5))));
-                return result;
-            }
-            return null;
+        if (!messageMatch.matches()) return null;
+
+        if (cfg.enabled) {
+            return assembleMessage(cfg, messageMatch, interactiveStyle);
+        }
+
+        if (cfg.sameChatColor || ConfigManager.config.glyph.playerMessageGlyphs) {
+            return assembleUnformattedMessage(cfg, rawWithCodes, messageMatch, interactiveStyle);
         }
 
         return null;
@@ -98,6 +93,36 @@ public class PlayerMessageFormatter {
         }
 
         return result;
+    }
+
+    private static Component assembleUnformattedMessage(PlayerMessagesCategory cfg, String rawWithCodes, Matcher chatMatch, Style interactiveStyle) {
+        String prefixText = ConfigManager.config.glyph.playerMessageGlyphs
+                ? substituteTierGlyph(rawWithCodes, chatMatch)
+                : rawWithCodes.substring(0, chatMatch.start(5));
+
+        MutableComponent result = Component.empty();
+        result.append(preserveClickAndHover(Component.literal(prefixText), interactiveStyle));
+
+        String messageColor = cfg.sameChatColor ? "§f" : chatMatch.group(5);
+        result.append(Component.literal(messageColor));
+        result.append(Component.literal(rawWithCodes.substring(chatMatch.end(5))));
+
+        return result;
+    }
+
+    private static String substituteTierGlyph(String rawWithCodes, Matcher chatMatch) {
+        char tierColorChar = chatMatch.group(1).charAt(0);
+        String tierTag = RankTierData.resolveTag(chatMatch.group(2));
+        String glyphKey = RankTierData.glyphKeyFor(tierColorChar, tierTag);
+        String glyph = RankTierData.glyphFor(glyphKey);
+        if (glyph == null) return rawWithCodes.substring(0, chatMatch.start(5));
+
+        int tierStart = chatMatch.start(1) - 1;
+        int tierEnd = chatMatch.end(2) + 1;
+
+        return rawWithCodes.substring(0, tierStart)
+                + "§f" + glyph
+                + rawWithCodes.substring(tierEnd, chatMatch.start(5));
     }
 
     private static Component preserveClickAndHover(Component comp, Style interactiveStyle) {

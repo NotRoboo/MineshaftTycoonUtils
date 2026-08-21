@@ -1,10 +1,9 @@
 package com.roboo.mineshafttycoonutils.features.timers;
 
+import com.roboo.mineshafttycoonutils.utils.HologramUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.phys.AABB;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -93,13 +92,7 @@ public class PetAdTracker {
         if (++tickCounter < SCAN_INTERVAL_TICKS) return;
         tickCounter = 0;
 
-        AABB box = new AABB(
-                PETAD_X - HOLOGRAM_SEARCH_RADIUS, PETAD_Y - HOLOGRAM_SEARCH_RADIUS, PETAD_Z - HOLOGRAM_SEARCH_RADIUS,
-                PETAD_X + HOLOGRAM_SEARCH_RADIUS, PETAD_Y + HOLOGRAM_SEARCH_RADIUS, PETAD_Z + HOLOGRAM_SEARCH_RADIUS
-        );
-        for (ArmorStand stand : mc.level.getEntitiesOfClass(ArmorStand.class, box,
-                s -> s.isInvisible() && s.hasCustomName())) {
-            String name = cleanName(stand);
+        for (String name : HologramUtils.findNearbyHologramLines(PETAD_X, PETAD_Y, PETAD_Z, HOLOGRAM_SEARCH_RADIUS)) {
             String lower = name.toLowerCase(Locale.ROOT);
             if (!lower.contains("adventure time:")) continue;
 
@@ -127,12 +120,6 @@ public class PetAdTracker {
             endTime = projectedEnd;
             lastSeenSeconds = totalSeconds;
         }
-    }
-
-    private static String cleanName(ArmorStand stand) {
-        var custom = stand.getCustomName();
-        if (custom == null) return "";
-        return custom.getString().replaceAll("§[0-9a-fk-or]", "").trim();
     }
 
     public static boolean isKnown() {

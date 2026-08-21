@@ -102,8 +102,7 @@ public class ProfitHud {
             HudTextUtils.drawLine(graphics, "§7Boosts: §c(Open refinery & /pets)", anchorX, y + (LINE_HEIGHT * line++), rightAligned);
         }
 
-        HudTextUtils.drawLine(graphics, "§7$/Hour: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr",
-                anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+        HudTextUtils.drawLine(graphics, profitPerHourText(cfg), anchorX, y + (LINE_HEIGHT * line++), rightAligned);
         HudTextUtils.drawLine(graphics, "§7Total: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getTotalProfit(), cfg.shortenNumbers),
                 anchorX, y + (LINE_HEIGHT * line++), rightAligned);
 
@@ -121,13 +120,18 @@ public class ProfitHud {
         }
     }
 
+    private static String profitPerHourText(ProfitCategory cfg) {
+        String base = "§7$/Hour: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr";
+        return ProfitTracker.isPaused() ? base + " §c(Paused)" : base;
+    }
+
     private static int countTotalLines(ProfitCategory cfg, LinkedHashMap<String, Integer> breakdown) {
-        int total = 1; // header
+        int total = 1;
         if (ProfitTracker.needsRamLevel()) total++;
-        total += 2; // $/Hour, Total
+        total += 2;
 
         if (cfg.tracker.showOreDrops) {
-            total++; // "Ores" header
+            total++;
             total += breakdown.isEmpty() ? 1 : breakdown.size();
         }
 
@@ -142,7 +146,7 @@ public class ProfitHud {
         if (ProfitTracker.needsRamLevel()) {
             width = Math.max(width, mc.font.width("§7Boosts: §c(Open refinery & /pets)"));
         }
-        width = Math.max(width, mc.font.width("§7$/Hour: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr"));
+        width = Math.max(width, mc.font.width(profitPerHourText(cfg)));
         width = Math.max(width, mc.font.width("§7Total: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getTotalProfit(), cfg.shortenNumbers)));
 
         if (cfg.tracker.showOreDrops) {

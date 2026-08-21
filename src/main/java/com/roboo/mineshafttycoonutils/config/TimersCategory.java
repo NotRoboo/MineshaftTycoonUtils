@@ -67,7 +67,8 @@ public class TimersCategory {
         SQUASH("Squash"),
         DUSTGRAIN("Dustgrain"),
         SUNFLOWER("Sunflower"),
-        FISHING_BUFF("Fishing Buff");
+        FISHING_BUFF("Fishing Buff"),
+        GREENHOUSE("Greenhouse");
 
         private final String displayName;
 

@@ -105,6 +105,11 @@ public class TimersHud {
     private static List<String> calcLines(TimersCategory cfg) {
         List<String> lines = new ArrayList<>();
         for (TimersCategory.Entry entry : cfg.order) {
+            if (entry == TimersCategory.Entry.GREENHOUSE) {
+                lines.addAll(renderGreenhouseLines());
+                continue;
+            }
+
             String rendered = renderEntry(entry, cfg);
             if (rendered != null) lines.add(rendered);
         }
@@ -141,7 +146,17 @@ public class TimersHud {
             case FISHING_BUFF -> renderBuff("Fishing Buff: ", BuffTracker.Buff.FISHING_BUFF, cfg);
             case PETAD -> renderPetad(cfg);
             case ILS_RESTOCK -> renderIlsRestock(cfg);
+            case GREENHOUSE -> null;
         };
+    }
+
+    private static List<String> renderGreenhouseLines() {
+        List<String> lines = new ArrayList<>();
+        for (GreenhouseTracker.Plot plot : GreenhouseTracker.Plot.values()) {
+            GreenhouseTracker.State state = GreenhouseTracker.getState(plot);
+            lines.add("§7Plot " + plot.number + ": " + state.label());
+        }
+        return lines;
     }
 
     private static String renderBuff(String label, BuffTracker.Buff buff, TimersCategory cfg) {
