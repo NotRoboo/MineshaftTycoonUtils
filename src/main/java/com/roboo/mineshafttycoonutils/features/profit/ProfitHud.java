@@ -121,8 +121,8 @@ public class ProfitHud {
     }
 
     private static String profitPerHourText(ProfitCategory cfg) {
-        String base = "§7$/Hour: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr";
-        return ProfitTracker.isPaused() ? base + " §c(Paused)" : base;
+        String color = ProfitTracker.isPaused() ? "§c" : "§e";
+        return "§7$/Hour: " + color + "$" + NumberFormatUtils.formatShortened(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr";
     }
 
     private static int countTotalLines(ProfitCategory cfg, LinkedHashMap<String, Integer> breakdown) {

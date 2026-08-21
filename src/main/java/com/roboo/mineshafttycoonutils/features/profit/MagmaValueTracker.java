@@ -8,7 +8,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
 
@@ -20,7 +22,10 @@ import java.util.regex.Pattern;
 
 public class MagmaValueTracker {
 
+    private static final Minecraft mc = Minecraft.getInstance();
+
     private static final String CONTAINER_TITLE = "Space Ores Bag";
+    private static final String LARGE_CHEST_TITLE = "Large Chest";
 
     private static final Pattern AMOUNT_PATTERN =
             Pattern.compile("(?i)amount in bag:\\s*([0-9,]*)");
@@ -28,23 +33,32 @@ public class MagmaValueTracker {
     private static final Map<MagmaValueConfig.Entry, Long> quantities =
             new EnumMap<>(MagmaValueConfig.Entry.class);
 
+    private static final Map<MagmaValueConfig.Entry, Long> inventoryQuantities =
+            new EnumMap<>(MagmaValueConfig.Entry.class);
+
     public static void init() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
     }
 
     private static void onTick() {
-        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
 
-        if (mc.player == null || !(mc.screen instanceof AbstractContainerScreen<?> containerScreen)) {
-            return;
+        Inventory playerInventory = mc.player.getInventory();
+
+        Map<MagmaValueConfig.Entry, Long> invCounts = new EnumMap<>(MagmaValueConfig.Entry.class);
+        countInventory(playerInventory, invCounts);
+        inventoryQuantities.clear();
+        inventoryQuantities.putAll(invCounts);
+
+        if (mc.screen instanceof AbstractContainerScreen<?> containerScreen) {
+            String title = containerScreen.getTitle().getString().trim();
+
+            if (CONTAINER_TITLE.equalsIgnoreCase(title)) {
+                readContainer(containerScreen.getMenu());
+            } else if (LARGE_CHEST_TITLE.equalsIgnoreCase(title)) {
+                readChestQuantities(containerScreen.getMenu(), playerInventory);
+            }
         }
-
-        String title = containerScreen.getTitle().getString().trim();
-        if (!CONTAINER_TITLE.equalsIgnoreCase(title)) {
-            return;
-        }
-
-        readContainer(containerScreen.getMenu());
     }
 
     private static void readContainer(AbstractContainerMenu menu) {
@@ -78,6 +92,45 @@ public class MagmaValueTracker {
         }
     }
 
+    private static void countInventory(Inventory inventory, Map<MagmaValueConfig.Entry, Long> counts) {
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack stack = inventory.getItem(i);
+            if (stack.isEmpty()) continue;
+
+            String name = ChatFormatting.stripFormatting(stack.getHoverName().getString()).trim();
+            MagmaValueConfig.Entry entry = fromDisplayName(name);
+            if (entry == null) continue;
+
+            counts.merge(entry, (long) stack.getCount(), Long::sum);
+        }
+    }
+
+    private static void readChestQuantities(AbstractContainerMenu menu, Inventory playerInventory) {
+        Map<MagmaValueConfig.Entry, Long> counts = new EnumMap<>(MagmaValueConfig.Entry.class);
+
+        for (Slot slot : menu.slots) {
+            if (slot.container == playerInventory) continue;
+
+            ItemStack stack = slot.getItem();
+            if (stack.isEmpty()) continue;
+
+            String name = ChatFormatting.stripFormatting(stack.getHoverName().getString()).trim();
+            MagmaValueConfig.Entry entry = fromDisplayName(name);
+            if (entry == null) continue;
+
+            counts.merge(entry, (long) stack.getCount(), Long::sum);
+        }
+
+        for (MagmaValueConfig.Entry entry : MagmaValueConfig.Entry.values()) {
+            long quantity = counts.getOrDefault(entry, 0L);
+            if (quantity > 0) {
+                quantities.put(entry, quantity);
+            } else {
+                quantities.remove(entry);
+            }
+        }
+    }
+
     private static MagmaValueConfig.Entry fromDisplayName(String name) {
         for (MagmaValueConfig.Entry entry : MagmaValueConfig.Entry.values()) {
             if (entry.getDisplayName().equalsIgnoreCase(name)) return entry;
@@ -102,7 +155,25 @@ public class MagmaValueTracker {
         return total;
     }
 
+    public static long getInventoryQuantity(MagmaValueConfig.Entry entry) {
+        Long quantity = inventoryQuantities.get(entry);
+        return quantity != null ? quantity : 0;
+    }
+
+    public static long getInventoryMagmaValue(MagmaValueConfig.Entry entry) {
+        return getInventoryQuantity(entry) * entry.getMagmaValue();
+    }
+
+    public static long getTotalInventoryMagma() {
+        long total = 0;
+        for (MagmaValueConfig.Entry entry : ConfigManager.config.profit.magma.order) {
+            total += getInventoryMagmaValue(entry);
+        }
+        return total;
+    }
+
     public static void reset() {
         quantities.clear();
+        inventoryQuantities.clear();
     }
 }
