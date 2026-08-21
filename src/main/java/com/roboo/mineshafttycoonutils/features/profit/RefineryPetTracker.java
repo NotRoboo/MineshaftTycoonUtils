@@ -113,7 +113,7 @@ public class RefineryPetTracker {
         MutableComponent message = Component.literal(" " + label + " ")
                 .withStyle(Style.EMPTY.withColor(0xAAAAAA));
 
-        message.append(Component.literal("updated!")
+        message.append(Component.literal("Updated!")
                 .withStyle(Style.EMPTY.withColor(0x55FF55)));
 
         mc.execute(() -> mc.player.displayClientMessage(SystemMessages.get().append(message), false));
