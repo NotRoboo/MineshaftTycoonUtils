@@ -45,6 +45,10 @@ public class MSTUConfig extends Config {
     public GlyphCategory glyph = new GlyphCategory();
 
     @Expose
+    @Category(name = "Action Bar", desc = "Reorder or hide parts of the action bar")
+    public ActionBarCategory actionBar = new ActionBarCategory();
+
+    @Expose
     @Category(name = "Scoreboard", desc = "Reorder or hide lines on the in-game scoreboard")
     public ScoreboardCategory scoreboard = new ScoreboardCategory();
 

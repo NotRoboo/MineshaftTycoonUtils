@@ -90,11 +90,19 @@ public class Commands {
                             return 1;
                         })
                 )
-                .then(ClientCommandManager.literal("printscoreboard")
-                        .executes(ctx -> {
-                            ScoreboardUtils.printScoreboard();
-                            return 1;
-                        })
+                .then(ClientCommandManager.literal("debug")
+                        .then(ClientCommandManager.literal("printscoreboard")
+                                .executes(ctx -> {
+                                    ScoreboardUtils.printScoreboard();
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("printactionbar")
+                                .executes(ctx -> {
+                                    com.roboo.mineshafttycoonutils.utils.ActionBarDebugUtils.dumpActionBar();
+                                    return 1;
+                                })
+                        )
                 )
                 .then(ClientCommandManager.literal("edithud")
                         .executes(ctx -> {
