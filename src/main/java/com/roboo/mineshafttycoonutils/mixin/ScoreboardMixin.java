@@ -50,7 +50,7 @@ public class ScoreboardMixin {
                         && CustomScoreboardManager.isMineshaftTycoonBoard(rawLines);
 
                 if (mineshaftUtils$active) {
-                    mineshaftUtils$cachedLines = CustomScoreboardManager.buildDisplayLines();
+                    mineshaftUtils$cachedLines = CustomScoreboardManager.formatDisplayLines();
                 }
             }
         }

@@ -3,12 +3,14 @@ package com.roboo.mineshafttycoonutils.features.scoreboard;
 import com.roboo.mineshafttycoonutils.MineshaftTycoonUtils;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.ScoreboardCategory;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.ChatFormatting;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CustomScoreboardManager {
@@ -16,7 +18,66 @@ public class CustomScoreboardManager {
     private static final Pattern DATE_PATTERN = Pattern.compile("^\\d{2}/\\d{2}/\\d{2}\\b");
     private static final String TITLE_TEXT = "§4§lMINESHAFT §c§lTYCOON";
 
+    private static final Pattern PET_MAGMA_PATTERN =
+            Pattern.compile("(?i)^\\*?\\s*pets!\\s*your\\s+.+?\\s+pet mined up\\s+(\\d+)\\s+magma for you!$");
+
+    private static final Pattern SCOREBOARD_MAGMA_PATTERN = Pattern.compile("(?<!§)([0-9][0-9,]*)");
+
     private CustomScoreboardManager() {}
+
+    public static void init() {
+        ClientReceiveMessageEvents.ALLOW_GAME.register((msg, overlay) -> {
+            handlePetMagmaMessage(msg.getString());
+            return true;
+        });
+
+        ClientReceiveMessageEvents.ALLOW_CHAT.register((msg, signed, sender, params, timestamp) -> {
+            handlePetMagmaMessage(msg.getString());
+            return true;
+        });
+    }
+
+    private static void handlePetMagmaMessage(String msg) {
+        if (msg == null) return;
+        String stripped = ChatFormatting.stripFormatting(msg).trim();
+        if (stripped.isEmpty()) return;
+
+        Matcher m = PET_MAGMA_PATTERN.matcher(stripped);
+        if (!m.matches()) return;
+
+        long amount;
+        try {
+            amount = Long.parseLong(m.group(1));
+        } catch (NumberFormatException e) {
+            return;
+        }
+
+        addMagma(amount);
+    }
+
+    private static void addMagma(long amount) {
+        ScoreboardCategory cfg = ConfigManager.config.scoreboard;
+        String known = cfg.lastKnownLines.get(ScoreboardCategory.Line.MAGMA);
+        if (known == null) return;
+
+        Matcher numberMatch = SCOREBOARD_MAGMA_PATTERN.matcher(known);
+        if (!numberMatch.find()) return;
+
+        long current;
+        try {
+            current = Long.parseLong(numberMatch.group(1).replace(",", ""));
+        } catch (NumberFormatException e) {
+            return;
+        }
+
+        long updated = current + amount;
+        String updatedLine = known.substring(0, numberMatch.start())
+                + String.format("%,d", updated)
+                + known.substring(numberMatch.end());
+
+        cfg.lastKnownLines.put(ScoreboardCategory.Line.MAGMA, updatedLine);
+        MineshaftTycoonUtils.configManager.saveConfig();
+    }
 
     public static void observe(List<String> rawFormattedLines) {
         ScoreboardCategory cfg = ConfigManager.config.scoreboard;
@@ -29,7 +90,7 @@ public class CustomScoreboardManager {
             String stripped = ChatFormatting.stripFormatting(raw).trim();
             if (stripped.isEmpty()) continue;
 
-            ScoreboardCategory.Line line = classify(stripped);
+            ScoreboardCategory.Line line = matchScoreboardLine(stripped);
             if (line == null) continue;
 
             seen.add(line);
@@ -61,7 +122,7 @@ public class CustomScoreboardManager {
         return false;
     }
 
-    public static List<String> buildDisplayLines() {
+    public static List<String> formatDisplayLines() {
         ScoreboardCategory cfg = ConfigManager.config.scoreboard;
         List<String> result = new ArrayList<>(cfg.lineOrder.size() + 1);
         result.add(TITLE_TEXT);
@@ -85,7 +146,7 @@ public class CustomScoreboardManager {
         return result;
     }
 
-    private static ScoreboardCategory.Line classify(String stripped) {
+    private static ScoreboardCategory.Line matchScoreboardLine(String stripped) {
         String lower = stripped.toLowerCase(Locale.ROOT);
 
         if (lower.contains("itv")) return ScoreboardCategory.Line.BY_ITV;

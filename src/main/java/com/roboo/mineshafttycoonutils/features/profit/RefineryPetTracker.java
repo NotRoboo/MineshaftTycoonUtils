@@ -116,6 +116,6 @@ public class RefineryPetTracker {
         message.append(Component.literal("Updated!")
                 .withStyle(Style.EMPTY.withColor(0x55FF55)));
 
-        mc.execute(() -> mc.player.displayClientMessage(SystemMessages.get().append(message), false));
+        mc.execute(() -> mc.player.displayClientMessage(SystemMessages.buildPrefix().append(message), false));
     }
 }

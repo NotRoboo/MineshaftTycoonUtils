@@ -17,6 +17,7 @@ import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitHud;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
 import com.roboo.mineshafttycoonutils.features.profit.RefineryPetTracker;
+import com.roboo.mineshafttycoonutils.features.scoreboard.CustomScoreboardManager;
 import com.roboo.mineshafttycoonutils.features.timers.BuffTracker;
 import com.roboo.mineshafttycoonutils.features.timers.GreenhouseTracker;
 import com.roboo.mineshafttycoonutils.features.timers.IlsRestockTracker;
@@ -40,6 +41,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         FishingTracker.init();
         OreDropTracker.init();
         PetAdTracker.init();
+        CustomScoreboardManager.init();
         MessageHider.init();
         PlayerMessageHandler.init();
 

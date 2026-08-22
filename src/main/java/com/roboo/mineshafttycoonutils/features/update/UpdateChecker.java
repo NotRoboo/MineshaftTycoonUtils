@@ -101,6 +101,6 @@ public class UpdateChecker {
         message.append(Component.literal(")")
                 .withStyle(Style.EMPTY.withColor(0xAAAAAA)));
 
-        mc.player.displayClientMessage(SystemMessages.get().append(message), false);
+        mc.player.displayClientMessage(SystemMessages.buildPrefix().append(message), false);
     }
 }

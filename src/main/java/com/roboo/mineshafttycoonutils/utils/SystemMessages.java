@@ -11,11 +11,11 @@ public class SystemMessages {
     private static final int GRADIENT_START = 0xFF0084;
     private static final int GRADIENT_END = 0x9A003D;
 
-    public static MutableComponent get() {
-        return get("");
+    public static MutableComponent buildPrefix() {
+        return buildPrefix("");
     }
 
-    public static MutableComponent get(String message) {
+    public static MutableComponent buildPrefix(String message) {
         String full = message.isEmpty() ? PREFIX : PREFIX + " " + message;
         MutableComponent result = Component.empty();
 

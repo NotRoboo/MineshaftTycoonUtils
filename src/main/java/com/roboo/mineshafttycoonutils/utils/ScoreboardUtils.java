@@ -24,7 +24,7 @@ public class ScoreboardUtils {
 
     private ScoreboardUtils() {}
 
-    public static void dumpSidebar() {
+    public static void printScoreboard() {
         if (mc.player == null || mc.level == null) {
             sendPlain("§cNo active world to read a scoreboard from.");
             return;
@@ -78,7 +78,7 @@ public class ScoreboardUtils {
 
     private static void sendHeader(String message) {
         if (mc.player == null) return;
-        mc.player.displayClientMessage(SystemMessages.get().append(colored(" " + message)), false);
+        mc.player.displayClientMessage(SystemMessages.buildPrefix().append(colored(" " + message)), false);
     }
 
     private static void sendPlain(String message) {

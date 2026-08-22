@@ -92,7 +92,7 @@ public class Commands {
                 )
                 .then(ClientCommandManager.literal("printscoreboard")
                         .executes(ctx -> {
-                            ScoreboardUtils.dumpSidebar();
+                            ScoreboardUtils.printScoreboard();
                             return 1;
                         })
                 )
@@ -114,6 +114,6 @@ public class Commands {
         message.append(Component.literal("Reset!")
                 .withStyle(Style.EMPTY.withColor(0xFF5555)));
 
-        mc.player.displayClientMessage(SystemMessages.get().append(message), false);
+        mc.player.displayClientMessage(SystemMessages.buildPrefix().append(message), false);
     }
 }

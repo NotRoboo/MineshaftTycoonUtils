@@ -82,7 +82,7 @@ public class MinecraftOptionUtils {
         message.append(Component.literal(enabled ? "Enabled" : "Disabled")
                 .withStyle(Style.EMPTY.withColor(enabled ? 0x55FF55 : 0xFF5555)));
 
-        mc.player.displayClientMessage(SystemMessages.get().append(message), false);
+        mc.player.displayClientMessage(SystemMessages.buildPrefix().append(message), false);
     }
 
     private static boolean isKeyDown(int glfwKey) {
