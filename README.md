@@ -3,9 +3,9 @@
 <p align="center">Client-side Fabric mod for MineshaftTycoon — fishing & profit tracking, chat cleanup, glyph ranks, HUDs, and more.</p>
 
 <p align="center">
-  <a href="https://github.com/yourusername/mineshafttycoonutils/releases"><b>Download Latest</b></a>
+  <a href="https://github.com/NotRoboo/mineshafttycoonutils/releases"><b>Download Latest</b></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/yourusername/mineshafttycoonutils/releases">all releases</a>
+  <a href="https://github.com/NotRoboo/mineshafttycoonutils/releases">all releases</a>
 </p>
 
 ## Installation
@@ -14,7 +14,7 @@
 2. Install the required mods:
    - [Fabric API](https://modrinth.com/mod/fabric-api)
    - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
-3. Download the latest jar from [Releases](https://github.com/yourusername/mineshafttycoonutils/releases) and place it in your `mods` folder.
+3. Download the latest jar from [Releases](https://github.com/NotRoboo/mineshafttycoonutils/releases) and place it in your `mods` folder.
 4. Launch with the Fabric profile and run `/mstu` to open the config.
 
 ## Features
