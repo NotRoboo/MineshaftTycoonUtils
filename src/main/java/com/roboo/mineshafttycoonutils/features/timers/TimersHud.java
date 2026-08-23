@@ -133,10 +133,10 @@ public class TimersHud {
 
     private static String renderEntry(TimersCategory.Entry entry, TimersCategory cfg) {
         return switch (entry) {
-            case T4_POTION -> renderBuff("T4 Pot: ", BuffTracker.Buff.T4_POTION, cfg);
-            case T3_POTION -> renderBuff("T3 Pot: ", BuffTracker.Buff.T3_POTION, cfg);
-            case T2_POTION -> renderBuff("T2 Pot: ", BuffTracker.Buff.T2_POTION, cfg);
-            case T1_POTION -> renderBuff("T1 Pot: ", BuffTracker.Buff.T1_POTION, cfg);
+            case T4_POTION -> renderPotion("T4 Pot: ", BuffTracker.Buff.T4_POTION, cfg);
+            case T3_POTION -> renderPotion("T3 Pot: ", BuffTracker.Buff.T3_POTION, cfg);
+            case T2_POTION -> renderPotion("T2 Pot: ", BuffTracker.Buff.T2_POTION, cfg);
+            case T1_POTION -> renderPotion("T1 Pot: ", BuffTracker.Buff.T1_POTION, cfg);
             case IRONVINE -> renderBuff("Ironvine: ", BuffTracker.Buff.IRONVINE, cfg);
             case REDROOT -> renderBuff("Redroot: ", BuffTracker.Buff.REDROOT, cfg);
             case AURORA_FRUIT -> renderBuff("Aurora Fruit: ", BuffTracker.Buff.AURORA_FRUIT, cfg);
@@ -148,6 +148,16 @@ public class TimersHud {
             case ILS_RESTOCK -> renderIlsRestock(cfg);
             case GREENHOUSE -> null;
         };
+    }
+
+    private static String renderPotion(String label, BuffTracker.Buff buff, TimersCategory cfg) {
+        long secondsLeft = BuffTracker.getPotionSecondsLeft(buff);
+        if (secondsLeft <= 0) return null;
+
+        String time = formatDuration(secondsLeft, cfg);
+        boolean active = BuffTracker.isPotionActive(buff);
+        String color = active ? "§e" : "§c";
+        return "§7" + label + color + time;
     }
 
     private static List<String> renderGreenhouseLines() {

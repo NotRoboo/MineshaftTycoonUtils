@@ -121,7 +121,7 @@ public class MagmaHud {
         long totalMagma = MagmaValueTracker.getTotalInventoryMagma();
         long totalCoins = totalMagma * cfg.magmaPriceBillions * COINS_PER_BILLION;
 
-        return "§lInventory Total: §c" + String.format("%,d", totalMagma)
+        return "§lInv Total: §c" + String.format("%,d", totalMagma)
                 + " Magma ($" + NumberFormatUtils.formatShortened(totalCoins, ConfigManager.config.profit.shortenNumbers) + ")";
     }
 

@@ -54,15 +54,17 @@ public class MagmaValueTracker {
             String title = containerScreen.getTitle().getString().trim();
 
             if (CONTAINER_TITLE.equalsIgnoreCase(title)) {
-                readContainer(containerScreen.getMenu());
+                readContainer(containerScreen.getMenu(), playerInventory);
             } else if (LARGE_CHEST_TITLE.equalsIgnoreCase(title)) {
                 readChestQuantities(containerScreen.getMenu(), playerInventory);
             }
         }
     }
 
-    private static void readContainer(AbstractContainerMenu menu) {
-        for (var slot : menu.slots) {
+    private static void readContainer(AbstractContainerMenu menu, Inventory playerInventory) {
+        for (Slot slot : menu.slots) {
+            if (slot.container == playerInventory) continue;
+
             ItemStack stack = slot.getItem();
             if (stack.isEmpty()) continue;
 
