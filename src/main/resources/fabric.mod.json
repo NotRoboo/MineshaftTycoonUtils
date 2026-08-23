@@ -9,6 +9,7 @@
   ],
   "contact": {},
   "license": "MIT",
+  "icon": "assets/mineshafttycoonutils/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
