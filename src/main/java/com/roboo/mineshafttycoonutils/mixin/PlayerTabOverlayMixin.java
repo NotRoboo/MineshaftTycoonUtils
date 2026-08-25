@@ -31,7 +31,7 @@ public class PlayerTabOverlayMixin {
 
     @Inject(method = "getNameForDisplay", at = @At("RETURN"), cancellable = true)
     private void mineshaftUtils$rewriteDisplayName(PlayerInfo info, CallbackInfoReturnable<Component> cir) {
-        if (!ConfigManager.config.glyph.tablistGlyphs) return;
+        if (!ConfigManager.config.glyph.tablistGlyphs.isEnabled()) return;
 
         TabListEntryParser.Parsed parsed = mineshaftUtils$parse(info);
         if (parsed == null) return;
@@ -85,8 +85,9 @@ public class PlayerTabOverlayMixin {
     @Unique
     private static String mineshaftUtils$tierSegment(TabListEntryParser.Parsed parsed) {
         if (parsed.tierTag() == null) return null;
+        GlyphCategory.GlyphMode mode = ConfigManager.config.glyph.tablistGlyphs;
         String glyphKey = RankTierData.glyphKeyFor(parsed.tierColor(), parsed.tierTag());
-        String glyph = RankTierData.glyphFor(glyphKey);
+        String glyph = RankTierData.glyphFor(glyphKey, mode);
         if (glyph != null) return "§f" + glyph;
         return "§" + parsed.tierColor() + "[" + parsed.tierTag() + "]";
     }

@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.chat;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.config.GlyphCategory;
 import com.roboo.mineshafttycoonutils.config.PlayerMessagesCategory;
 import com.roboo.mineshafttycoonutils.utils.RankTierData;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
@@ -40,7 +41,7 @@ public class PlayerMessageFormatter {
             return assembleMessage(cfg, messageMatch, interactiveStyle);
         }
 
-        if (cfg.sameChatColor || ConfigManager.config.glyph.playerMessageGlyphs) {
+        if (cfg.sameChatColor || ConfigManager.config.glyph.playerMessageGlyphs.isEnabled()) {
             return assembleUnformattedMessage(cfg, rawWithCodes, messageMatch, interactiveStyle);
         }
 
@@ -56,6 +57,7 @@ public class PlayerMessageFormatter {
 
         String tierTag = RankTierData.resolveTag(chatMatch.group(2));
         String glyphKey = RankTierData.glyphKeyFor(tierColorChar, tierTag);
+        GlyphCategory.GlyphMode glyphMode = ConfigManager.config.glyph.playerMessageGlyphs;
 
         char rankColor = rankSegment.charAt(1);
         boolean hasRankTag = rankSegment.contains("[");
@@ -67,7 +69,7 @@ public class PlayerMessageFormatter {
         for (PlayerMessagesCategory.Part part : cfg.partOrder) {
             Component segment = switch (part) {
                 case TIER -> {
-                    String glyph = ConfigManager.config.glyph.playerMessageGlyphs ? RankTierData.glyphFor(glyphKey) : null;
+                    String glyph = glyphMode.isEnabled() ? RankTierData.glyphFor(glyphKey, glyphMode) : null;
                     if (glyph != null) {
                         yield Component.literal("§f" + glyph);
                     }
@@ -96,8 +98,9 @@ public class PlayerMessageFormatter {
     }
 
     private static Component assembleUnformattedMessage(PlayerMessagesCategory cfg, String rawWithCodes, Matcher chatMatch, Style interactiveStyle) {
-        String prefixText = ConfigManager.config.glyph.playerMessageGlyphs
-                ? substituteTierGlyph(rawWithCodes, chatMatch)
+        GlyphCategory.GlyphMode glyphMode = ConfigManager.config.glyph.playerMessageGlyphs;
+        String prefixText = glyphMode.isEnabled()
+                ? substituteTierGlyph(rawWithCodes, chatMatch, glyphMode)
                 : rawWithCodes.substring(0, chatMatch.start(5));
 
         MutableComponent result = Component.empty();
@@ -110,11 +113,11 @@ public class PlayerMessageFormatter {
         return result;
     }
 
-    private static String substituteTierGlyph(String rawWithCodes, Matcher chatMatch) {
+    private static String substituteTierGlyph(String rawWithCodes, Matcher chatMatch, GlyphCategory.GlyphMode mode) {
         char tierColorChar = chatMatch.group(1).charAt(0);
         String tierTag = RankTierData.resolveTag(chatMatch.group(2));
         String glyphKey = RankTierData.glyphKeyFor(tierColorChar, tierTag);
-        String glyph = RankTierData.glyphFor(glyphKey);
+        String glyph = RankTierData.glyphFor(glyphKey, mode);
         if (glyph == null) return rawWithCodes.substring(0, chatMatch.start(5));
 
         int tierStart = chatMatch.start(1) - 1;

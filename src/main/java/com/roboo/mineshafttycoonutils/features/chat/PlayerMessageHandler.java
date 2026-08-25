@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.chat;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.config.GlyphCategory;
 import com.roboo.mineshafttycoonutils.config.PlayerMessagesCategory;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
 import com.roboo.mineshafttycoonutils.utils.GlyphTextUtils;
@@ -26,9 +27,10 @@ public class PlayerMessageHandler {
 
     private static boolean handle(Component message) {
         PlayerMessagesCategory cfg = ConfigManager.config.playerMessages;
-        boolean playerGlyphsEnabled = ConfigManager.config.glyph.playerMessageGlyphs;
+        GlyphCategory.GlyphMode playerGlyphMode = ConfigManager.config.glyph.playerMessageGlyphs;
+        GlyphCategory.GlyphMode otherGlyphMode = ConfigManager.config.glyph.otherMessageGlyphs;
 
-        if (!cfg.enabled && !cfg.sameChatColor && !playerGlyphsEnabled && !ConfigManager.config.glyph.otherMessageGlyphs) return true;
+        if (!cfg.enabled && !cfg.sameChatColor && !playerGlyphMode.isEnabled() && !otherGlyphMode.isEnabled()) return true;
         if (message == null) return true;
 
         Style interactiveStyle = ComponentTextUtils.findInteractiveStyle(message);
@@ -37,7 +39,7 @@ public class PlayerMessageHandler {
 
         if (MessageHider.shouldHide(raw)) return true;
 
-        if (cfg.enabled || cfg.sameChatColor || playerGlyphsEnabled) {
+        if (cfg.enabled || cfg.sameChatColor || playerGlyphMode.isEnabled()) {
             Component formatted = PlayerMessageFormatter.format(raw, interactiveStyle);
             if (formatted != null) {
                 mc.gui.getChat().addMessage(formatted);
@@ -45,8 +47,8 @@ public class PlayerMessageHandler {
             }
         }
 
-        if (ConfigManager.config.glyph.otherMessageGlyphs) {
-            String replaced = GlyphTextUtils.substituteTierTags(raw, true);
+        if (otherGlyphMode.isEnabled()) {
+            String replaced = GlyphTextUtils.substituteTierTags(raw, otherGlyphMode);
             if (!replaced.equals(raw)) {
                 mc.gui.getChat().addMessage(preserveClickAndHover(Component.literal(replaced), interactiveStyle));
                 return false;

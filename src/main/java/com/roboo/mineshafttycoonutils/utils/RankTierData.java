@@ -1,5 +1,7 @@
 package com.roboo.mineshafttycoonutils.utils;
 
+import com.roboo.mineshafttycoonutils.config.GlyphCategory;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -7,7 +9,7 @@ import java.util.Map;
 
 /**
  * Shared staff/tier tag data used by chat formatting, the tab list overlay,
- * and nametag rendering so all three stay in sync. This replaces  what was in PlayerMessageFormatter.
+ * and nametag rendering so all three stay in sync.
  */
 public class RankTierData {
 
@@ -54,6 +56,15 @@ public class RankTierData {
         TIER_GLYPHS.put("System", "\uE016");
     }
 
+    // just offsetting og glyphs by 100
+    public static final Map<String, String> TIER_GLYPHS_TEXTURED = new LinkedHashMap<>();
+    static {
+        for (Map.Entry<String, String> entry : TIER_GLYPHS.entrySet()) {
+            char shifted = (char) (entry.getValue().charAt(0) + 0x100);
+            TIER_GLYPHS_TEXTURED.put(entry.getKey(), String.valueOf(shifted));
+        }
+    }
+
     public static final List<String> TIER_SORT_ORDER = List.of(
             "OWNER", "MANAGER", "ADMIN", "DEV", "BUILD", "MOD", "HELPER", "SYSTEM",
             "4T5", "6T5", "7T5",
@@ -94,8 +105,13 @@ public class RankTierData {
         return staff != null ? staff.display() : (colorChar + resolvedTag);
     }
 
-    public static String glyphFor(String glyphKey) {
-        return TIER_GLYPHS.get(glyphKey);
+    public static String glyphFor(String glyphKey, GlyphCategory.GlyphMode mode) {
+        if (mode == null) return null;
+        return switch (mode) {
+            case CLASSIC -> TIER_GLYPHS.get(glyphKey);
+            case THEMED -> TIER_GLYPHS_TEXTURED.get(glyphKey);
+            case OFF -> null;
+        };
     }
 
     public static int tierSortIndex(char colorChar, String resolvedTag) {

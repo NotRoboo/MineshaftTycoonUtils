@@ -1,5 +1,6 @@
 package com.roboo.mineshafttycoonutils.utils;
 
+import com.roboo.mineshafttycoonutils.config.GlyphCategory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,8 +10,8 @@ public class GlyphTextUtils {
 
     private GlyphTextUtils() {}
 
-    public static String substituteTierTags(String rawWithCodes, boolean enabled) {
-        if (rawWithCodes == null || !enabled) {
+    public static String substituteTierTags(String rawWithCodes, GlyphCategory.GlyphMode mode) {
+        if (rawWithCodes == null || mode == null || !mode.isEnabled()) {
             return rawWithCodes;
         }
 
@@ -21,7 +22,7 @@ public class GlyphTextUtils {
             char colorChar = m.group(1).charAt(0);
             String resolvedTag = RankTierData.resolveTag(m.group(2));
             String glyphKey = RankTierData.glyphKeyFor(colorChar, resolvedTag);
-            String glyph = RankTierData.glyphFor(glyphKey);
+            String glyph = RankTierData.glyphFor(glyphKey, mode);
             if (glyph == null) continue;
 
             out.append(rawWithCodes, last, m.start())
