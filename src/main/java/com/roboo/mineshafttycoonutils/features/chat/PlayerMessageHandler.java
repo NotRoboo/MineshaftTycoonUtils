@@ -4,6 +4,7 @@ import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.GlyphCategory;
 import com.roboo.mineshafttycoonutils.config.PlayerMessagesCategory;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
+import com.roboo.mineshafttycoonutils.utils.EmojiTextUtils;
 import com.roboo.mineshafttycoonutils.utils.GlyphTextUtils;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.Minecraft;
@@ -29,15 +30,18 @@ public class PlayerMessageHandler {
         PlayerMessagesCategory cfg = ConfigManager.config.playerMessages;
         GlyphCategory.GlyphMode playerGlyphMode = ConfigManager.config.glyph.playerMessageGlyphs;
         GlyphCategory.GlyphMode otherGlyphMode = ConfigManager.config.glyph.otherMessageGlyphs;
+        boolean emojiEnabled = ConfigManager.config.emoji.emojisEnabled;
 
-        if (!cfg.enabled && !cfg.sameChatColor && !playerGlyphMode.isEnabled() && !otherGlyphMode.isEnabled()) return true;
+        if (!cfg.enabled && !cfg.sameChatColor && !playerGlyphMode.isEnabled() && !otherGlyphMode.isEnabled() && !emojiEnabled) return true;
         if (message == null) return true;
 
         Style interactiveStyle = ComponentTextUtils.findInteractiveStyle(message);
-        String raw = ComponentTextUtils.stripHypixelMessage(ComponentTextUtils.formattedText(message));
-        if (raw.isEmpty()) return true;
+        String originalRaw = ComponentTextUtils.stripHypixelMessage(ComponentTextUtils.formattedText(message));
+        if (originalRaw.isEmpty()) return true;
 
-        if (MessageHider.shouldHide(raw)) return true;
+        if (MessageHider.shouldHide(originalRaw)) return true;
+
+        String raw = emojiEnabled ? EmojiTextUtils.substitute(originalRaw, true) : originalRaw;
 
         if (cfg.enabled || cfg.sameChatColor || playerGlyphMode.isEnabled()) {
             Component formatted = PlayerMessageFormatter.format(raw, interactiveStyle);
@@ -47,12 +51,14 @@ public class PlayerMessageHandler {
             }
         }
 
+        String replaced = raw;
         if (otherGlyphMode.isEnabled()) {
-            String replaced = GlyphTextUtils.substituteTierTags(raw, otherGlyphMode);
-            if (!replaced.equals(raw)) {
-                mc.gui.getChat().addMessage(preserveClickAndHover(Component.literal(replaced), interactiveStyle));
-                return false;
-            }
+            replaced = GlyphTextUtils.substituteTierTags(replaced, otherGlyphMode);
+        }
+
+        if (!replaced.equals(originalRaw)) {
+            mc.gui.getChat().addMessage(preserveClickAndHover(Component.literal(replaced), interactiveStyle));
+            return false;
         }
 
         return true;

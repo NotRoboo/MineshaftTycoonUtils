@@ -2,115 +2,231 @@
     "providers": [
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/owner.png",
+            "file": "minecraft:ranks/classic/owner.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE009"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/manager.png",
+            "file": "minecraft:ranks/classic/manager.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE010"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/dev.png",
+            "file": "minecraft:ranks/classic/dev.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE011"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/admin.png",
+            "file": "minecraft:ranks/classic/admin.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE012"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/builder.png",
+            "file": "minecraft:ranks/classic/builder.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE013"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/mod.png",
+            "file": "minecraft:ranks/classic/mod.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE014"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/helper.png",
+            "file": "minecraft:ranks/classic/helper.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE015"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/system.png",
+            "file": "minecraft:ranks/classic/system.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE016"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/t1.png",
+            "file": "minecraft:ranks/classic/t1.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE001"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/t2.png",
+            "file": "minecraft:ranks/classic/t2.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE002"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/t3.png",
+            "file": "minecraft:ranks/classic/t3.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE003"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/t4v2.png",
+            "file": "minecraft:ranks/classic/t4v2.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE004"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/t4v1.png",
+            "file": "minecraft:ranks/classic/t4v1.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE005"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/t5p1.png",
+            "file": "minecraft:ranks/classic/t5p1.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE006"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/t5p2.png",
+            "file": "minecraft:ranks/classic/t5p2.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE007"]
         },
         {
             "type": "bitmap",
-            "file": "minecraft:ranks/t5p3.png",
+            "file": "minecraft:ranks/classic/t5p3.png",
             "ascent": 8,
             "height": 9,
             "chars": ["\uE008"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-owner.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE109"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-manager.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE110"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-dev.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE111"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-admin.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE112"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-builder.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE113"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-mod.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE114"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-helper.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE115"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-system.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE116"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-t1.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE101"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-t2.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE102"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-t3.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE103"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-t4v2.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE104"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-t4v1.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE105"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-t5p1.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE106"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-t5p2.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE107"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/themed/themed-t5p3.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE108"]
+        },
+        {
+            "type": "reference",
+            "id": "mineshafttycoonutils:emojis"
         }
     ]
 }

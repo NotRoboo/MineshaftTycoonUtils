@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.config.chat.EmojiConfig;
 import io.github.notenoughupdates.moulconfig.Config;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText;
@@ -55,4 +56,8 @@ public class MSTUConfig extends Config {
     @Expose
     @Category(name = "Misc", desc = "Miscellaneous quality-of-life settings")
     public MiscCategory misc = new MiscCategory();
+
+    @Expose
+    @Category(name = "Emojis", desc = "Chat emoji settings")
+    public EmojiConfig emoji = new EmojiConfig();
 }
