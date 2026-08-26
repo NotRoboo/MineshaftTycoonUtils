@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class EmojiConfig {
 
     @Expose
-    @ConfigOption(name = "Enable Emojis", desc = "Replace :shortcode: text with emoji images in chat messages")
+    @ConfigOption(name = "Enable Emojis", desc = "Replace :shortcode: text like :mpreg: with emoji images in chat messages")
     @ConfigEditorBoolean
     public boolean emojisEnabled = true;
 

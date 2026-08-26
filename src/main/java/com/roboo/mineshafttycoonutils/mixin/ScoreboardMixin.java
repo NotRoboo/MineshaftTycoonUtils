@@ -2,8 +2,8 @@ package com.roboo.mineshafttycoonutils.mixin;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.features.scoreboard.CustomScoreboardManager;
+import com.roboo.mineshafttycoonutils.features.scoreboard.ScoreboardHud;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -57,7 +57,7 @@ public class ScoreboardMixin {
 
         if (!mineshaftUtils$active) return;
 
-        mineshaftUtils$renderCustomSidebar(guiGraphics, mineshaftUtils$cachedLines);
+        ScoreboardHud.renderLines(guiGraphics, mineshaftUtils$cachedLines);
         ci.cancel();
     }
 
@@ -75,39 +75,5 @@ public class ScoreboardMixin {
         }
 
         return lines;
-    }
-
-    @Unique
-    private void mineshaftUtils$renderCustomSidebar(GuiGraphics graphics, List<String> lines) {
-        var font = Minecraft.getInstance().font;
-        int lineHeight = 9;
-
-        int width = 0;
-        for (String line : lines) {
-            width = Math.max(width, font.width(line));
-        }
-        width += 6;
-
-        int screenWidth = graphics.guiWidth();
-        int screenHeight = graphics.guiHeight();
-        int totalHeight = lines.size() * lineHeight + 2;
-
-        int top = (screenHeight - totalHeight) / 2;
-        int right = screenWidth - 1;
-        int left = right - width;
-
-        graphics.fill(left, top - 2, right, top + totalHeight, 0x4E000000);
-
-        int y = top;
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            if (!line.isEmpty()) {
-                int x = i == 0
-                        ? left + (width - font.width(line)) / 2 // title (always first) - centered
-                        : left + 3;                              // everything else - left aligned
-                graphics.drawString(font, line, x, y, 0xFFFFFFFF, true);
-            }
-            y += lineHeight;
-        }
     }
 }

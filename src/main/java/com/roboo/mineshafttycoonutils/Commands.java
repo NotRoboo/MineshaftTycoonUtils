@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.roboo.mineshafttycoonutils.config.ConfigGuiManager;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.config.ScoreboardCategory;
 import com.roboo.mineshafttycoonutils.features.fishing.FishingTracker;
 import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
@@ -85,6 +86,8 @@ public class Commands {
                             ConfigManager.config.timers.timersHudY = DEFAULT_TIMERS_HUD_Y;
                             ConfigManager.config.information.informationHudX = DEFAULT_INFORMATION_HUD_X;
                             ConfigManager.config.information.informationHudY = DEFAULT_INFORMATION_HUD_Y;
+                            ConfigManager.config.scoreboard.hudX = ScoreboardCategory.AUTO_POSITION;
+                            ConfigManager.config.scoreboard.hudY = ScoreboardCategory.AUTO_POSITION;
                             MineshaftTycoonUtils.configManager.saveConfig();
                             resetMsg("HUD positions");
                             return 1;

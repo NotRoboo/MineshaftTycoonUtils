@@ -17,6 +17,10 @@
 3. Download the latest jar from [Releases](https://github.com/NotRoboo/mineshafttycoonutils/releases) and place it in your `mods` folder.
 4. Launch with the Fabric profile and run `/mstu` to open the config.
 
+## Special Thanks
+ Special thanks to `_CB_KYE_, ov3rstimulated, KingCacti` and everyone who helped with testing. An additional thanks to
+ `watergrowsifwhat` for making the `Themed` version of the glyphs
+
 ## Features
 
 - **Player Message Formatting** – Reorder ranks, hide Hypixel ranks, custom name colors, white chat for non-ranks.

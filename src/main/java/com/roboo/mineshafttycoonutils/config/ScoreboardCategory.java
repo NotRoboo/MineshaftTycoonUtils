@@ -12,6 +12,8 @@ import java.util.Map;
 
 public class ScoreboardCategory {
 
+    public static final int AUTO_POSITION = Integer.MIN_VALUE;
+
     @Expose
     @ConfigOption(
             name = "Enable Custom Scoreboard",
@@ -41,6 +43,12 @@ public class ScoreboardCategory {
             Line.BLANK_2,
             Line.TIME
     ));
+
+    @Expose
+    public int hudX = AUTO_POSITION;
+
+    @Expose
+    public int hudY = AUTO_POSITION;
 
     @Expose
     public Map<Line, String> lastKnownLines = new EnumMap<>(Line.class);
