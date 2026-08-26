@@ -31,6 +31,7 @@
 - **Magma / Bag Value HUDs** – Ore bag value with Cash Reg, Refinery & Dune Ram buffs.
 - **Timers HUD** – Potion durations, PetAd timer, Il's restock.
 - **Chat Filters** – Toggleable filters for join messages, pet XP, fishing spam, Discord ads, etc.
+- **Chat Emotes** - `:fire:` etc. in chat, most popular ~150 emotes and ~15 flags
 - **Warp & Pet Helper** – `/warp <name>` / `/pet <name>` auto-clicks the menu (disabled by default, use at your own risk).
 - **Custom Scoreboard** – Reorder lines while keeping live values.
 - **Misc** – ToggleAttack / ToggleUse keybinds, Night Vision blocker, Force Tab List Sort.

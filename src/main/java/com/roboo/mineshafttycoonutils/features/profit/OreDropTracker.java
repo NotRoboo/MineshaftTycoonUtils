@@ -20,8 +20,8 @@ public class OreDropTracker {
         ORE_CHAT_PATTERNS.put("rare drop! ametrine", "Ametrine");
         ORE_CHAT_PATTERNS.put("rare drop! rhodnite", "Rhodnite");
         ORE_CHAT_PATTERNS.put("rare drop! sun fragment", "Sun Fragment");
-        ORE_CHAT_PATTERNS.put("rare drop! plasma shard", "Plasma Shard");
-        ORE_CHAT_PATTERNS.put("rare drop! fiber", "Fiber");
+        ORE_CHAT_PATTERNS.put("epic drop! plasma shard", "Plasma Shard");
+        ORE_CHAT_PATTERNS.put("epic drop! fiber", "Fiber");
     }
 
     private static final Map<String, Integer> counts = new LinkedHashMap<>();
