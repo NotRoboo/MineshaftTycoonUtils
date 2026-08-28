@@ -54,10 +54,10 @@ public class MSTUConfig extends Config {
     public ScoreboardCategory scoreboard = new ScoreboardCategory();
 
     @Expose
-    @Category(name = "Misc", desc = "Miscellaneous quality-of-life settings")
-    public MiscCategory misc = new MiscCategory();
-
-    @Expose
     @Category(name = "Emojis", desc = "Chat emoji settings")
     public EmojiConfig emoji = new EmojiConfig();
+
+    @Expose
+    @Category(name = "Misc", desc = "Miscellaneous quality-of-life settings")
+    public MiscCategory misc = new MiscCategory();
 }

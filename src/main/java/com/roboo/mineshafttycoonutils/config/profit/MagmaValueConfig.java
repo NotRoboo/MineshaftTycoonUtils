@@ -15,8 +15,8 @@ import java.util.List;
 public class MagmaValueConfig {
 
     @Expose
-    @ConfigOption(name = "Show Magma Value HUD", desc = "Show the magma value HUD overlay while inside the Space Ores Bag " +
-            "Use `Edit Container HUD Locations Keybind` to edit location")
+    @ConfigOption(name = "Magma Value HUD", desc = "Show the magma value HUD overlay while inside the Space Ores Bag " +
+            "§eUse your `Edit Container HUD Locations Keybind` to edit location")
     @ConfigEditorBoolean
     public boolean hudEnabled = true;
 
@@ -35,17 +35,17 @@ public class MagmaValueConfig {
 
     @Expose
     @ConfigOption(
+            name = "Magma Price (Billions)",
+            desc = "Coin value of a single Magma, in billions. E.g. 200 means 1 Magma = 200b coins. §eDefault: 200")
+    @ConfigEditorSlider(minValue = 1, maxValue = 2000, minStep = 1)
+    public int magmaPriceBillions = 200;
+
+    @Expose
+    @ConfigOption(
             name = "Order",
             desc = "Drag to reorder ores shown on the HUD. Remove an entry to hide it and exclude it from the total.")
     @ConfigEditorDraggableList
     public List<Entry> order = new ArrayList<>(Arrays.asList(Entry.values()));
-
-    @Expose
-    @ConfigOption(
-            name = "Magma Price (Billions)",
-            desc = "Coin value of a single Magma, in billions. E.g. 200 means 1 Magma = 200b coins.")
-    @ConfigEditorSlider(minValue = 1, maxValue = 2000, minStep = 1)
-    public int magmaPriceBillions = 200;
 
     @Expose
     public int magmaHudX = 200;

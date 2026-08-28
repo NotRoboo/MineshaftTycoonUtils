@@ -12,7 +12,7 @@ import java.util.List;
 public class ActionBarCategory {
 
     @Expose
-    @ConfigOption(name = "Action Bar Reorder", desc = "Reorder or hide parts of the action bar")
+    @ConfigOption(name = "Action Bar Reorder", desc = "Reorder or hide parts of the action bar §e(Text above hotbar)")
     @ConfigEditorBoolean
     public boolean enabled = false;
 

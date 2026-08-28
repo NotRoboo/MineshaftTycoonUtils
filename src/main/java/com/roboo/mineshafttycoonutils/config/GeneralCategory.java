@@ -20,28 +20,28 @@ public class GeneralCategory {
     @Expose
     @ConfigOption(
             name = "Edit Container HUD Locations Keybind",
-            desc = "Press while inside the Bag menu to toggle dragging the Money in Bag HUD position")
+            desc = "Press while inside the Bag menu to toggle dragging HUD position")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     public int editBagHudKeybind = GLFW.GLFW_KEY_UNKNOWN;
 
     @Expose
     @ConfigOption(
             name = "Check for Updates",
-            desc = "Automatically check for new releases on GitHub each time you join a world or server")
+            desc = "Automatically check for new releases on GitHub each time you join")
     @ConfigEditorBoolean
     public boolean checkForUpdates = true;
 
     @Expose
     @ConfigOption(
             name = "Warp Helper",
-            desc = "Use at own risk - Typing /warp <name> opens the warp menu and automatically clicks the matching warp")
+            desc = "Typing /warp <name> opens the warp menu and automatically clicks the matching warp - §cUse at own risk")
     @ConfigEditorBoolean
     public boolean warpHelperEnabled = false;
 
     @Expose
     @ConfigOption(
             name = "Pets Helper",
-            desc = "Use at own risk - Typing /pets <name> opens the pets menu and automatically clicks the matching pet")
+            desc = "Typing /pets <name> opens the pets menu and automatically clicks the matching pet - §cUse at own risk")
     @ConfigEditorBoolean
     public boolean petsHelperEnabled = false;
 }

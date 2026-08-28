@@ -15,9 +15,9 @@ public class TimersCategory {
 
     @Expose
     @ConfigOption(
-            name = "Show Timers HUD",
-            desc = "Show the timers HUD overlay. " +
-                    "NOTE: Over long periods of timer may run out slightly before it actually does")
+            name = "Timers HUD",
+            desc = "Show the timers HUD overlay. \n" +
+                    "§eNOTE: Over long periods timer may go slightly quicker")
     @ConfigEditorBoolean
     public boolean hudEnabled = true;
 

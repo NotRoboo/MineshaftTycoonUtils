@@ -12,19 +12,21 @@ import java.util.List;
 public class PlayerMessagesCategory {
 
     @Expose
-    @ConfigOption(name = "Enable Chat Formatting", desc = "Reformat player chat messages using the settings below")
+    @ConfigOption(name = "Chat Formatting", desc = "Reformat player chat messages using the settings below. Also reformats [SYSTEM] chat bridge messages to strip the bot's name and show the real sender")
     @ConfigEditorBoolean
     public boolean enabled = false;
 
     @Expose
     @ConfigOption(
             name = "Part Order",
-            desc = "Drag to reorder the parts of a chat message. Remove a part to hide it entirely.")
+            desc = "Drag to reorder the parts of a chat message. Remove a part to hide it entirely.\n" +
+                    "Top -> Bottom = Left -> Right"
+    )
     @ConfigEditorDraggableList
     public List<Part> partOrder = new ArrayList<>(Arrays.asList(Part.values()));
 
     @Expose
-    @ConfigOption(name = "Hypixel Rank Hider", desc = "Hide player ranks (e.g. [VIP], [MVP+]) in chat messages")
+    @ConfigOption(name = "Hypixel Rank Hider", desc = "Hide ranks ([VIP], [MVP+])")
     @ConfigEditorBoolean
     public boolean rankHider = false;
 

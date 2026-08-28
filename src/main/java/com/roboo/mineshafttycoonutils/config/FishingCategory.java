@@ -15,7 +15,7 @@ import java.util.List;
 public class FishingCategory {
 
     @Expose
-    @ConfigOption(name = "Show Fishing HUD", desc = "Show the fishing tracker HUD overlay")
+    @ConfigOption(name = "Fishing HUD", desc = "Show the fishing tracker HUD overlay")
     @ConfigEditorBoolean
     public boolean hudEnabled = true;
 

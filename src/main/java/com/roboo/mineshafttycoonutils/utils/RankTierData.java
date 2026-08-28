@@ -19,14 +19,14 @@ public class RankTierData {
 
     public static final Map<String, StaffRank> STAFF_RANKS = new LinkedHashMap<>();
     static {
-        STAFF_RANKS.put("OWNER", new StaffRank("Owner", 0xAA0000));
-        STAFF_RANKS.put("MANAGER", new StaffRank("Manager", 0x660000));
-        STAFF_RANKS.put("ADMIN", new StaffRank("Admin", 0x890000));
-        STAFF_RANKS.put("DEV", new StaffRank("Dev", 0xFA4241));
-        STAFF_RANKS.put("BUILD", new StaffRank("Builder", 0xFDE047));
-        STAFF_RANKS.put("MOD", new StaffRank("Mod", 0x5B1771));
-        STAFF_RANKS.put("HELPER", new StaffRank("Helper", 0x15803D));
-        STAFF_RANKS.put("SYSTEM", new StaffRank("System", 0x555555));
+        STAFF_RANKS.put("OWNER", new StaffRank("Owner", 0xA80000));
+        STAFF_RANKS.put("MANAGER", new StaffRank("Manager", 0xA80000));
+        STAFF_RANKS.put("ADMIN", new StaffRank("Admin", 0xA80000));
+        STAFF_RANKS.put("DEV", new StaffRank("Dev", 0xEC4F4F));
+        STAFF_RANKS.put("BUILD", new StaffRank("Builder", 0xFAFA53));
+        STAFF_RANKS.put("MOD", new StaffRank("Mod", 0x960096));
+        STAFF_RANKS.put("HELPER", new StaffRank("Helper", 0x00A800));
+        STAFF_RANKS.put("SYSTEM", new StaffRank("System", 0x545454));
     }
 
     public static final Map<String, String> TAG_DISPLAY_ALIASES = new LinkedHashMap<>();

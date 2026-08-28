@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class ProfitCategory {
 
     @Expose
-    @ConfigOption(name = "Shorten Numbers", desc = "Abbreviate large profit numbers, e.g. 489.39T instead of 489,390,000,000,000")
+    @ConfigOption(name = "Shorten Numbers", desc = "Abbreviate large profit numbers, e.g. 125B instead of 125,000,000,000")
     @ConfigEditorBoolean
     public boolean shortenNumbers = true;
 

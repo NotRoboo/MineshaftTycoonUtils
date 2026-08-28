@@ -25,6 +25,15 @@ public class PlayerMessageFormatter {
             "^(?:(?:§.)*\\s*\\+\\s*)?§(.)\\[([^]]+)]\\s(§.(?:\\[[^]]*])?)\\s?([^\\s§]+)(§.): (.*)$"
     );
 
+    // matches the "[RANK] username: message" or "RANK username: message" text hiding inside a SYSTEM bridge message
+    private static final Pattern INNER_BRIDGE_MESSAGE_PATTERN = Pattern.compile(
+            "^([^\\s§:]+):\\s*(.*)$"
+    );
+
+    private static final String SYSTEM_TIER_TAG = "SYSTEM";
+
+    private record BridgedPlayerMessage(String rankTag, String username, String message) {}
+
     private PlayerMessageFormatter() {}
 
     public static Component format(String rawWithCodes, Style interactiveStyle) {
@@ -38,6 +47,11 @@ public class PlayerMessageFormatter {
         if (!messageMatch.matches()) return null;
 
         if (cfg.enabled) {
+            String tierTag = RankTierData.resolveTag(messageMatch.group(2));
+            if (SYSTEM_TIER_TAG.equals(tierTag)) {
+                Component systemMessage = assembleSystemBridgeMessage(messageMatch, interactiveStyle);
+                if (systemMessage != null) return systemMessage;
+            }
             return assembleMessage(cfg, messageMatch, interactiveStyle);
         }
 
@@ -46,6 +60,72 @@ public class PlayerMessageFormatter {
         }
 
         return null;
+    }
+
+    private static Component assembleSystemBridgeMessage(Matcher chatMatch, Style interactiveStyle) {
+        char tierColorChar = chatMatch.group(1).charAt(0);
+        String tierTagRaw = chatMatch.group(2);
+        String botMessage = chatMatch.group(6);
+
+        BridgedPlayerMessage bridged = parseBridgedPlayerMessage(botMessage);
+        if (bridged == null) return null;
+
+        MutableComponent result = Component.empty();
+        result.append(buildRankTagComponent(tierTagRaw, tierColorChar));
+
+        if (bridged.rankTag() != null) {
+            result.append(Component.literal(" "));
+            result.append(buildRankTagComponent(bridged.rankTag(), '7'));
+        }
+
+        result.append(Component.literal(" §8§l" + bridged.username()));
+        result.append(Component.literal("§f: " + bridged.message()));
+
+        return preserveClickAndHover(result, interactiveStyle);
+    }
+
+    private static BridgedPlayerMessage parseBridgedPlayerMessage(String innerContent) {
+        String remaining = innerContent.trim();
+        String rankTag = null;
+
+        if (remaining.startsWith("[")) {
+            int closeBracket = remaining.indexOf(']');
+            if (closeBracket > 0) {
+                rankTag = remaining.substring(1, closeBracket);
+                remaining = remaining.substring(closeBracket + 1).trim();
+            }
+        } else {
+            int firstSpace = remaining.indexOf(' ');
+            if (firstSpace > 0) {
+                String possibleRankTag = remaining.substring(0, firstSpace);
+                if (RankTierData.isStaff(RankTierData.resolveTag(possibleRankTag))) {
+                    rankTag = possibleRankTag;
+                    remaining = remaining.substring(firstSpace + 1).trim();
+                }
+            }
+        }
+
+        Matcher usernameMatch = INNER_BRIDGE_MESSAGE_PATTERN.matcher(remaining);
+        if (!usernameMatch.matches()) return null;
+
+        return new BridgedPlayerMessage(rankTag, usernameMatch.group(1), usernameMatch.group(2));
+    }
+
+    private static Component buildRankTagComponent(String rawTag, char fallbackColorChar) {
+        String resolvedTag = RankTierData.resolveTag(rawTag);
+        GlyphCategory.GlyphMode glyphMode = ConfigManager.config.glyph.playerMessageGlyphs;
+
+        if (RankTierData.isStaff(resolvedTag)) {
+            String glyphKey = RankTierData.glyphKeyFor(fallbackColorChar, resolvedTag);
+            String glyph = glyphMode.isEnabled() ? RankTierData.glyphFor(glyphKey, glyphMode) : null;
+            if (glyph != null) {
+                return Component.literal("§f" + glyph);
+            }
+            int hex = RankTierData.STAFF_RANKS.get(resolvedTag).hex();
+            return Component.literal("[" + resolvedTag + "]").setStyle(Style.EMPTY.withColor(TextColor.fromRgb(hex)));
+        }
+
+        return Component.literal("§" + fallbackColorChar + "[" + rawTag + "]");
     }
 
     private static Component assembleMessage(PlayerMessagesCategory cfg, Matcher chatMatch, Style interactiveStyle) {

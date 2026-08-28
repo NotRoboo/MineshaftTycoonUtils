@@ -9,8 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class BagValueConfig {
 
     @Expose
-    @ConfigOption(name = "Show Bag Value HUD", desc = "Show the bag value HUD overlay while inside the /bag menu " +
-            "Use `Edit Container HUD Locations Keybind` to edit location")
+    @ConfigOption(name = "Bag Value HUD", desc = "Show the bag value HUD overlay while inside the /bag menu " +
+            "§eUse your `Edit Container HUD Locations Keybind` to edit location")
     @ConfigEditorBoolean
     public boolean hudEnabled = true;
 

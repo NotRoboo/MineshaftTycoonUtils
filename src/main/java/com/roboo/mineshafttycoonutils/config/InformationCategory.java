@@ -14,7 +14,7 @@ import java.util.List;
 public class InformationCategory {
 
     @Expose
-    @ConfigOption(name = "Show Information HUD", desc = "Show the information HUD overlay")
+    @ConfigOption(name = "Information HUD", desc = "Show the information HUD overlay")
     @ConfigEditorBoolean
     public boolean hudEnabled = true;
 

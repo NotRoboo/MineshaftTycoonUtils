@@ -141,9 +141,21 @@
         "beer": 987273,
         "beers": 987274,
         "fire": 987275,
+        "bug": 987281,
+        "dancer": 987283,
+        "standingman": 987284,
+        "blind": 987285,
+        "catjoy": 987286,
+        "catsmirk": 987287,
+        "catscream": 987288,
+        "cathearteye": 987289,
+        "catcrying": 987290,
         "idk": 987276,
         "salute": 987277,
-        "lightningmcqueen": 987278
+        "lightningmcqueen": 987278,
+        "mmmm": 987279,
+        "leek": 987280,
+        "banned": 987282
     },
     "flags": {
         "usa": 991232,

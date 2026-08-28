@@ -16,7 +16,7 @@ public class ScoreboardCategory {
 
     @Expose
     @ConfigOption(
-            name = "Enable Custom Scoreboard",
+            name = "Custom Scoreboard",
             desc = "Reorder/hide lines on the scoreboard")
     @ConfigEditorBoolean
     public boolean enabled = false;
