@@ -27,7 +27,12 @@ public class PlayerMessageFormatter {
 
     // matches the "[RANK] username: message" or "RANK username: message" text hiding inside a SYSTEM bridge message
     private static final Pattern INNER_BRIDGE_MESSAGE_PATTERN = Pattern.compile(
-            "^([^\\s§:]+):\\s*(.*)$"
+            "^([^§:]+):\\s*(.*)$"
+    );
+
+    // stupid chat lvl
+    private static final Pattern POWER_BOT_LEVEL_PATTERN = Pattern.compile(
+            "^\\d+$"
     );
 
     private static final String SYSTEM_TIER_TAG = "SYSTEM";
@@ -88,13 +93,25 @@ public class PlayerMessageFormatter {
         String remaining = innerContent.trim();
         String rankTag = null;
 
-        if (remaining.startsWith("[")) {
+        while (remaining.startsWith("[")) {
             int closeBracket = remaining.indexOf(']');
-            if (closeBracket > 0) {
-                rankTag = remaining.substring(1, closeBracket);
-                remaining = remaining.substring(closeBracket + 1).trim();
+            if (closeBracket <= 0) break;
+
+            String bracketContent = remaining.substring(1, closeBracket);
+            String afterBracket = remaining.substring(closeBracket + 1).trim();
+
+            if (POWER_BOT_LEVEL_PATTERN.matcher(bracketContent).matches()) {
+                remaining = afterBracket;
+                continue;
             }
-        } else {
+
+            if (rankTag != null) break;
+
+            rankTag = bracketContent;
+            remaining = afterBracket;
+        }
+
+        if (rankTag == null) {
             int firstSpace = remaining.indexOf(' ');
             if (firstSpace > 0) {
                 String possibleRankTag = remaining.substring(0, firstSpace);
@@ -108,6 +125,8 @@ public class PlayerMessageFormatter {
         if (rankTag != null) {
             remaining = stripDuplicateRankTag(remaining, rankTag);
         }
+
+        remaining = stripPowerBotLevel(remaining);
 
         Matcher usernameMatch = INNER_BRIDGE_MESSAGE_PATTERN.matcher(remaining);
         if (!usernameMatch.matches()) return null;
@@ -125,6 +144,19 @@ public class PlayerMessageFormatter {
         if (!RankTierData.resolveTag(duplicateTag).equalsIgnoreCase(RankTierData.resolveTag(rankTag))) return remaining;
 
         return remaining.substring(closeBracket + 1).trim();
+    }
+
+    private static String stripPowerBotLevel(String remaining) {
+        while (remaining.startsWith("[")) {
+            int closeBracket = remaining.indexOf(']');
+            if (closeBracket <= 0) break;
+
+            String bracketContent = remaining.substring(1, closeBracket);
+            if (!POWER_BOT_LEVEL_PATTERN.matcher(bracketContent).matches()) break;
+
+            remaining = remaining.substring(closeBracket + 1).trim();
+        }
+        return remaining;
     }
 
     public static boolean isSystemBridgeMessage(String rawWithCodes) {
