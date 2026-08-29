@@ -3,8 +3,8 @@
 <p align="center">Client-side Fabric mod for MineshaftTycoon — fishing & profit tracking, chat cleanup, glyph ranks, HUDs, and more.</p>
 
 <p align="center">
-  <a href="https://github.com/NotRoboo/mineshafttycoonutils/releases"><b>Download Latest</b></a>
-  &nbsp;·&nbsp;
+  <a href="https://github.com/NotRoboo/mineshafttycoonutils/releases/latest"><b>Download Latest</b></a>
+    &nbsp;·&nbsp;
   <a href="https://github.com/NotRoboo/mineshafttycoonutils/releases">all releases</a>
 </p>
 
