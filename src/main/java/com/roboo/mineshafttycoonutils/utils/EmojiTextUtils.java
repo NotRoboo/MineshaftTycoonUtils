@@ -6,7 +6,8 @@ import java.util.regex.Pattern;
 
 public class EmojiTextUtils {
 
-    private static final Pattern SHORTCODE_PATTERN = Pattern.compile(":([a-z0-9_]+):");
+    private static final Pattern SHORTCODE_PATTERN = Pattern.compile(":([a-z0-9_]+):", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DISCORD_EMOJI_PATTERN = Pattern.compile("<a?:([a-z0-9_]+):\\d+>", Pattern.CASE_INSENSITIVE);
     private static final String COLOR_CODES = "0123456789abcdef";
 
     private EmojiTextUtils() {}
@@ -44,5 +45,10 @@ public class EmojiTextUtils {
             }
         }
         return "§f";
+    }
+
+    public static String stripDiscordEmojiWrapper(String rawWithCodes) {
+        if (rawWithCodes == null || rawWithCodes.isEmpty()) return rawWithCodes;
+        return DISCORD_EMOJI_PATTERN.matcher(rawWithCodes).replaceAll(":$1:");
     }
 }

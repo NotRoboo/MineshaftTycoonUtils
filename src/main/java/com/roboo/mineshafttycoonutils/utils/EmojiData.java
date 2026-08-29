@@ -25,6 +25,7 @@ public class EmojiData {
     private static class Mapping {
         Map<String, Integer> emotes = new LinkedHashMap<>();
         Map<String, Integer> flags = new LinkedHashMap<>();
+        Map<String, Integer> custom = new LinkedHashMap<>();
     }
 
     static {
@@ -45,6 +46,9 @@ public class EmojiData {
 
             if (mapping.emotes != null) {
                 SHORTCODE_TO_CODEPOINT.putAll(mapping.emotes);
+            }
+            if (mapping.custom != null) {
+                SHORTCODE_TO_CODEPOINT.putAll(mapping.custom);
             }
             if (mapping.flags != null) {
                 FLAG_TO_CODEPOINT.putAll(mapping.flags);

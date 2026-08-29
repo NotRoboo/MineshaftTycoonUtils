@@ -41,7 +41,13 @@ public class PlayerMessageHandler {
 
         if (MessageHider.shouldHide(originalRaw)) return true;
 
-        String raw = emojiEnabled ? EmojiTextUtils.substitute(originalRaw, true) : originalRaw;
+        String raw;
+        if (PlayerMessageFormatter.isSystemBridgeMessage(originalRaw)) {
+            String stripped = EmojiTextUtils.stripDiscordEmojiWrapper(originalRaw);
+            raw = emojiEnabled ? EmojiTextUtils.substitute(stripped, true) : stripped;
+        } else {
+            raw = emojiEnabled ? EmojiTextUtils.substitute(originalRaw, true) : originalRaw;
+        }
 
         if (cfg.enabled || cfg.sameChatColor || playerGlyphMode.isEnabled()) {
             Component formatted = PlayerMessageFormatter.format(raw, interactiveStyle);

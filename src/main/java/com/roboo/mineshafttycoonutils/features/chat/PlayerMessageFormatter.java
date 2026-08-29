@@ -122,9 +122,21 @@ public class PlayerMessageFormatter {
         if (closeBracket <= 0) return remaining;
 
         String duplicateTag = remaining.substring(1, closeBracket);
-        if (!RankTierData.resolveTag(duplicateTag).equals(RankTierData.resolveTag(rankTag))) return remaining;
+        if (!RankTierData.resolveTag(duplicateTag).equalsIgnoreCase(RankTierData.resolveTag(rankTag))) return remaining;
 
         return remaining.substring(closeBracket + 1).trim();
+    }
+
+    public static boolean isSystemBridgeMessage(String rawWithCodes) {
+        if (rawWithCodes == null) return false;
+
+        Matcher messageMatch = MST_PLAYER_PATTERN.matcher(rawWithCodes);
+        if (!messageMatch.matches()) {
+            messageMatch = MOD_USERS_PATTERN.matcher(rawWithCodes);
+        }
+        if (!messageMatch.matches()) return false;
+
+        return SYSTEM_TIER_TAG.equals(RankTierData.resolveTag(messageMatch.group(2)));
     }
 
     private static Component buildRankTagComponent(String rawTag, char fallbackColorChar) {
