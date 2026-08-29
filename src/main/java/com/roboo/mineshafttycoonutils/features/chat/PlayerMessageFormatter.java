@@ -105,10 +105,26 @@ public class PlayerMessageFormatter {
             }
         }
 
+        if (rankTag != null) {
+            remaining = stripDuplicateRankTag(remaining, rankTag);
+        }
+
         Matcher usernameMatch = INNER_BRIDGE_MESSAGE_PATTERN.matcher(remaining);
         if (!usernameMatch.matches()) return null;
 
         return new BridgedPlayerMessage(rankTag, usernameMatch.group(1), usernameMatch.group(2));
+    }
+
+    private static String stripDuplicateRankTag(String remaining, String rankTag) {
+        if (!remaining.startsWith("[")) return remaining;
+
+        int closeBracket = remaining.indexOf(']');
+        if (closeBracket <= 0) return remaining;
+
+        String duplicateTag = remaining.substring(1, closeBracket);
+        if (!RankTierData.resolveTag(duplicateTag).equals(RankTierData.resolveTag(rankTag))) return remaining;
+
+        return remaining.substring(closeBracket + 1).trim();
     }
 
     private static Component buildRankTagComponent(String rawTag, char fallbackColorChar) {
