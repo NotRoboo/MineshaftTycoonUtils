@@ -4,8 +4,6 @@
 
 <p align="center">
   <a href="https://github.com/NotRoboo/mineshafttycoonutils/releases"><b>Download Latest</b></a>
-  &nbsp;·&nbsp;
-  <a href="https://github.com/NotRoboo/mineshafttycoonutils/releases">all releases</a>
 </p>
 
 ## Installation
