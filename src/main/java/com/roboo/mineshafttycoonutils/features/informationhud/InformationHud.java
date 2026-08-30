@@ -176,10 +176,6 @@ public class InformationHud {
         return "§7" + label + ": " + status;
     }
 
-    private static final java.util.Set<String> NON_PET_SUFFIXED_NAMES = java.util.Set.of(
-            "Caspian Tiger"
-    );
-
     private static String renderPet() {
         assert mc.player != null;
         ItemStack stack = mc.player.getInventory().getItem(HOTBAR_PET_SLOT);
@@ -187,12 +183,7 @@ public class InformationHud {
         ItemLore lore = stack.get(DataComponents.LORE);
         if (lore == null || lore.lines().isEmpty()) return "§7Pet: §c(None)";
         String firstLine = ChatFormatting.stripFormatting(lore.lines().getFirst().getString()).trim();
-        if (firstLine.isEmpty()) return "§7Pet: §c(None)";
-
-        boolean isKnownPet = firstLine.toLowerCase(Locale.ROOT).contains("pet")
-                || NON_PET_SUFFIXED_NAMES.contains(firstLine);
-        if (!isKnownPet) return "§7Pet: §c(None)";
-
+        if (firstLine.isEmpty() || !firstLine.toLowerCase(Locale.ROOT).contains("pet")) return "§7Pet: §c(None)";
         if (firstLine.endsWith(" Pet")) {
             firstLine = firstLine.substring(0, firstLine.length() - 4).trim();
         }
