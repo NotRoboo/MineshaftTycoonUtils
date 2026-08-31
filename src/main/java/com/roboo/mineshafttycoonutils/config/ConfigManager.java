@@ -2,6 +2,9 @@ package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.roboo.mineshafttycoonutils.config.migration.ConfigMigrations;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis;
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver;
@@ -30,13 +33,20 @@ public class ConfigManager {
         if (configFile.exists()) {
             try {
                 String json = FileUtils.readFileToString(configFile, StandardCharsets.UTF_8);
-                config = gson.fromJson(json, MSTUConfig.class);
+                JsonObject savedConfig = JsonParser.parseString(json).getAsJsonObject();
+
+                int savedVersion = savedConfig.has("configVersion") ? savedConfig.get("configVersion").getAsInt() : 0;
+                ConfigMigrations.upgradeSavedConfig(savedConfig, savedVersion);
+
+                config = gson.fromJson(savedConfig, MSTUConfig.class);
+                config.configVersion = ConfigMigrations.CURRENT_VERSION;
             } catch (Exception e) {
                 e.printStackTrace();
                 config = new MSTUConfig();
             }
         } else {
             config = new MSTUConfig();
+            config.configVersion = ConfigMigrations.CURRENT_VERSION;
             saveConfig();
         }
         recreateProcessor();

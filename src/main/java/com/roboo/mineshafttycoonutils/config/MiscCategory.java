@@ -38,7 +38,7 @@ public class MiscCategory {
             name = "Night Vision Blocker",
             desc = "Removes the Night Vision effect")
     @ConfigEditorBoolean
-    public boolean nightVisionBlockerEnabled = false;
+    public boolean nightVisionBlocker = false;
 
     @Expose
     @ConfigOption(

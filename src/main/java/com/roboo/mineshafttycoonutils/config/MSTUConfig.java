@@ -2,6 +2,7 @@ package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
 import com.roboo.mineshafttycoonutils.config.chat.EmojiConfig;
+import com.roboo.mineshafttycoonutils.config.migration.ConfigMigrations;
 import io.github.notenoughupdates.moulconfig.Config;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText;
@@ -12,6 +13,9 @@ public class MSTUConfig extends Config {
     public StructuredText getTitle() {
         return StructuredText.of("MineshaftTycoon Utils");
     }
+
+    @Expose
+    public int configVersion = ConfigMigrations.CURRENT_VERSION;
 
     @Expose
     @Category(name = "General", desc = "General settings")
