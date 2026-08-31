@@ -21,6 +21,9 @@ public class CustomScoreboardManager {
     private static final Pattern PET_MAGMA_PATTERN =
             Pattern.compile("(?i)^\\*?\\s*pets!\\s*your\\s+.+?\\s+pet mined up\\s+(\\d+)\\s+magma for you!$");
 
+    private static final Pattern MAGMA_OVERFLOW_PATTERN =
+            Pattern.compile("(?i)^\\*?\\s*magma!\\s*you had too much magma and it bubbled out of your storage!$");
+
     private static final Pattern SCOREBOARD_MAGMA_PATTERN = Pattern.compile("(?<!§)([0-9][0-9,]*)");
 
     private CustomScoreboardManager() {}
@@ -41,6 +44,11 @@ public class CustomScoreboardManager {
         if (msg == null) return;
         String stripped = ChatFormatting.stripFormatting(msg).trim();
         if (stripped.isEmpty()) return;
+
+        if (MAGMA_OVERFLOW_PATTERN.matcher(stripped).matches()) {
+            addMagma(-1);
+            return;
+        }
 
         Matcher m = PET_MAGMA_PATTERN.matcher(stripped);
         if (!m.matches()) return;

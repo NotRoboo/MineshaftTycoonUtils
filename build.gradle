@@ -4,7 +4,10 @@ plugins {
 	id 'maven-publish'
 }
 
-version = project.mod_version
+def versionProps = new Properties()
+file('version.properties').withInputStream { versionProps.load(it) }
+
+version = versionProps.getProperty('mod_version')
 group = project.maven_group
 
 base {
