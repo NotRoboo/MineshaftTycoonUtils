@@ -4,6 +4,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.features.pets.PetsHelper;
+import com.roboo.mineshafttycoonutils.features.timers.PotionToggleHelper;
 import com.roboo.mineshafttycoonutils.features.warp.WarpHelper;
 import com.roboo.mineshafttycoonutils.utils.EmojiData;
 import net.minecraft.client.gui.components.CommandSuggestions;
@@ -31,6 +32,8 @@ public abstract class CommandSuggestionsMixin {
     @Unique
     private static final String PET_PREFIX = "/pet ";
     @Unique
+    private static final String POTSOFF_PREFIX = "/potsoff ";
+    @Unique
     private static final char EMOJI_TRIGGER = ':';
 
     @Shadow @Final EditBox input;
@@ -55,6 +58,10 @@ public abstract class CommandSuggestionsMixin {
             prefix = lower.startsWith(PETS_PREFIX) ? PETS_PREFIX : PET_PREFIX;
             if (cursor < prefix.length()) return;
             matches = PetsHelper.matchingArgs(text.substring(prefix.length(), cursor).toLowerCase(Locale.ROOT));
+        } else if (ConfigManager.config.general.potsoffCommand && lower.startsWith(POTSOFF_PREFIX)) {
+            prefix = POTSOFF_PREFIX;
+            if (cursor < prefix.length()) return;
+            matches = PotionToggleHelper.matchingArgs(text.substring(prefix.length(), cursor).toLowerCase(Locale.ROOT));
         } else if (ConfigManager.config.emoji.suggestionsEnabled) {
             int colonIndex = text.lastIndexOf(EMOJI_TRIGGER, cursor - 1);
             if (colonIndex < 0 || colonIndex >= cursor) return;

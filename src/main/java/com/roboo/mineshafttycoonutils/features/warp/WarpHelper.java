@@ -4,6 +4,7 @@ import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.utils.SystemMessages;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -11,6 +12,9 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
@@ -190,12 +194,28 @@ public class WarpHelper {
             return;
         }
 
+        if (enabled && key != null && !WARP_ITEMS.containsKey(key)) {
+            errorMsg("Unknown warp: " + key);
+            pendingEntry = null;
+            retryTicks = -1;
+            return;
+        }
+
         pendingEntry = (enabled && key != null) ? WARP_ITEMS.get(key) : null;
         navRetriesLeft = NAV_RETRIES;
         targetRetriesLeft = TARGET_RETRIES;
         retryTicks = -1;
 
         sendRawCommand("warp");
+    }
+
+    private static void errorMsg(String text) {
+        if (mc.player == null) return;
+
+        MutableComponent message = Component.literal(" " + text)
+                .withStyle(Style.EMPTY.withColor(0xFF5555));
+
+        mc.player.displayClientMessage(SystemMessages.buildPrefix().append(message), false);
     }
 
     private static void sendRawCommand(String command) {

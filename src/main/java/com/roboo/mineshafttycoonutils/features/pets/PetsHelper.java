@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.utils.PetStatusUtils;
+import com.roboo.mineshafttycoonutils.utils.SystemMessages;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -18,6 +19,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
@@ -177,6 +180,11 @@ public class PetsHelper {
         boolean enabled = ConfigManager.config.general.petsHelperEnabled;
         String key = target == null ? null : target.toLowerCase(Locale.ROOT).trim();
 
+        if (enabled && key != null && !PET_ITEMS.containsKey(key)) {
+            errorMsg("Unknown pet: " + key);
+            return;
+        }
+
         PetEntry entry = (enabled && key != null) ? PET_ITEMS.get(key) : null;
 
         reset();
@@ -191,6 +199,15 @@ public class PetsHelper {
         }
 
         sendRawCommand();
+    }
+
+    private static void errorMsg(String text) {
+        if (mc.player == null) return;
+
+        MutableComponent message = Component.literal(" " + text)
+                .withStyle(Style.EMPTY.withColor(0xFF5555));
+
+        mc.player.displayClientMessage(SystemMessages.buildPrefix().append(message), false);
     }
 
     private static void sendRawCommand() {

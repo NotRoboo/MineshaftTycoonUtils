@@ -20,7 +20,7 @@ public class BuffTracker {
 
     private static final Minecraft mc = Minecraft.getInstance();
     private static final String CONTAINER_TITLE = "Buff Duration Menu";
-    private static final String MENU_BUTTON_MARKER = "Menu Button";
+    static final String MENU_BUTTON_MARKER = "Menu Button";
 
     private static final Pattern TIME_LEFT_PATTERN =
             Pattern.compile("(?i)time left:\\s*([0-9,]+)s");
@@ -164,6 +164,30 @@ public class BuffTracker {
         }
 
         return target.secondsAtRead();
+    }
+
+    public static Boolean readEnabledState(ItemStack stack) {
+        ItemLore lore = stack.get(DataComponents.LORE);
+        if (lore == null) return null;
+
+        boolean isMenuButton = false;
+        Boolean enabled = null;
+
+        for (Component loreLine : lore.lines()) {
+            String text = ChatFormatting.stripFormatting(loreLine.getString()).trim();
+
+            if (text.contains(MENU_BUTTON_MARKER)) {
+                isMenuButton = true;
+            }
+
+            if (text.contains("ENABLED!")) {
+                enabled = true;
+            } else if (text.contains("DISABLED!")) {
+                enabled = false;
+            }
+        }
+
+        return isMenuButton ? enabled : null;
     }
 
     public static boolean isPotionActive(Buff buff) {

@@ -44,4 +44,11 @@ public class GeneralCategory {
             desc = "Typing /pets <name> opens the pets menu and automatically clicks the matching pet - §cUse at own risk")
     @ConfigEditorBoolean
     public boolean petsHelperEnabled = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Pots Off Helper",
+            desc = "Typing /potsoff <type> opens the buff menu and automatically toggles the matching potion/buff - §cUse at own risk")
+    @ConfigEditorBoolean
+    public boolean potsoffCommand = false;
 }
