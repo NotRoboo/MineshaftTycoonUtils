@@ -47,8 +47,8 @@ public enum TrackedOre {
     REGOLITH(List.of(Blocks.ACACIA_PLANKS, Blocks.ACACIA_SLAB, Blocks.ACACIA_STAIRS), "REGOLITH", 180_000, () -> ConfigManager.config.profit.tracker.state.regolithLevel, 4_500, true),
     AMBER_ROCK(List.of(Blocks.ORANGE_WOOL), "AMBER ROCK", 88_000, () -> ConfigManager.config.profit.tracker.state.amberRockLevel, 2_200, true),
     AMBER_CRYSTAL(List.of(Blocks.ORANGE_STAINED_GLASS, Blocks.ORANGE_STAINED_GLASS_PANE), "AMBER CRYSTAL", 46_000, () -> ConfigManager.config.profit.tracker.state.amberCrystalLevel, 1_150, true),
-    COSMIC_FIBER(List.of(Blocks.RED_STAINED_GLASS), "COSMIC FIBER", 68_000, () -> ConfigManager.config.profit.tracker.state.cosmicFiberLevel, 2_375, true),
-    CRIMSON_PLASMA(List.of(Blocks.RED_WOOL), "CRIMSON PLASMA", 95_000, () -> ConfigManager.config.profit.tracker.state.crimsonPlasmaLevel, 1_700, true);
+    COSMIC_FIBER(List.of(Blocks.RED_WOOL), "COSMIC FIBER", 95_000, () -> ConfigManager.config.profit.tracker.state.cosmicFiberLevel, 2_375, true),
+    CRIMSON_PLASMA(List.of(Blocks.RED_STAINED_GLASS), "CRIMSON PLASMA", 68_000, () -> ConfigManager.config.profit.tracker.state.crimsonPlasmaLevel, 1_700, true);
 
     private final List<Block> blocks;
     private final String bagItemName;
