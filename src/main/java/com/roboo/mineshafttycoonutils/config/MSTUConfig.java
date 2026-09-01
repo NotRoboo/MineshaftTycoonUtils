@@ -62,6 +62,10 @@ public class MSTUConfig extends Config {
     public EmojiConfig emoji = new EmojiConfig();
 
     @Expose
+    @Category(name = "Item Lore", desc = "Reformat or shorten values shown in item lore")
+    public ItemLoreCategory itemLore = new ItemLoreCategory();
+
+    @Expose
     @Category(name = "Misc", desc = "Miscellaneous quality-of-life settings")
     public MiscCategory misc = new MiscCategory();
 }

@@ -10,16 +10,9 @@ public class MiscCategory {
 
     @Expose
     @ConfigOption(
-            name = "Shorten Lore Numbers",
-            desc = "Shortens numbers over 1,000,000 in item lore, e.g. 1,500,000,000 becomes 1.50B")
-    @ConfigEditorBoolean
-    public boolean shortenLoreNumbersEnabled = true;
-
-    @Expose
-    @ConfigOption(
             name = "Toggle Attack Keybind",
             desc = "Press to flip Minecraft's §e`Toggle Attack' §foption on/off \n" +
-            "§eThis is just the setting state, not actually clicking"
+                    "§eThis is just the setting state, not actually clicking"
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     public int toggleAttackKeybind = GLFW.GLFW_KEY_UNKNOWN;

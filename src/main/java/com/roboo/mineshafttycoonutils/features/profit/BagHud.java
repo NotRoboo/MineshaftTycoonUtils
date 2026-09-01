@@ -80,11 +80,11 @@ public class BagHud {
             long value = BagValueTracker.getValue(ore);
             if (value <= 0) continue;
 
-            HudTextUtils.drawLine(graphics, "§7 - " + ore.getDisplayName() + ": §e$" + NumberFormatUtils.formatShortened(value, ConfigManager.config.profit.shortenNumbers),
+            HudTextUtils.drawLine(graphics, "§7 - " + ore.getDisplayName() + ": §e$" + NumberFormatUtils.formatShortened(value, true),
                     anchorX, y + (LINE_HEIGHT * line++), rightAligned);
         }
 
-        HudTextUtils.drawLine(graphics, "§lTotal: §e$" + NumberFormatUtils.formatShortened(BagValueTracker.getTotalValue(), ConfigManager.config.profit.shortenNumbers),
+        HudTextUtils.drawLine(graphics, "§lTotal: §e$" + NumberFormatUtils.formatShortened(BagValueTracker.getTotalValue(), true),
                 anchorX, y + (LINE_HEIGHT * line), rightAligned, titleColor);
     }
 
@@ -95,10 +95,10 @@ public class BagHud {
             long value = BagValueTracker.getValue(ore);
             if (value <= 0) continue;
 
-            width = Math.max(width, mc.font.width("§7" + ore.getDisplayName() + ": §e$" + NumberFormatUtils.formatShortened(value, ConfigManager.config.profit.shortenNumbers)));
+            width = Math.max(width, mc.font.width("§7" + ore.getDisplayName() + ": §e$" + NumberFormatUtils.formatShortened(value, true)));
         }
 
-        width = Math.max(width, mc.font.width("§lTotal: §e$" + NumberFormatUtils.formatShortened(BagValueTracker.getTotalValue(), ConfigManager.config.profit.shortenNumbers)));
+        width = Math.max(width, mc.font.width("§lTotal: §e$" + NumberFormatUtils.formatShortened(BagValueTracker.getTotalValue(), true)));
         return width;
     }
 
