@@ -3,6 +3,7 @@ package com.roboo.mineshafttycoonutils.mixin;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
 import com.roboo.mineshafttycoonutils.utils.LoreNumberUtils;
+import com.roboo.mineshafttycoonutils.utils.LoreTimeUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -21,8 +22,10 @@ import java.util.List;
 public class ItemStackTooltipMixin {
 
     @Inject(method = "getTooltipLines", at = @At("RETURN"), cancellable = true)
-    private void mineshaftUtils$shortenLoreNumbers(CallbackInfoReturnable<List<Component>> cir) {
-        if (!ConfigManager.config.misc.shortenLoreNumbersEnabled) return;
+    private void mineshaftUtils$rewriteLoreNumbers(CallbackInfoReturnable<List<Component>> cir) {
+        boolean numbersEnabled = ConfigManager.config.itemLore.shortenLoreNumbers;
+        boolean timeEnabled = ConfigManager.config.itemLore.shortenLoreTime;
+        if (!numbersEnabled && !timeEnabled) return;
 
         List<Component> original = cir.getReturnValue();
         if (original == null || original.isEmpty()) return;
@@ -32,12 +35,15 @@ public class ItemStackTooltipMixin {
 
         for (Component line : original) {
             String raw = ComponentTextUtils.formattedText(line);
-            String shortened = LoreNumberUtils.shortenLargeNumbers(raw);
+            String result = raw;
 
-            if (shortened.equals(raw)) {
+            if (numbersEnabled) result = LoreNumberUtils.shortenLargeNumbers(result);
+            if (timeEnabled) result = LoreTimeUtils.shortenSeconds(result);
+
+            if (result.equals(raw)) {
                 replaced.add(line);
             } else {
-                replaced.add(mineshaftUtils$legacyToComponent(shortened));
+                replaced.add(mineshaftUtils$legacyToComponent(result));
                 changed = true;
             }
         }

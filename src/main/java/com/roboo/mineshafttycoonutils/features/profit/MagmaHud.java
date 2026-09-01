@@ -114,7 +114,7 @@ public class MagmaHud {
         long totalCoins = totalMagma * cfg.magmaPriceBillions * COINS_PER_BILLION;
 
         return "§lTotal: §c" + String.format("%,d", totalMagma)
-                + " Magma ($" + NumberFormatUtils.formatShortened(totalCoins, ConfigManager.config.profit.shortenNumbers) + ")";
+                + " Magma ($" + NumberFormatUtils.formatShortened(totalCoins, true) + ")";
     }
 
     private static String inventoryTotalText(MagmaValueConfig cfg) {
@@ -122,7 +122,7 @@ public class MagmaHud {
         long totalCoins = totalMagma * cfg.magmaPriceBillions * COINS_PER_BILLION;
 
         return "§lInv Total: §c" + String.format("%,d", totalMagma)
-                + " Magma ($" + NumberFormatUtils.formatShortened(totalCoins, ConfigManager.config.profit.shortenNumbers) + ")";
+                + " Magma ($" + NumberFormatUtils.formatShortened(totalCoins, true) + ")";
     }
 
     private static int computeWidth() {

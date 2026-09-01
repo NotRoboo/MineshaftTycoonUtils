@@ -1,5 +1,6 @@
 package com.roboo.mineshafttycoonutils.config.migration;
 
+import com.roboo.mineshafttycoonutils.config.ItemLoreCategory;
 import com.roboo.mineshafttycoonutils.features.misc.NightVisionBlocker;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
@@ -13,12 +14,13 @@ public class ConfigMigrations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("MineshaftTycoonUtils");
 
-    public static final int CURRENT_VERSION = 2;
+    public static final int CURRENT_VERSION = 3;
 
     private static final Map<Integer, Consumer<JsonObject>> UPGRADE_STEPS = new TreeMap<>();
 
     static {
         registerUpgradeStep(2, NightVisionBlocker::onConfigFix);
+        registerUpgradeStep(3, ItemLoreCategory::onConfigFix);
     }
 
     private ConfigMigrations() {}
