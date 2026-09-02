@@ -45,13 +45,13 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         ActionBarDebugUtils.init();
         MessageHider.init();
         PlayerMessageHandler.init();
+        ProfitTracker.init();
         ActionBarFormatter.init();
 
         FishingHud.init();
         InformationHud.init();
         PetsHelper.init();
         ProfitHud.init();
-        ProfitTracker.init();
         RefineryPetTracker.init();
         BagValueTracker.init();
         BagHud.init();
