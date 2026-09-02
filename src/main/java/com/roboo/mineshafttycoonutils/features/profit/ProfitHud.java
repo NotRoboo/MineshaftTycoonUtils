@@ -1,7 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.profit;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
-import com.roboo.mineshafttycoonutils.config.ProfitCategory;
+import com.roboo.mineshafttycoonutils.config.categories.ProfitCategory;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.FishingZones;

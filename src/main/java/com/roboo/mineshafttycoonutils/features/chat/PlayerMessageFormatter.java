@@ -1,8 +1,8 @@
 package com.roboo.mineshafttycoonutils.features.chat;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
-import com.roboo.mineshafttycoonutils.config.GlyphCategory;
-import com.roboo.mineshafttycoonutils.config.PlayerMessagesCategory;
+import com.roboo.mineshafttycoonutils.config.categories.GlyphCategory;
+import com.roboo.mineshafttycoonutils.config.categories.PlayerMessagesCategory;
 import com.roboo.mineshafttycoonutils.utils.RankTierData;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
 import net.minecraft.network.chat.Component;

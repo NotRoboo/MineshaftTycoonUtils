@@ -1,7 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.timers;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
-import com.roboo.mineshafttycoonutils.config.TimersCategory;
+import com.roboo.mineshafttycoonutils.config.categories.TimersCategory;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;

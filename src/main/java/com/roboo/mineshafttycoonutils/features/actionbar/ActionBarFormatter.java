@@ -1,6 +1,6 @@
 package com.roboo.mineshafttycoonutils.features.actionbar;
 
-import com.roboo.mineshafttycoonutils.config.ActionBarCategory;
+import com.roboo.mineshafttycoonutils.config.categories.ActionBarCategory;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
