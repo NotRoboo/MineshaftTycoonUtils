@@ -1,6 +1,6 @@
 package com.roboo.mineshafttycoonutils.utils;
 
-import com.roboo.mineshafttycoonutils.config.GlyphCategory;
+import com.roboo.mineshafttycoonutils.config.categories.GlyphCategory;
 
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.config;
 
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.config.categories.*;
 import com.roboo.mineshafttycoonutils.config.chat.EmojiConfig;
 import com.roboo.mineshafttycoonutils.config.migration.ConfigMigrations;
 import io.github.notenoughupdates.moulconfig.Config;

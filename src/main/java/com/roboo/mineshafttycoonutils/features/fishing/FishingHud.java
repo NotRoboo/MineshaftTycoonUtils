@@ -1,7 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.fishing;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
-import com.roboo.mineshafttycoonutils.config.FishingCategory;
+import com.roboo.mineshafttycoonutils.config.categories.FishingCategory;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.FishingZones;

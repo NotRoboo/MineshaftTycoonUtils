@@ -1,4 +1,4 @@
-package com.roboo.mineshafttycoonutils.config;
+package com.roboo.mineshafttycoonutils.config.categories;
 
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;

@@ -1,6 +1,6 @@
 package com.roboo.mineshafttycoonutils.config.migration;
 
-import com.roboo.mineshafttycoonutils.config.ItemLoreCategory;
+import com.roboo.mineshafttycoonutils.config.categories.ItemLoreCategory;
 import com.roboo.mineshafttycoonutils.features.misc.NightVisionBlocker;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;

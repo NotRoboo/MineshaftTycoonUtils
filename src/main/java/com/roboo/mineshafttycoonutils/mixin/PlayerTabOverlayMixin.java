@@ -1,7 +1,7 @@
 package com.roboo.mineshafttycoonutils.mixin;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
-import com.roboo.mineshafttycoonutils.config.GlyphCategory;
+import com.roboo.mineshafttycoonutils.config.categories.GlyphCategory;
 import com.roboo.mineshafttycoonutils.features.tablist.TabListEntryParser;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
 import com.roboo.mineshafttycoonutils.utils.RankTierData;

@@ -1,4 +1,4 @@
-package com.roboo.mineshafttycoonutils.config;
+package com.roboo.mineshafttycoonutils.config.categories;
 
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
@@ -11,27 +11,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TimersCategory {
+public class InformationCategory {
 
     @Expose
-    @ConfigOption(
-            name = "Timers HUD",
-            desc = "Show the timers HUD overlay. \n" +
-                    "§eNOTE: Over long periods timer may go slightly quicker")
+    @ConfigOption(name = "Information HUD", desc = "Show the information HUD overlay")
     @ConfigEditorBoolean
     public boolean hudEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Title Color", desc = "Color used for the Timers HUD title")
+    @ConfigOption(name = "Title Color", desc = "Color used for the Information HUD title")
     @ConfigEditorColour
     public ChromaColour titleColor = ChromaColour.fromStaticRGB(255, 255, 85, 255);
-
-    @Expose
-    @ConfigOption(
-            name = "Hide Seconds Until Final Minute",
-            desc = "Only show seconds once a timer drops under a minute, so timers with hours/minutes left aren't ticking down on screen")
-    @ConfigEditorBoolean
-    public boolean hideSecondsUntilFinalMinute = false;
 
     @Expose
     @ConfigOption(
@@ -43,32 +33,22 @@ public class TimersCategory {
 
     @Expose
     @ConfigOption(
-            name = "Timer Order",
-            desc = "Drag to reorder timers shown on the HUD. Remove an entry to hide it; it will still be tracked.")
+            name = "Line Order",
+            desc = "Drag to reorder the lines shown on the information HUD. Remove an entry to hide it entirely.")
     @ConfigEditorDraggableList
     public List<Entry> order = new ArrayList<>(Arrays.asList(Entry.values()));
 
     @Expose
-    public int timersHudX = 180;
+    public int informationHudX = 10;
 
     @Expose
-    public int timersHudY = 20;
+    public int informationHudY = 10;
 
     public enum Entry {
-        T4_POTION("T4 Potion"),
-        T3_POTION("T3 Potion"),
-        T2_POTION("T2 Potion"),
-        T1_POTION("T1 Potion"),
-        PETAD("Petad"),
-        ILS_RESTOCK("Il's Restock"),
-        IRONVINE("Ironvine"),
-        REDROOT("Redroot"),
-        AURORA_FRUIT("Aurora Fruit"),
-        SQUASH("Squash"),
-        DUSTGRAIN("Dustgrain"),
-        SUNFLOWER("Sunflower"),
-        FISHING_BUFF("Fishing Buff"),
-        GREENHOUSE("Greenhouse");
+        SPRINT("Sprint"),
+        LEFT_CLICK("Left Click"),
+        RIGHT_CLICK("Right Click"),
+        PET("Pet");
 
         private final String displayName;
 

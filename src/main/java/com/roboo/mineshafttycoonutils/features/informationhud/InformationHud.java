@@ -1,7 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.informationhud;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
-import com.roboo.mineshafttycoonutils.config.InformationCategory;
+import com.roboo.mineshafttycoonutils.config.categories.InformationCategory;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;

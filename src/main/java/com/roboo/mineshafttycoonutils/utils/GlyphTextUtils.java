@@ -1,6 +1,6 @@
 package com.roboo.mineshafttycoonutils.utils;
 
-import com.roboo.mineshafttycoonutils.config.GlyphCategory;
+import com.roboo.mineshafttycoonutils.config.categories.GlyphCategory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

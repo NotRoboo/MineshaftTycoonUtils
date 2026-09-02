@@ -1,4 +1,4 @@
-package com.roboo.mineshafttycoonutils.config;
+package com.roboo.mineshafttycoonutils.config.categories;
 
 import com.google.gson.annotations.Expose;
 import com.roboo.mineshafttycoonutils.hud.HudEditScreen;
@@ -47,7 +47,7 @@ public class GeneralCategory {
 
     @Expose
     @ConfigOption(
-            name = "Pots Off Helper",
+            name = "Potsoff Helper",
             desc = "Typing /potsoff <type> opens the buff menu and automatically toggles the matching potion/buff - §cUse at own risk")
     @ConfigEditorBoolean
     public boolean potsoffCommand = false;

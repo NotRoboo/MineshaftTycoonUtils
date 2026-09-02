@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.roboo.mineshafttycoonutils.config.ConfigGuiManager;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
-import com.roboo.mineshafttycoonutils.config.ScoreboardCategory;
+import com.roboo.mineshafttycoonutils.config.categories.ScoreboardCategory;
 import com.roboo.mineshafttycoonutils.features.fishing.FishingTracker;
 import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
