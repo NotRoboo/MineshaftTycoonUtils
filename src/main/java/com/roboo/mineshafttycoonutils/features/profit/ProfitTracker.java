@@ -38,8 +38,9 @@ public class ProfitTracker {
 
     public static void init() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
-        ClientReceiveMessageEvents.GAME.register((msg, overlay) -> {
+        ClientReceiveMessageEvents.ALLOW_GAME.register((msg, overlay) -> {
             if (overlay) onActionBar(msg.getString());
+            return true;
         });
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> resetSession());
