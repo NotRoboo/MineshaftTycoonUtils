@@ -16,7 +16,7 @@ public class ProfitTracker {
 
     private static final Minecraft mc = Minecraft.getInstance();
 
-    private static final double FORTUNE_PER_DROP = 100.0;
+    private static final long FORTUNE_PER_DROP = 100;
     private static final long IDLE_TIMEOUT_MS = 10_000;
     private static final long DISPLAY_UPDATE_INTERVAL_MS = 500;
 
@@ -103,7 +103,7 @@ public class ProfitTracker {
         long value = ore.getDropValue();
         if (value < 0) return;
 
-        long drops = Math.round(fortune / FORTUNE_PER_DROP);
+        long drops = rollDrops(fortune);
         long gained = drops * value;
         totalProfit += gained;
 
@@ -111,6 +111,17 @@ public class ProfitTracker {
         if (lastMinedMillis < 0) lastSecondMarkMillis = now;
         lastMinedMillis = now;
         paused = false;
+    }
+
+    private static long rollDrops(long fortune) {
+        long wholeDrops = fortune / FORTUNE_PER_DROP;
+        long remainder = fortune % FORTUNE_PER_DROP;
+
+        if (remainder > 0 && Math.random() * FORTUNE_PER_DROP < remainder) {
+            wholeDrops++;
+        }
+
+        return wholeDrops;
     }
 
     public static long getTotalProfit() {

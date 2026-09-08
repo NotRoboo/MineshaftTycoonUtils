@@ -1,12 +1,12 @@
-<h1 align="center">MineshaftTycoon Utils</h1>
+<div align="center">
 
-<p align="center">Client-side Fabric mod for MineshaftTycoon — fishing & profit tracking, chat cleanup, glyph ranks, HUDs, and more.</p>
+# MineshaftTycoon Utils
 
-<p align="center">
-  <a href="https://github.com/NotRoboo/mineshafttycoonutils/releases/latest"><b>Download Latest</b></a>
-    &nbsp;·&nbsp;
-  <a href="https://github.com/NotRoboo/mineshafttycoonutils/releases">all releases</a>
-</p>
+Client-side Fabric mod for MineshaftTycoon — fishing & profit tracking, chat cleanup, glyph ranks, HUDs, and more.
+
+[**Download Latest**](https://github.com/NotRoboo/mineshafttycoonutils/releases/latest) &nbsp;·&nbsp; [All Releases](https://github.com/NotRoboo/mineshafttycoonutils/releases)
+
+</div>
 
 ## Installation
 
@@ -16,6 +16,9 @@
    - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
 3. Download the latest jar from [Releases](https://github.com/NotRoboo/mineshafttycoonutils/releases) and place it in your `mods` folder.
 4. Launch with the Fabric profile and run `/mstu` to open the config.
+
+## Bugs & Feature Requests
+ Please direct any bugs or suggestions [here!](https://github.com/NotRoboo/MineshaftTycoonUtils/issues)
 
 ## Special Thanks
  Special thanks to `_CB_KYE_, ov3rstimulated, KingCacti` and everyone who helped with testing. An additional thanks to
@@ -38,14 +41,14 @@
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `/mstu` | Open config GUI |
-| `/mstu <search>` | Open config with search pre-filled |
-| `/mstu edithud` | HUD position editor |
-| `/mstu hudpositionsreset` | Reset HUD positions |
-| `/mstu resetfishinghud` | Reset fishing tracker |
-| `/mstu resetprofittracker` | Reset profit tracker |
+| Command                    | Description                        |
+|----------------------------|------------------------------------|
+| `/mstu`                    | Open config GUI                    |
+| `/mstu <search>`           | Open config with search pre-filled |
+| `/mstu edithud`            | HUD position editor                |
+| `/mstu hudpositionsreset`  | Reset HUD positions                |
+| `/mstu resetfishinghud`    | Reset fishing tracker              |
+| `/mstu resetprofittracker` | Reset profit tracker               |
 
 Aliases: `/mineshafttycoonutils`, `/mstutils`
 

@@ -10,14 +10,14 @@ public class ItemLoreCategory {
 
     @Expose
     @ConfigOption(
-            name = "Shorten Large Lore Numbers",
+            name = "Shorten Numbers",
             desc = "Shortens numbers over 1,000,000,000 in item lore, e.g. 1,500,000,000 becomes 1.50B")
     @ConfigEditorBoolean
     public boolean shortenLoreNumbers = true;
 
     @Expose
     @ConfigOption(
-            name = "Shorten Lore Time",
+            name = "Shorten Time",
             desc = "Shortens `Xs (X Seconds)` style durations in item lore into Xd Xh Xm Xs format")
     @ConfigEditorBoolean
     public boolean shortenLoreTime = true;
