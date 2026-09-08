@@ -1,9 +1,11 @@
-package com.roboo.mineshafttycoonutils.utils;
+package com.roboo.mineshafttycoonutils.features.misc;
+
+import com.roboo.mineshafttycoonutils.utils.TimeFormatUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LoreTimeUtils {
+public class LoreTimes {
 
     private static final String START_GUARD = "(?<!§)(?:(?<!\\d)|(?<=§\\d))";
 
@@ -11,7 +13,7 @@ public class LoreTimeUtils {
             START_GUARD + "([\\d,]+)s(?![A-Za-z0-9])"
     );
 
-    private LoreTimeUtils() {}
+    private LoreTimes() {}
 
     public static String shortenSeconds(String text) {
         if (text == null) return null;
@@ -30,7 +32,7 @@ public class LoreTimeUtils {
             }
 
             result.append(text, last, matcher.start());
-            result.append(formatDuration(totalSeconds));
+            result.append(TimeFormatUtils.formatDuration(totalSeconds, true));
             last = matcher.end();
             changed = true;
         }
@@ -39,20 +41,5 @@ public class LoreTimeUtils {
 
         result.append(text.substring(last));
         return result.toString();
-    }
-
-    private static String formatDuration(long totalSeconds) {
-        long days = totalSeconds / 86400;
-        long hours = (totalSeconds % 86400) / 3600;
-        long minutes = (totalSeconds % 3600) / 60;
-        long seconds = totalSeconds % 60;
-
-        StringBuilder sb = new StringBuilder();
-        if (days > 0) sb.append(days).append("d ");
-        if (days > 0 || hours > 0) sb.append(hours).append("h ");
-        if (days > 0 || hours > 0 || minutes > 0) sb.append(minutes).append("m ");
-        sb.append(seconds).append("s");
-
-        return sb.toString();
     }
 }

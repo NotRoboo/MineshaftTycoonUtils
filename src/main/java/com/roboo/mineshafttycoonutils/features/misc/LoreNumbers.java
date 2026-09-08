@@ -1,9 +1,11 @@
-package com.roboo.mineshafttycoonutils.utils;
+package com.roboo.mineshafttycoonutils.features.misc;
+
+import com.roboo.mineshafttycoonutils.utils.NumberFormatUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LoreNumberUtils {
+public class LoreNumbers {
 
     private static final String START_GUARD = "(?<!§)(?:(?<!\\d)|(?<=§\\d))";
 
@@ -15,7 +17,7 @@ public class LoreNumberUtils {
 
     private static final long THRESHOLD = 1_000_000L;
 
-    private LoreNumberUtils() {}
+    private LoreNumbers() {}
 
     public static String shortenLargeNumbers(String text) {
         if (text == null) return null;

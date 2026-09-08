@@ -2,8 +2,8 @@ package com.roboo.mineshafttycoonutils.mixin;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
-import com.roboo.mineshafttycoonutils.utils.LoreNumberUtils;
-import com.roboo.mineshafttycoonutils.utils.LoreTimeUtils;
+import com.roboo.mineshafttycoonutils.features.misc.LoreNumbers;
+import com.roboo.mineshafttycoonutils.features.misc.LoreTimes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -37,8 +37,8 @@ public class ItemStackTooltipMixin {
             String raw = ComponentTextUtils.formattedText(line);
             String result = raw;
 
-            if (numbersEnabled) result = LoreNumberUtils.shortenLargeNumbers(result);
-            if (timeEnabled) result = LoreTimeUtils.shortenSeconds(result);
+            if (numbersEnabled) result = LoreNumbers.shortenLargeNumbers(result);
+            if (timeEnabled) result = LoreTimes.shortenSeconds(result);
 
             if (result.equals(raw)) {
                 replaced.add(line);

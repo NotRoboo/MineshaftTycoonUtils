@@ -8,6 +8,7 @@ import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.FishingZones;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
 import com.roboo.mineshafttycoonutils.utils.NumberFormatUtils;
+import com.roboo.mineshafttycoonutils.utils.TimeFormatUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
@@ -121,6 +122,10 @@ public class ProfitHud {
             HudTextUtils.drawLine(graphics, "§7Boosts: §c(Open refinery & /pets)", localAnchorX, LINE_HEIGHT * line++, rightAligned);
         }
 
+        if (cfg.tracker.showMiningTime) {
+            HudTextUtils.drawLine(graphics, miningTimeText(cfg), localAnchorX, LINE_HEIGHT * line++, rightAligned);
+        }
+
         HudTextUtils.drawLine(graphics, profitPerHourText(cfg), localAnchorX, LINE_HEIGHT * line++, rightAligned);
         HudTextUtils.drawLine(graphics, "§7Total: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getTotalProfit(), cfg.shortenNumbers),
                 localAnchorX, LINE_HEIGHT * line++, rightAligned);
@@ -146,9 +151,15 @@ public class ProfitHud {
         return "§7$/Hour: " + color + "$" + NumberFormatUtils.formatShortened(ProfitTracker.getProfitPerHour(), cfg.shortenNumbers) + "/hr";
     }
 
+    private static String miningTimeText(ProfitCategory cfg) {
+        String color = ProfitTracker.isPaused() ? "§c" : "§e";
+        return "§7Mining Time: " + color + TimeFormatUtils.formatDuration(ProfitTracker.getUptimeSeconds(), cfg.tracker.showMiningTimeSeconds);
+    }
+
     private static int countTotalLines(ProfitCategory cfg, LinkedHashMap<String, Integer> breakdown) {
         int total = 1;
         if (ProfitTracker.needsRamLevel()) total++;
+        if (cfg.tracker.showMiningTime) total++;
         total += 2;
 
         if (cfg.tracker.showOreDrops) {
@@ -166,6 +177,9 @@ public class ProfitHud {
 
         if (ProfitTracker.needsRamLevel()) {
             width = Math.max(width, mc.font.width("§7Boosts: §c(Open refinery & /pets)"));
+        }
+        if (cfg.tracker.showMiningTime) {
+            width = Math.max(width, mc.font.width(miningTimeText(cfg)));
         }
         width = Math.max(width, mc.font.width(profitPerHourText(cfg)));
         width = Math.max(width, mc.font.width("§7Total: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getTotalProfit(), cfg.shortenNumbers)));

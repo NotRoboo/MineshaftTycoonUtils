@@ -130,6 +130,10 @@ public class ProfitTracker {
         return cachedProfitPerHour;
     }
 
+    public static long getUptimeSeconds() {
+        return uptimeSeconds;
+    }
+
     private static long calcProfitPerHour() {
         if (uptimeSeconds <= 0) return 0;
         return Math.round(totalProfit / (double) uptimeSeconds * 3600.0);

@@ -25,9 +25,20 @@ public class ProfitTrackerConfig {
     public boolean onlyShowWhenMining = true;
 
     @Expose
-    @ConfigOption(name = "Show Ore Drops", desc = "Show a breakdown of rare ore drops obtained (Lunar Fragment, Basalt Shard, etc.) on the profit HUD")
+    @ConfigOption(name = "Ore Drops", desc = "Show a breakdown of rare ore drops obtained (Lunar Fragment, Basalt Shard, etc.) on the profit HUD")
     @ConfigEditorBoolean
     public boolean showOreDrops = true;
+
+    @Expose
+    @ConfigOption(name = "Mining Time", desc = "Show how long you've been actively mining on the profit HUD")
+    @ConfigEditorBoolean
+    public boolean showMiningTime = true;
+
+    @Expose
+    @ConfigOption(name = "Show Seconds", desc = "Include seconds in the Mining Time display")
+    @ConfigEditorBoolean
+    public boolean showMiningTimeSeconds = true;
+
 
     @Expose
     @ConfigOption(name = "Disable Right-Align Flip", desc = "Keep this HUD's text left-aligned even when positioned past the middle of the screen, instead of automatically flipping to right-aligned")
