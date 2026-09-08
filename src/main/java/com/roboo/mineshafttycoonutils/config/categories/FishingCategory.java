@@ -5,6 +5,7 @@ import com.roboo.mineshafttycoonutils.config.fishing.CrateOrderConfig;
 import com.roboo.mineshafttycoonutils.config.fishing.SeaCreatureOrderConfig;
 import com.roboo.mineshafttycoonutils.config.fishing.TreasureOrderConfig;
 import com.roboo.mineshafttycoonutils.config.fishing.TrophyOrderConfig;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.annotations.*;
 
@@ -65,6 +66,9 @@ public class FishingCategory {
 
     @Expose
     public int hudY = 80;
+
+    @Expose
+    public float scale = HudScale.DEFAULT;
 
     @Expose
     @Category(name = "Treasure", desc = "Treasure and plate drop tracking settings")

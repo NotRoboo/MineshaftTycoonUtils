@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.config.categories;
 
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
@@ -53,6 +54,9 @@ public class TimersCategory {
 
     @Expose
     public int timersHudY = 20;
+
+    @Expose
+    public float scale = HudScale.DEFAULT;
 
     public enum Entry {
         T4_POTION("T4 Potion"),

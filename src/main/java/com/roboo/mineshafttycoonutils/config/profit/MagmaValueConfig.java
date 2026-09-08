@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.config.profit;
 
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
@@ -52,6 +53,9 @@ public class MagmaValueConfig {
 
     @Expose
     public int magmaHudY = 160;
+
+    @Expose
+    public float magmaHudScale = HudScale.DEFAULT;
 
     public enum Entry {
         LUNAR_FRAGMENT("Lunar Fragment", 1),

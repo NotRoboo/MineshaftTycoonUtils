@@ -3,6 +3,7 @@ package com.roboo.mineshafttycoonutils.features.profit;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.ProfitCategory;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.FishingZones;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
@@ -45,12 +46,22 @@ public class ProfitHud {
 
         @Override
         public int getWidth() {
-            return calcWidth();
+            return Math.round(calcWidth() * HudScale.normalize(ConfigManager.config.profit.tracker.profitHudScale));
         }
 
         @Override
         public int getHeight() {
-            return calcHeight();
+            return Math.round(calcHeight() * HudScale.normalize(ConfigManager.config.profit.tracker.profitHudScale));
+        }
+
+        @Override
+        public float getScale() {
+            return ConfigManager.config.profit.tracker.profitHudScale;
+        }
+
+        @Override
+        public void setScale(float scale) {
+            ConfigManager.config.profit.tracker.profitHudScale = HudScale.clamp(scale);
         }
 
         @Override
@@ -77,7 +88,7 @@ public class ProfitHud {
                     if (mc.player == null || !cfg.tracker.profitTrackerEnabled) return;
                     if (cfg.tracker.onlyShowWhenMining && FishingZones.isInZone(mc.player.blockPosition())) return;
 
-                    int totalHeight = calcHeight();
+                    int totalHeight = Math.round(calcHeight() * HudScale.normalize(cfg.tracker.profitHudScale));
                     int x = HudTextUtils.clampX(cfg.tracker.profitHudX);
                     int y = HudTextUtils.clampY(cfg.tracker.profitHudY, totalHeight);
 
@@ -94,30 +105,40 @@ public class ProfitHud {
         LinkedHashMap<String, Integer> breakdown = OreDropTracker.getBreakdown();
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.tracker.disableRightAlignFlip);
         int titleColor = HudTextUtils.chromaToArgb(cfg.tracker.titleColor);
+        float scale = HudScale.normalize(cfg.tracker.profitHudScale);
+        int unscaledWidth = calcWidth();
+        int screenLeft = rightAligned ? anchorX - Math.round(unscaledWidth * scale) : anchorX;
+        int localAnchorX = rightAligned ? unscaledWidth : 0;
 
-        HudTextUtils.drawLine(graphics, TITLE_TEXT, anchorX, y, rightAligned, titleColor);
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(screenLeft, y);
+        graphics.pose().scale(scale, scale);
+
+        HudTextUtils.drawLine(graphics, TITLE_TEXT, localAnchorX, 0, rightAligned, titleColor);
         int line = 1;
 
         if (ProfitTracker.needsRamLevel()) {
-            HudTextUtils.drawLine(graphics, "§7Boosts: §c(Open refinery & /pets)", anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+            HudTextUtils.drawLine(graphics, "§7Boosts: §c(Open refinery & /pets)", localAnchorX, LINE_HEIGHT * line++, rightAligned);
         }
 
-        HudTextUtils.drawLine(graphics, profitPerHourText(cfg), anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+        HudTextUtils.drawLine(graphics, profitPerHourText(cfg), localAnchorX, LINE_HEIGHT * line++, rightAligned);
         HudTextUtils.drawLine(graphics, "§7Total: §e$" + NumberFormatUtils.formatShortened(ProfitTracker.getTotalProfit(), cfg.shortenNumbers),
-                anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+                localAnchorX, LINE_HEIGHT * line++, rightAligned);
 
         if (cfg.tracker.showOreDrops) {
-            HudTextUtils.drawLine(graphics, ORES_HEADER_TEXT, anchorX, y + (LINE_HEIGHT * line++), rightAligned, titleColor);
+            HudTextUtils.drawLine(graphics, ORES_HEADER_TEXT, localAnchorX, LINE_HEIGHT * line++, rightAligned, titleColor);
 
             if (breakdown.isEmpty()) {
-                HudTextUtils.drawLine(graphics, "§7- None", anchorX, y + (LINE_HEIGHT * line), rightAligned);
+                HudTextUtils.drawLine(graphics, "§7- None", localAnchorX, LINE_HEIGHT * line, rightAligned);
             } else {
                 for (var entry : breakdown.entrySet()) {
                     HudTextUtils.drawLine(graphics, "§7- " + entry.getKey() + " §7(§e" + entry.getValue() + "§7)",
-                            anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+                            localAnchorX, LINE_HEIGHT * line++, rightAligned);
                 }
             }
         }
+
+        graphics.pose().popMatrix();
     }
 
     private static String profitPerHourText(ProfitCategory cfg) {

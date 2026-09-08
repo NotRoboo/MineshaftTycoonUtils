@@ -4,6 +4,7 @@ import com.roboo.mineshafttycoonutils.MineshaftTycoonUtils;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.profit.BagValueConfig;
 import com.roboo.mineshafttycoonutils.hud.ContainerHudDragHandler;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
 import com.roboo.mineshafttycoonutils.utils.NumberFormatUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -27,9 +28,23 @@ public class BagHud {
 
             ScreenEvents.afterRender(screen).register((s, graphics, mouseX, mouseY, tickDelta) -> render(graphics));
             ScreenEvents.remove(screen).register(s -> dragHandler.reset());
+
+            registerScroll(screen);
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
+    }
+
+    private static void registerScroll(Screen screen) {
+        dragHandler.registerScroll(
+                screen,
+                () -> ConfigManager.config.profit.bagValue.bagValueHudX,
+                () -> ConfigManager.config.profit.bagValue.bagValueHudY,
+                BagHud::calcWidth,
+                BagHud::calcHeight,
+                () -> ConfigManager.config.profit.bagValue.bagValueHudScale,
+                scale -> ConfigManager.config.profit.bagValue.bagValueHudScale = scale
+        );
     }
 
     private static boolean isNotBagScreen(Screen screen) {
@@ -49,8 +64,8 @@ public class BagHud {
                 ConfigManager.config.general.editBagHudKeybind,
                 cfg.bagValueHudX,
                 cfg.bagValueHudY,
-                computeWidth(),
-                computeHeight(),
+                calcWidth(),
+                calcHeight(),
                 (x, y) -> {
                     cfg.bagValueHudX = x;
                     cfg.bagValueHudY = y;
@@ -63,7 +78,7 @@ public class BagHud {
         BagValueConfig cfg = ConfigManager.config.profit.bagValue;
         if (!cfg.hudEnabled) return;
 
-        dragHandler.drawBoxIfEditing(graphics, cfg.bagValueHudX, cfg.bagValueHudY, computeWidth(), computeHeight());
+        dragHandler.drawBoxIfEditing(graphics, cfg.bagValueHudX, cfg.bagValueHudY, calcWidth(), calcHeight());
 
         drawContent(graphics, cfg.bagValueHudX, cfg.bagValueHudY);
     }
@@ -72,8 +87,16 @@ public class BagHud {
         BagValueConfig cfg = ConfigManager.config.profit.bagValue;
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
         int titleColor = HudTextUtils.chromaToArgb(cfg.titleColor);
+        float scale = HudScale.normalize(cfg.bagValueHudScale);
+        int unscaledWidth = calcUnscaledWidth();
+        int screenLeft = rightAligned ? anchorX - Math.round(unscaledWidth * scale) : anchorX;
+        int localAnchorX = rightAligned ? unscaledWidth : 0;
 
-        HudTextUtils.drawLine(graphics, "§lBag Value", anchorX, y, rightAligned, titleColor);
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(screenLeft, y);
+        graphics.pose().scale(scale, scale);
+
+        HudTextUtils.drawLine(graphics, "§lBag Value", localAnchorX, 0, rightAligned, titleColor);
         int line = 1;
 
         for (TrackedOre ore : TrackedOre.values()) {
@@ -81,14 +104,16 @@ public class BagHud {
             if (value <= 0) continue;
 
             HudTextUtils.drawLine(graphics, "§7 - " + ore.getDisplayName() + ": §e$" + NumberFormatUtils.formatShortened(value, true),
-                    anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+                    localAnchorX, LINE_HEIGHT * line++, rightAligned);
         }
 
         HudTextUtils.drawLine(graphics, "§lTotal: §e$" + NumberFormatUtils.formatShortened(BagValueTracker.getTotalValue(), true),
-                anchorX, y + (LINE_HEIGHT * line), rightAligned, titleColor);
+                localAnchorX, LINE_HEIGHT * line, rightAligned, titleColor);
+
+        graphics.pose().popMatrix();
     }
 
-    private static int computeWidth() {
+    private static int calcUnscaledWidth() {
         int width = mc.font.width("§lBag Value");
 
         for (TrackedOre ore : TrackedOre.values()) {
@@ -102,7 +127,7 @@ public class BagHud {
         return width;
     }
 
-    private static int computeHeight() {
+    private static int calcUnscaledHeight() {
         int lines = 1;
 
         for (TrackedOre ore : TrackedOre.values()) {
@@ -112,5 +137,15 @@ public class BagHud {
 
         lines++;
         return lines * LINE_HEIGHT;
+    }
+
+    private static int calcWidth() {
+        float scale = HudScale.normalize(ConfigManager.config.profit.bagValue.bagValueHudScale);
+        return Math.round(calcUnscaledWidth() * scale);
+    }
+
+    private static int calcHeight() {
+        float scale = HudScale.normalize(ConfigManager.config.profit.bagValue.bagValueHudScale);
+        return Math.round(calcUnscaledHeight() * scale);
     }
 }

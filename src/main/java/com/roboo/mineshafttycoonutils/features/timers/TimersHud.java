@@ -3,6 +3,7 @@ package com.roboo.mineshafttycoonutils.features.timers;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.TimersCategory;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -44,12 +45,22 @@ public class TimersHud {
 
         @Override
         public int getWidth() {
-            return calcWidth();
+            return Math.round(calcWidth() * HudScale.normalize(ConfigManager.config.timers.scale));
         }
 
         @Override
         public int getHeight() {
-            return calcHeight();
+            return Math.round(calcHeight() * HudScale.normalize(ConfigManager.config.timers.scale));
+        }
+
+        @Override
+        public float getScale() {
+            return ConfigManager.config.timers.scale;
+        }
+
+        @Override
+        public void setScale(float scale) {
+            ConfigManager.config.timers.scale = HudScale.clamp(scale);
         }
 
         @Override
@@ -78,7 +89,7 @@ public class TimersHud {
                     List<String> lines = calcLines(cfg);
                     if (lines.isEmpty()) return;
 
-                    int totalHeight = (lines.size() + 1) * LINE_HEIGHT;
+                    int totalHeight = Math.round((lines.size() + 1) * LINE_HEIGHT * HudScale.normalize(cfg.scale));
 
                     int x = HudTextUtils.clampX(cfg.timersHudX);
                     int y = HudTextUtils.clampY(cfg.timersHudY, totalHeight);
@@ -94,12 +105,22 @@ public class TimersHud {
         TimersCategory cfg = ConfigManager.config.timers;
         List<String> lines = calcLines(cfg);
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
+        float scale = HudScale.normalize(cfg.scale);
+        int unscaledWidth = calcWidth();
+        int screenLeft = rightAligned ? anchorX - Math.round(unscaledWidth * scale) : anchorX;
+        int localAnchorX = rightAligned ? unscaledWidth : 0;
 
-        HudTextUtils.drawLine(graphics, TITLE_TEXT, anchorX, y, rightAligned, HudTextUtils.chromaToArgb(cfg.titleColor));
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(screenLeft, y);
+        graphics.pose().scale(scale, scale);
+
+        HudTextUtils.drawLine(graphics, TITLE_TEXT, localAnchorX, 0, rightAligned, HudTextUtils.chromaToArgb(cfg.titleColor));
         int line = 1;
         for (String l : lines) {
-            HudTextUtils.drawLine(graphics, l, anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+            HudTextUtils.drawLine(graphics, l, localAnchorX, LINE_HEIGHT * line++, rightAligned);
         }
+
+        graphics.pose().popMatrix();
     }
 
     private static List<String> calcLines(TimersCategory cfg) {

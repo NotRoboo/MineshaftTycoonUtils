@@ -3,6 +3,7 @@ package com.roboo.mineshafttycoonutils.features.scoreboard;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.ScoreboardCategory;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
 import net.minecraft.client.Minecraft;
@@ -28,22 +29,32 @@ public class ScoreboardHud {
 
         @Override
         public int getX() {
-            return resolveLeft(CustomScoreboardManager.formatDisplayLines());
+            return resolveLeft(getWidth());
         }
 
         @Override
         public int getY() {
-            return resolveTop(CustomScoreboardManager.formatDisplayLines());
+            return resolveTop(getHeight());
         }
 
         @Override
         public int getWidth() {
-            return computeWidth(CustomScoreboardManager.formatDisplayLines());
+            return Math.round(calcWidth(CustomScoreboardManager.formatDisplayLines()) * HudScale.normalize(ConfigManager.config.scoreboard.scale));
         }
 
         @Override
         public int getHeight() {
-            return computeTotalHeight(CustomScoreboardManager.formatDisplayLines());
+            return Math.round(calcTotalHeight(CustomScoreboardManager.formatDisplayLines()) * HudScale.normalize(ConfigManager.config.scoreboard.scale));
+        }
+
+        @Override
+        public float getScale() {
+            return ConfigManager.config.scoreboard.scale;
+        }
+
+        @Override
+        public void setScale(float scale) {
+            ConfigManager.config.scoreboard.scale = HudScale.clamp(scale);
         }
 
         @Override
@@ -63,30 +74,39 @@ public class ScoreboardHud {
     }
 
     public static void renderLines(GuiGraphics graphics, List<String> lines) {
-        int width = computeWidth(lines);
-        int totalHeight = computeTotalHeight(lines);
-        int left = resolveLeft(lines);
-        int top = resolveTop(lines);
+        ScoreboardCategory cfg = ConfigManager.config.scoreboard;
+        float scale = HudScale.normalize(cfg.scale);
+        int unscaledWidth = calcWidth(lines);
+        int unscaledHeight = calcTotalHeight(lines);
+        int width = Math.round(unscaledWidth * scale);
+        int totalHeight = Math.round(unscaledHeight * scale);
+        int left = resolveLeft(width);
+        int top = resolveTop(totalHeight);
         int right = left + width;
 
-        graphics.fill(left, top - 2, right, top + totalHeight, 0x4E000000);
+        graphics.fill(left, top - Math.round(2 * scale), right, top + totalHeight, 0x4E000000);
 
-        int y = top;
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(left, top);
+        graphics.pose().scale(scale, scale);
+
+        int y = 0;
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
             if (!line.isEmpty()) {
                 int x = i == 0
-                        ? left + (width - mc.font.width(line)) / 2
-                        : left + 3;
+                        ? (unscaledWidth - mc.font.width(line)) / 2
+                        : 3;
                 graphics.drawString(mc.font, line, x, y, 0xFFFFFFFF, true);
             }
             y += LINE_HEIGHT;
         }
+
+        graphics.pose().popMatrix();
     }
 
-    private static int resolveLeft(List<String> lines) {
+    private static int resolveLeft(int width) {
         ScoreboardCategory cfg = ConfigManager.config.scoreboard;
-        int width = computeWidth(lines);
 
         if (cfg.hudX == ScoreboardCategory.AUTO_POSITION) {
             return mc.getWindow().getGuiScaledWidth() - 1 - width;
@@ -95,18 +115,17 @@ public class ScoreboardHud {
         return HudTextUtils.isRightAligned(cfg.hudX) ? cfg.hudX - width : cfg.hudX;
     }
 
-    private static int resolveTop(List<String> lines) {
+    private static int resolveTop(int totalHeight) {
         ScoreboardCategory cfg = ConfigManager.config.scoreboard;
 
         if (cfg.hudY == ScoreboardCategory.AUTO_POSITION) {
-            int totalHeight = computeTotalHeight(lines);
             return (mc.getWindow().getGuiScaledHeight() - totalHeight) / 2;
         }
 
         return cfg.hudY;
     }
 
-    private static int computeWidth(List<String> lines) {
+    private static int calcWidth(List<String> lines) {
         int width = 0;
         for (String line : lines) {
             width = Math.max(width, mc.font.width(line));
@@ -114,7 +133,7 @@ public class ScoreboardHud {
         return width + 6;
     }
 
-    private static int computeTotalHeight(List<String> lines) {
+    private static int calcTotalHeight(List<String> lines) {
         return lines.size() * LINE_HEIGHT + 2;
     }
 }
