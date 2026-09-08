@@ -26,6 +26,10 @@ import java.util.concurrent.CompletableFuture;
 public abstract class CommandSuggestionsMixin {
 
     @Unique
+    private static final String VISIT_PREFIX = "/visit ";
+    @Unique
+    private static final String VISIT_SUGGESTION = "masterplaysxd";
+    @Unique
     private static final String WARP_PREFIX = "/warp ";
     @Unique
     private static final String PETS_PREFIX = "/pets ";
@@ -49,7 +53,12 @@ public abstract class CommandSuggestionsMixin {
         String prefix;
         List<String> matches;
 
-        if (ConfigManager.config.general.warpHelperEnabled && lower.startsWith(WARP_PREFIX)) {
+        if (lower.startsWith(VISIT_PREFIX)) {
+            prefix = VISIT_PREFIX;
+            if (cursor < prefix.length()) return;
+            String partial = text.substring(prefix.length(), cursor).toLowerCase(Locale.ROOT);
+            matches = VISIT_SUGGESTION.startsWith(partial) ? List.of(VISIT_SUGGESTION) : List.of();
+        } else if (ConfigManager.config.general.warpHelperEnabled && lower.startsWith(WARP_PREFIX)) {
             prefix = WARP_PREFIX;
             if (cursor < prefix.length()) return;
             matches = WarpHelper.matchingArgs(text.substring(prefix.length(), cursor).toLowerCase(Locale.ROOT));
