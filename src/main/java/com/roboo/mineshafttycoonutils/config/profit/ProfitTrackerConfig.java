@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.config.profit;
 
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
@@ -38,6 +39,9 @@ public class ProfitTrackerConfig {
 
     @Expose
     public int profitHudY = 70;
+
+    @Expose
+    public float profitHudScale = HudScale.DEFAULT;
 
     @Expose
     public RefineryState state = new RefineryState();

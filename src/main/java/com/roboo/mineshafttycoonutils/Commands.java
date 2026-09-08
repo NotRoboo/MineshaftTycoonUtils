@@ -9,6 +9,7 @@ import com.roboo.mineshafttycoonutils.features.fishing.FishingTracker;
 import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
 import com.roboo.mineshafttycoonutils.hud.HudEditScreen;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.utils.ScoreboardUtils;
 import com.roboo.mineshafttycoonutils.utils.SystemMessages;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -90,6 +91,20 @@ public class Commands {
                             ConfigManager.config.scoreboard.hudY = ScoreboardCategory.AUTO_POSITION;
                             MineshaftTycoonUtils.configManager.saveConfig();
                             resetMsg("HUD positions");
+                            return 1;
+                        })
+                )
+                .then(ClientCommandManager.literal("hudscalereset")
+                        .executes(ctx -> {
+                            ConfigManager.config.fishing.scale = HudScale.DEFAULT;
+                            ConfigManager.config.profit.tracker.profitHudScale = HudScale.DEFAULT;
+                            ConfigManager.config.profit.bagValue.bagValueHudScale = HudScale.DEFAULT;
+                            ConfigManager.config.profit.magma.magmaHudScale = HudScale.DEFAULT;
+                            ConfigManager.config.timers.scale = HudScale.DEFAULT;
+                            ConfigManager.config.information.scale = HudScale.DEFAULT;
+                            ConfigManager.config.scoreboard.scale = HudScale.DEFAULT;
+                            MineshaftTycoonUtils.configManager.saveConfig();
+                            resetMsg("HUD scale");
                             return 1;
                         })
                 )

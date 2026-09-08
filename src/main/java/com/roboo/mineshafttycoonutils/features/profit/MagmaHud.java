@@ -4,6 +4,7 @@ import com.roboo.mineshafttycoonutils.MineshaftTycoonUtils;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.profit.MagmaValueConfig;
 import com.roboo.mineshafttycoonutils.hud.ContainerHudDragHandler;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
 import com.roboo.mineshafttycoonutils.utils.NumberFormatUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -29,9 +30,23 @@ public class MagmaHud {
 
             ScreenEvents.afterRender(screen).register((s, graphics, mouseX, mouseY, tickDelta) -> render(graphics));
             ScreenEvents.remove(screen).register(s -> dragHandler.reset());
+
+            registerScroll(screen);
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
+    }
+
+    private static void registerScroll(Screen screen) {
+        dragHandler.registerScroll(
+                screen,
+                () -> ConfigManager.config.profit.magma.magmaHudX,
+                () -> ConfigManager.config.profit.magma.magmaHudY,
+                MagmaHud::calcWidth,
+                MagmaHud::calcHeight,
+                () -> ConfigManager.config.profit.magma.magmaHudScale,
+                scale -> ConfigManager.config.profit.magma.magmaHudScale = scale
+        );
     }
 
     private static boolean isNotRelevantScreen(Screen screen) {
@@ -52,8 +67,8 @@ public class MagmaHud {
                 ConfigManager.config.general.editBagHudKeybind,
                 cfg.magmaHudX,
                 cfg.magmaHudY,
-                computeWidth(),
-                computeHeight(),
+                calcWidth(),
+                calcHeight(),
                 (x, y) -> {
                     cfg.magmaHudX = x;
                     cfg.magmaHudY = y;
@@ -66,7 +81,7 @@ public class MagmaHud {
         MagmaValueConfig cfg = ConfigManager.config.profit.magma;
         if (!cfg.hudEnabled) return;
 
-        dragHandler.drawBoxIfEditing(graphics, cfg.magmaHudX, cfg.magmaHudY, computeWidth(), computeHeight());
+        dragHandler.drawBoxIfEditing(graphics, cfg.magmaHudX, cfg.magmaHudY, calcWidth(), calcHeight());
 
         drawContent(graphics, cfg.magmaHudX, cfg.magmaHudY);
     }
@@ -75,8 +90,16 @@ public class MagmaHud {
         MagmaValueConfig cfg = ConfigManager.config.profit.magma;
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
         int titleColor = HudTextUtils.chromaToArgb(cfg.titleColor);
+        float scale = HudScale.normalize(cfg.magmaHudScale);
+        int unscaledWidth = calcUnscaledWidth();
+        int screenLeft = rightAligned ? anchorX - Math.round(unscaledWidth * scale) : anchorX;
+        int localAnchorX = rightAligned ? unscaledWidth : 0;
 
-        HudTextUtils.drawLine(graphics, "§lMagma Value:", anchorX, y, rightAligned, titleColor);
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(screenLeft, y);
+        graphics.pose().scale(scale, scale);
+
+        HudTextUtils.drawLine(graphics, "§lMagma Value:", localAnchorX, 0, rightAligned, titleColor);
         int line = 1;
 
         for (MagmaValueConfig.Entry entry : cfg.order) {
@@ -84,24 +107,26 @@ public class MagmaHud {
             if (quantity <= 0) continue;
 
             long value = MagmaValueTracker.getMagmaValue(entry);
-            HudTextUtils.drawLine(graphics, lineText(entry, quantity, value), anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+            HudTextUtils.drawLine(graphics, lineText(entry, quantity, value), localAnchorX, LINE_HEIGHT * line++, rightAligned);
         }
 
-        HudTextUtils.drawLine(graphics, totalText(cfg), anchorX, y + (LINE_HEIGHT * line++), rightAligned, titleColor);
+        HudTextUtils.drawLine(graphics, totalText(cfg), localAnchorX, LINE_HEIGHT * line++, rightAligned, titleColor);
 
         line++;
 
-        HudTextUtils.drawLine(graphics, "§lInv Magma:", anchorX, y + (LINE_HEIGHT * line++), rightAligned, titleColor);
+        HudTextUtils.drawLine(graphics, "§lInv Magma:", localAnchorX, LINE_HEIGHT * line++, rightAligned, titleColor);
 
         for (MagmaValueConfig.Entry entry : cfg.order) {
             long quantity = MagmaValueTracker.getInventoryQuantity(entry);
             if (quantity <= 0) continue;
 
             long value = MagmaValueTracker.getInventoryMagmaValue(entry);
-            HudTextUtils.drawLine(graphics, lineText(entry, quantity, value), anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+            HudTextUtils.drawLine(graphics, lineText(entry, quantity, value), localAnchorX, LINE_HEIGHT * line++, rightAligned);
         }
 
-        HudTextUtils.drawLine(graphics, inventoryTotalText(cfg), anchorX, y + (LINE_HEIGHT * line), rightAligned, titleColor);
+        HudTextUtils.drawLine(graphics, inventoryTotalText(cfg), localAnchorX, LINE_HEIGHT * line, rightAligned, titleColor);
+
+        graphics.pose().popMatrix();
     }
 
     private static String lineText(MagmaValueConfig.Entry entry, long quantity, long value) {
@@ -125,7 +150,7 @@ public class MagmaHud {
                 + " Magma ($" + NumberFormatUtils.formatShortened(totalCoins, true) + ")";
     }
 
-    private static int computeWidth() {
+    private static int calcUnscaledWidth() {
         MagmaValueConfig cfg = ConfigManager.config.profit.magma;
         int width = mc.font.width("§lMagma Value:");
 
@@ -154,7 +179,7 @@ public class MagmaHud {
         return width;
     }
 
-    private static int computeHeight() {
+    private static int calcUnscaledHeight() {
         MagmaValueConfig cfg = ConfigManager.config.profit.magma;
         int lines = 1;
 
@@ -174,5 +199,15 @@ public class MagmaHud {
         lines++;
 
         return lines * LINE_HEIGHT;
+    }
+
+    private static int calcWidth() {
+        float scale = HudScale.normalize(ConfigManager.config.profit.magma.magmaHudScale);
+        return Math.round(calcUnscaledWidth() * scale);
+    }
+
+    private static int calcHeight() {
+        float scale = HudScale.normalize(ConfigManager.config.profit.magma.magmaHudScale);
+        return Math.round(calcUnscaledHeight() * scale);
     }
 }

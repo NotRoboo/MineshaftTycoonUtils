@@ -1,8 +1,12 @@
 package com.roboo.mineshafttycoonutils.hud;
 
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.function.IntSupplier;
 
 public class ContainerHudDragHandler {
 
@@ -46,13 +50,8 @@ public class ContainerHudDragHandler {
         int mouseX = (int) (mc.mouseHandler.xpos() * mc.getWindow().getGuiScaledWidth() / mc.getWindow().getScreenWidth());
         int mouseY = (int) (mc.mouseHandler.ypos() * mc.getWindow().getGuiScaledHeight() / mc.getWindow().getScreenHeight());
 
-        int left = x - BOX_PADDING;
-        int top = y - BOX_PADDING;
-        int right = x + width + BOX_PADDING;
-        int bottom = y + height + BOX_PADDING;
-
         if (mouseDown && !dragging) {
-            if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) {
+            if (isWithinBox(mouseX, mouseY, x, y, width, height)) {
                 dragging = true;
                 dragOffsetX = mouseX - x;
                 dragOffsetY = mouseY - y;
@@ -65,6 +64,33 @@ public class ContainerHudDragHandler {
         if (dragging) {
             setter.set((int) Math.round(mouseX - dragOffsetX), (int) Math.round(mouseY - dragOffsetY));
         }
+    }
+
+    public void registerScroll(Screen screen, IntSupplier xSupplier, IntSupplier ySupplier,
+                               IntSupplier widthSupplier, IntSupplier heightSupplier,
+                               ScaleGetter scaleGetter, ScaleSetter scaleSetter) {
+        ScreenMouseEvents.beforeMouseScroll(screen).register((s, mouseX, mouseY, horizontalAmount, verticalAmount) -> {
+            if (!editing) return;
+            if (verticalAmount == 0) return;
+
+            int x = xSupplier.getAsInt();
+            int y = ySupplier.getAsInt();
+            int width = widthSupplier.getAsInt();
+            int height = heightSupplier.getAsInt();
+
+            if (!isWithinBox(mouseX, mouseY, x, y, width, height)) return;
+
+            float delta = verticalAmount > 0 ? HudScale.STEP : -HudScale.STEP;
+            scaleSetter.set(HudScale.clamp(scaleGetter.get() + delta));
+        });
+    }
+
+    private boolean isWithinBox(double mouseX, double mouseY, int x, int y, int width, int height) {
+        int left = x - BOX_PADDING;
+        int top = y - BOX_PADDING;
+        int right = x + width + BOX_PADDING;
+        int bottom = y + height + BOX_PADDING;
+        return mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom;
     }
 
     public void drawBoxIfEditing(GuiGraphics graphics, int x, int y, int width, int height) {
@@ -91,5 +117,15 @@ public class ContainerHudDragHandler {
     @FunctionalInterface
     public interface PositionSetter {
         void set(int x, int y);
+    }
+
+    @FunctionalInterface
+    public interface ScaleGetter {
+        float get();
+    }
+
+    @FunctionalInterface
+    public interface ScaleSetter {
+        void set(float scale);
     }
 }

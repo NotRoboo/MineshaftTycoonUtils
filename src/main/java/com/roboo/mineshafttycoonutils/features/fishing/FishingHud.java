@@ -3,6 +3,7 @@ package com.roboo.mineshafttycoonutils.features.fishing;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.FishingCategory;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
 import com.roboo.mineshafttycoonutils.utils.FishingZones;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
@@ -47,12 +48,22 @@ public class FishingHud {
 
         @Override
         public int getWidth() {
-            return calcWidth();
+            return Math.round(calcWidth() * HudScale.normalize(cfg().scale));
         }
 
         @Override
         public int getHeight() {
-            return calcHeight();
+            return Math.round(calcHeight() * HudScale.normalize(cfg().scale));
+        }
+
+        @Override
+        public float getScale() {
+            return cfg().scale;
+        }
+
+        @Override
+        public void setScale(float scale) {
+            cfg().scale = HudScale.clamp(scale);
         }
 
         @Override
@@ -79,7 +90,7 @@ public class FishingHud {
                     if (mc.player == null || !cfg.hudEnabled) return;
                     if (cfg.onlyShowWhenFishing && !FishingZones.isInZone(mc.player.blockPosition())) return;
 
-                    int totalHeight = calcHeight();
+                    int totalHeight = Math.round(calcHeight() * HudScale.normalize(cfg.scale));
                     int x = HudTextUtils.clampX(cfg.hudX);
                     int y = HudTextUtils.clampY(cfg.hudY, totalHeight);
 
@@ -98,12 +109,22 @@ public class FishingHud {
         FishingCategory cfg = cfg();
         List<String> lines = calcLines(cfg);
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
+        float scale = HudScale.normalize(cfg.scale);
+        int unscaledWidth = calcWidth();
+        int screenLeft = rightAligned ? anchorX - Math.round(unscaledWidth * scale) : anchorX;
+        int localAnchorX = rightAligned ? unscaledWidth : 0;
 
-        HudTextUtils.drawLine(graphics, TITLE_TEXT, anchorX, y, rightAligned, HudTextUtils.chromaToArgb(cfg.titleColor));
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(screenLeft, y);
+        graphics.pose().scale(scale, scale);
+
+        HudTextUtils.drawLine(graphics, TITLE_TEXT, localAnchorX, 0, rightAligned, HudTextUtils.chromaToArgb(cfg.titleColor));
         int line = 1;
         for (String l : lines) {
-            HudTextUtils.drawLine(graphics, l, anchorX, y + (LINE_HEIGHT * line++), rightAligned);
+            HudTextUtils.drawLine(graphics, l, localAnchorX, LINE_HEIGHT * line++, rightAligned);
         }
+
+        graphics.pose().popMatrix();
     }
 
     private static List<String> calcLines(FishingCategory cfg) {

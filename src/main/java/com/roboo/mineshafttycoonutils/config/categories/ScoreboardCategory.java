@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.config.categories;
 
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -49,6 +50,9 @@ public class ScoreboardCategory {
 
     @Expose
     public int hudY = AUTO_POSITION;
+
+    @Expose
+    public float scale = HudScale.DEFAULT;
 
     @Expose
     public Map<Line, String> lastKnownLines = new EnumMap<>(Line.class);

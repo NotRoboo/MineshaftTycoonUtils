@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.config.profit;
 
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.hud.HudScale;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
@@ -32,4 +33,7 @@ public class BagValueConfig {
 
     @Expose
     public int bagValueHudY = 85;
+
+    @Expose
+    public float bagValueHudScale = HudScale.DEFAULT;
 }

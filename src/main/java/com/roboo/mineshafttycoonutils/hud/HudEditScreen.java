@@ -59,8 +59,8 @@ public class HudEditScreen extends Screen {
             hud.render(graphics);
         }
 
-        String hint = "Drag a HUD to move it - press ESC to save and exit";
-        float hintScale = 0.75f;
+        String hint = "Drag a HUD to move it, scroll to resize - press ESC to save and exit";
+        float hintScale = 1f;
         int hintColor = 0xFFAAAAAA;
 
         graphics.pose().pushMatrix();
@@ -82,26 +82,29 @@ public class HudEditScreen extends Screen {
         return mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom;
     }
 
+    private MovableHud findHovered(int mouseX, int mouseY) {
+        for (MovableHud hud : HudEditorRegistry.getAll()) {
+            if (!hud.isMasterEnabled()) continue;
+
+            int left = hud.getX() - BOX_PADDING;
+            int top = hud.getY() - BOX_PADDING;
+            int right = hud.getX() + hud.getWidth() + BOX_PADDING;
+            int bottom = hud.getY() + hud.getHeight() + BOX_PADDING;
+
+            if (isWithin(mouseX, mouseY, left, top, right, bottom)) return hud;
+        }
+        return null;
+    }
+
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         if (click.button() == 0) {
-            double mouseX = click.x();
-            double mouseY = click.y();
-
-            for (MovableHud hud : HudEditorRegistry.getAll()) {
-                if (!hud.isMasterEnabled()) continue;
-
-                int left = hud.getX() - BOX_PADDING;
-                int top = hud.getY() - BOX_PADDING;
-                int right = hud.getX() + hud.getWidth() + BOX_PADDING;
-                int bottom = hud.getY() + hud.getHeight() + BOX_PADDING;
-
-                if (isWithin((int) mouseX, (int) mouseY, left, top, right, bottom)) {
-                    dragging = hud;
-                    dragOffsetX = mouseX - hud.getX();
-                    dragOffsetY = mouseY - hud.getY();
-                    return true;
-                }
+            MovableHud target = findHovered((int) click.x(), (int) click.y());
+            if (target != null) {
+                dragging = target;
+                dragOffsetX = click.x() - target.getX();
+                dragOffsetY = click.y() - target.getY();
+                return true;
             }
         }
         return super.mouseClicked(click, doubled);
@@ -126,6 +129,18 @@ public class HudEditScreen extends Screen {
             return true;
         }
         return super.mouseReleased(click);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (scrollY == 0) return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+
+        MovableHud target = dragging != null ? dragging : findHovered((int) mouseX, (int) mouseY);
+        if (target == null) return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+
+        float delta = scrollY > 0 ? HudScale.STEP : -HudScale.STEP;
+        target.setScale(HudScale.clamp(target.getScale() + delta));
+        return true;
     }
 
     private static int toAnchorX(int boxLeft, int width, int screenWidth) {

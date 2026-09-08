@@ -16,6 +16,10 @@ public interface MovableHud {
 
     int getHeight();
 
+    float getScale();
+
+    void setScale(float scale);
+
     void setPosition(int x, int y);
 
     void render(GuiGraphics graphics);
