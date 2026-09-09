@@ -20,9 +20,9 @@ public class ProfitTrackerConfig {
     public ChromaColour titleColor = ChromaColour.fromStaticRGB(255, 255, 85, 255);
 
     @Expose
-    @ConfigOption(name = "Hide in Ocean", desc = "Hide the profit tracker HUD while inside a designated fishing area")
+    @ConfigOption(name = "Hide in Other Zones", desc = "Hide the profit tracker HUD while inside other tracker zones")
     @ConfigEditorBoolean
-    public boolean onlyShowWhenMining = true;
+    public boolean hideInOtherZones = true;
 
     @Expose
     @ConfigOption(name = "Ore Drops", desc = "Show a breakdown of rare ore drops obtained (Lunar Fragment, Basalt Shard, etc.) on the profit HUD")

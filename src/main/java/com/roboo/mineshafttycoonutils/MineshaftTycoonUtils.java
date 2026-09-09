@@ -18,6 +18,8 @@ import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitHud;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
 import com.roboo.mineshafttycoonutils.features.profit.RefineryPetTracker;
+import com.roboo.mineshafttycoonutils.features.pve.PvEHud;
+import com.roboo.mineshafttycoonutils.features.pve.PvETracker;
 import com.roboo.mineshafttycoonutils.features.scoreboard.CustomScoreboardManager;
 import com.roboo.mineshafttycoonutils.features.scoreboard.ScoreboardHud;
 import com.roboo.mineshafttycoonutils.features.timers.*;
@@ -38,6 +40,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         configManager.firstLoad();
 
         FishingTracker.init();
+        PvETracker.init();
         OreDropTracker.init();
         PetAdTracker.init();
         CustomScoreboardManager.init();
@@ -49,6 +52,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         ActionBarFormatter.init();
 
         FishingHud.init();
+        PvEHud.init();
         InformationHud.init();
         PetsHelper.init();
         ProfitHud.init();

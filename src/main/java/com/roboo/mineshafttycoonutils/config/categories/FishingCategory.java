@@ -26,9 +26,9 @@ public class FishingCategory {
     public ChromaColour titleColor = ChromaColour.fromStaticRGB(255, 255, 85, 255);
 
     @Expose
-    @ConfigOption(name = "Only Show In Ocean", desc = "Only show the fishing HUD while inside a designated fishing area")
+    @ConfigOption(name = "Hide in Other Zones", desc = "Hide the fishing HUD while outside of the designated fishing areas")
     @ConfigEditorBoolean
-    public boolean onlyShowWhenFishing = true;
+    public boolean hideInOtherZones = true;
 
     @Expose
     @ConfigOption(

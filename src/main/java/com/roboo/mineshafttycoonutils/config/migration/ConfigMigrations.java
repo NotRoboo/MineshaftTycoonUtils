@@ -14,13 +14,19 @@ public class ConfigMigrations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("MineshaftTycoonUtils");
 
-    public static final int CURRENT_VERSION = 3;
+    public static final int CURRENT_VERSION = 4;
 
     private static final Map<Integer, Consumer<JsonObject>> UPGRADE_STEPS = new TreeMap<>();
 
     static {
         registerUpgradeStep(2, NightVisionBlocker::onConfigFix);
         registerUpgradeStep(3, ItemLoreCategory::onConfigFix);
+        registerUpgradeStep(4, ConfigMigrations::renameZoneSettings);
+    }
+
+    private static void renameZoneSettings(JsonObject savedConfig) {
+        ConfigJsonUtils.renameSetting(savedConfig, "fishing.onlyShowWhenFishing", "hideInOtherZones");
+        ConfigJsonUtils.renameSetting(savedConfig, "profit.tracker.onlyShowWhenMining", "hideInOtherZones");
     }
 
     private ConfigMigrations() {}

@@ -5,7 +5,7 @@ import com.roboo.mineshafttycoonutils.config.categories.ProfitCategory;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
-import com.roboo.mineshafttycoonutils.utils.FishingZones;
+import com.roboo.mineshafttycoonutils.utils.HudZones;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
 import com.roboo.mineshafttycoonutils.utils.NumberFormatUtils;
 import com.roboo.mineshafttycoonutils.utils.TimeFormatUtils;
@@ -87,7 +87,9 @@ public class ProfitHud {
                 (graphics, tickCounter) -> {
                     ProfitCategory cfg = ConfigManager.config.profit;
                     if (mc.player == null || !cfg.tracker.profitTrackerEnabled) return;
-                    if (cfg.tracker.onlyShowWhenMining && FishingZones.isInZone(mc.player.blockPosition())) return;
+                    if (cfg.tracker.hideInOtherZones
+                            && (HudZones.isInFishingZone(mc.player.blockPosition()) || HudZones.isInPveZone(mc.player.blockPosition())))
+                        return;
 
                     int totalHeight = Math.round(calcHeight() * HudScale.normalize(cfg.tracker.profitHudScale));
                     int x = HudTextUtils.clampX(cfg.tracker.profitHudX);

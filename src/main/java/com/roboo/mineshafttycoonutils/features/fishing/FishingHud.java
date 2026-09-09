@@ -5,7 +5,7 @@ import com.roboo.mineshafttycoonutils.config.categories.FishingCategory;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
-import com.roboo.mineshafttycoonutils.utils.FishingZones;
+import com.roboo.mineshafttycoonutils.utils.HudZones;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -88,7 +88,7 @@ public class FishingHud {
                 (graphics, tickCounter) -> {
                     FishingCategory cfg = cfg();
                     if (mc.player == null || !cfg.hudEnabled) return;
-                    if (cfg.onlyShowWhenFishing && !FishingZones.isInZone(mc.player.blockPosition())) return;
+                    if (cfg.hideInOtherZones && !HudZones.isInFishingZone(mc.player.blockPosition())) return;
 
                     int totalHeight = Math.round(calcHeight() * HudScale.normalize(cfg.scale));
                     int x = HudTextUtils.clampX(cfg.hudX);

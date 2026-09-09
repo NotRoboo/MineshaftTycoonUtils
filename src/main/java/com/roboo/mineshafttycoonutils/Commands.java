@@ -8,6 +8,7 @@ import com.roboo.mineshafttycoonutils.config.categories.ScoreboardCategory;
 import com.roboo.mineshafttycoonutils.features.fishing.FishingTracker;
 import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
+import com.roboo.mineshafttycoonutils.features.pve.PvETracker;
 import com.roboo.mineshafttycoonutils.hud.HudEditScreen;
 import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.utils.ScoreboardUtils;
@@ -26,6 +27,8 @@ public class Commands {
 
     private static final int DEFAULT_FISHING_HUD_X = 10;
     private static final int DEFAULT_FISHING_HUD_Y = 80;
+    private static final int DEFAULT_PVE_HUD_X = 10;
+    private static final int DEFAULT_PVE_HUD_Y = 100;
     private static final int DEFAULT_PROFIT_HUD_X = 10;
     private static final int DEFAULT_PROFIT_HUD_Y = 80;
     private static final int DEFAULT_BAG_VALUE_HUD_X = 200;
@@ -73,10 +76,71 @@ public class Commands {
                             return 1;
                         })
                 )
+                .then(ClientCommandManager.literal("resetpve")
+                        .executes(ctx -> {
+                            if (mc.player != null) {
+                                MutableComponent message = Component.literal(" Specify what to reset: all, killsperhour, emperor, terror, pirate, wizard, corruptonaut")
+                                        .withStyle(Style.EMPTY.withColor(0xFF5555));
+                                mc.player.displayClientMessage(SystemMessages.buildPrefix().append(message), false);
+                            }
+                            return 1;
+                        })
+                        .then(ClientCommandManager.literal("all")
+                                .executes(ctx -> {
+                                    PvETracker.resetAll();
+                                    resetMsg("All PvE kills");
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("killsperhour")
+                                .executes(ctx -> {
+                                    PvETracker.resetKillsPerHour();
+                                    resetMsg("PvE Kills/Hour");
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("emperor")
+                                .executes(ctx -> {
+                                    PvETracker.resetMob("Emperor");
+                                    resetMsg("Emperor kills");
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("terror")
+                                .executes(ctx -> {
+                                    PvETracker.resetMob("Terror");
+                                    resetMsg("Terror kills");
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("pirate")
+                                .executes(ctx -> {
+                                    PvETracker.resetMob("Pirate");
+                                    resetMsg("Pirate kills");
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("wizard")
+                                .executes(ctx -> {
+                                    PvETracker.resetMob("Wizard");
+                                    resetMsg("Wizard kills");
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("corruptonaut")
+                                .executes(ctx -> {
+                                    PvETracker.resetMob("Corruptonaut");
+                                    resetMsg("Corruptonaut kills");
+                                    return 1;
+                                })
+                        )
+                )
                 .then(ClientCommandManager.literal("hudpositionsreset")
                         .executes(ctx -> {
                             ConfigManager.config.fishing.hudX = DEFAULT_FISHING_HUD_X;
                             ConfigManager.config.fishing.hudY = DEFAULT_FISHING_HUD_Y;
+                            ConfigManager.config.pve.hudX = DEFAULT_PVE_HUD_X;
+                            ConfigManager.config.pve.hudY = DEFAULT_PVE_HUD_Y;
                             ConfigManager.config.profit.tracker.profitHudX = DEFAULT_PROFIT_HUD_X;
                             ConfigManager.config.profit.tracker.profitHudY = DEFAULT_PROFIT_HUD_Y;
                             ConfigManager.config.profit.bagValue.bagValueHudX = DEFAULT_BAG_VALUE_HUD_X;
@@ -97,6 +161,7 @@ public class Commands {
                 .then(ClientCommandManager.literal("hudscalereset")
                         .executes(ctx -> {
                             ConfigManager.config.fishing.scale = HudScale.DEFAULT;
+                            ConfigManager.config.pve.scale = HudScale.DEFAULT;
                             ConfigManager.config.profit.tracker.profitHudScale = HudScale.DEFAULT;
                             ConfigManager.config.profit.bagValue.bagValueHudScale = HudScale.DEFAULT;
                             ConfigManager.config.profit.magma.magmaHudScale = HudScale.DEFAULT;

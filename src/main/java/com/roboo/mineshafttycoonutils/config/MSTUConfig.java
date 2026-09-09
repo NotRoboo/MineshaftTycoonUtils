@@ -31,8 +31,12 @@ public class MSTUConfig extends Config {
     public ProfitCategory profit = new ProfitCategory();
 
     @Expose
-    @Category(name = "Fishing", desc = "Fishing tracker and HUD settings")
+    @Category(name = "Fishing", desc = "Fishing tracker HUD settings")
     public FishingCategory fishing = new FishingCategory();
+
+    @Expose
+    @Category(name = "PvE", desc = "PvE kill tracker HUD settings")
+    public PvECategory pve = new PvECategory();
 
     @Expose
     @Category(name = "Timers", desc = "Buff, Petad, and Il's Restock timer settings")
