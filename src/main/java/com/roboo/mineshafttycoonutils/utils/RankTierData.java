@@ -65,6 +65,15 @@ public class RankTierData {
         }
     }
 
+    // offsetting og glyphs by 200
+    public static final Map<String, String> TIER_GLYPHS_BUTTON = new LinkedHashMap<>();
+    static {
+        for (Map.Entry<String, String> entry : TIER_GLYPHS.entrySet()) {
+            char shifted = (char) (entry.getValue().charAt(0) + 0x200);
+            TIER_GLYPHS_BUTTON.put(entry.getKey(), String.valueOf(shifted));
+        }
+    }
+
     public static final List<String> TIER_SORT_ORDER = List.of(
             "OWNER", "MANAGER", "ADMIN", "DEV", "BUILD", "MOD", "HELPER", "SYSTEM",
             "4T5", "6T5", "7T5",
@@ -110,6 +119,7 @@ public class RankTierData {
         return switch (mode) {
             case CLASSIC -> TIER_GLYPHS.get(glyphKey);
             case THEMED -> TIER_GLYPHS_TEXTURED.get(glyphKey);
+            case BUTTON -> TIER_GLYPHS_BUTTON.get(glyphKey);
             case OFF -> null;
         };
     }

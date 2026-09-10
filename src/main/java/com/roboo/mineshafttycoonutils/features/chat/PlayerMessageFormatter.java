@@ -51,12 +51,15 @@ public class PlayerMessageFormatter {
         }
         if (!messageMatch.matches()) return null;
 
-        if (cfg.enabled) {
-            String tierTag = RankTierData.resolveTag(messageMatch.group(2));
-            if (SYSTEM_TIER_TAG.equals(tierTag)) {
-                Component systemMessage = assembleSystemBridgeMessage(messageMatch, interactiveStyle);
-                if (systemMessage != null) return systemMessage;
-            }
+        String tierTag = RankTierData.resolveTag(messageMatch.group(2));
+        boolean isSystemBridge = SYSTEM_TIER_TAG.equals(tierTag);
+
+        if (isSystemBridge && cfg.formatSystemMessages) {
+            Component systemMessage = assembleSystemBridgeMessage(messageMatch, interactiveStyle);
+            if (systemMessage != null) return systemMessage;
+        }
+
+        if (cfg.partOrderEnabled) {
             return assembleMessage(cfg, messageMatch, interactiveStyle);
         }
 

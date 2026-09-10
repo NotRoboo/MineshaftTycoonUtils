@@ -225,6 +225,118 @@
             "chars": ["\uE108"]
         },
         {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-owner.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE209"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-manager.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE210"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-dev.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE211"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-admin.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE212"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-builder.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE213"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-mod.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE214"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-helper.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE215"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-system.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE216"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-tier1.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE201"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-tier2.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE202"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-tier3.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE203"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-tier4v2.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE204"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-tier4v1.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE205"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-tier5p1.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE206"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-tier5p2.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE207"]
+        },
+        {
+            "type": "bitmap",
+            "file": "minecraft:ranks/button/button-tier5p3.png",
+            "ascent": 8,
+            "height": 9,
+            "chars": ["\uE208"]
+        },
+        {
             "type": "reference",
             "id": "mineshafttycoonutils:emojis"
         }

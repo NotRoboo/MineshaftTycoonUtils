@@ -15,10 +15,11 @@ public class GlyphCategory {
     @ConfigOption(
             name = "Glyph Preview",
             desc = """
-                    Thanks watergrowsifwhat for `§eThemed` §fglyphs
                     §7Off:      §a[T1] §e[T2] §c[T3]  §3[T4] §9[T4] §7[T5] §6[T5] §4[T5]
                     §7Classic: §f\uE001 \uE002 \uE003 \uE005 \uE004 \uE006 \uE007 \uE008
-                    §7Themed: §f\uE101  \uE102 \uE103  \uE105  \uE104 \uE106 \uE107  \uE108"""
+                    §7Themed: §f\uE101  \uE102 \uE103  \uE105  \uE104 \uE106 \uE107  \uE108
+                    §7Button:  §f\uE201   \uE202  \uE203   \uE205   \uE204  \uE206  \uE207   \uE208
+                    §7Thanks water for Themed & Soul for B U T T O N"""
     )
     @ConfigEditorInfoText
     @SuppressWarnings("unused")
@@ -76,7 +77,8 @@ public class GlyphCategory {
     public enum GlyphMode {
         OFF("Off"),
         CLASSIC("Classic"),
-        THEMED("Themed");
+        THEMED("Themed"),
+        BUTTON("B U T T O N");
 
         private final String displayName;
 

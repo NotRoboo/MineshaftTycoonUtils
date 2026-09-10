@@ -20,7 +20,7 @@ public class GeneralCategory {
     @Expose
     @ConfigOption(
             name = "Edit Container HUD Locations Keybind",
-            desc = "Press while inside the Bag menu to toggle dragging HUD position")
+            desc = "Press while inside the a bag GUI to drag HUD position")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     public int editBagHudKeybind = GLFW.GLFW_KEY_UNKNOWN;
 

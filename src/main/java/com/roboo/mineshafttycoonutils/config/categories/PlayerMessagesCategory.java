@@ -1,6 +1,8 @@
 package com.roboo.mineshafttycoonutils.config.categories;
 
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.config.migration.ConfigJsonUtils;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.annotations.*;
 
@@ -11,19 +13,11 @@ import java.util.List;
 
 public class PlayerMessagesCategory {
 
-    @Expose
-    @ConfigOption(name = "Chat Formatting", desc = "Reformat player chat messages using the settings below. Also reformats [SYSTEM] chat bridge messages to strip the bot's name and show the real sender")
-    @ConfigEditorBoolean
-    public boolean enabled = false;
 
     @Expose
-    @ConfigOption(
-            name = "Part Order",
-            desc = "Drag to reorder the parts of a chat message. Remove a part to hide it entirely.\n" +
-                    "Top -> Bottom = Left -> Right"
-    )
-    @ConfigEditorDraggableList
-    public List<Part> partOrder = new ArrayList<>(Arrays.asList(Part.values()));
+    @ConfigOption(name = "Format System", desc = "Reformat [SYSTEM] chat bridge messages to strip the bot's name and show the real sender")
+    @ConfigEditorBoolean
+    public boolean formatSystemMessages = false;
 
     @Expose
     @ConfigOption(name = "Hypixel Rank Hider", desc = "Hide ranks ([VIP], [MVP+])")
@@ -34,6 +28,20 @@ public class PlayerMessagesCategory {
     @ConfigOption(name = "Nons White Chat", desc = "Make all nons chat messages white instead of grey")
     @ConfigEditorBoolean
     public boolean sameChatColor = true;
+    
+    @Expose
+    @ConfigOption(name = "Part Order", desc = "Reformat player chat messages using the order below")
+    @ConfigEditorBoolean
+    public boolean partOrderEnabled = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Order",
+            desc = "Drag to reorder the parts of a chat message. Remove a part to hide it entirely.\n" +
+                    "Top -> Bottom = Left -> Right"
+    )
+    @ConfigEditorDraggableList
+    public List<Part> partOrder = new ArrayList<>(Arrays.asList(Part.values()));
 
     @Expose
     @ConfigOption(
@@ -66,5 +74,9 @@ public class PlayerMessagesCategory {
         public String toString() {
             return displayName;
         }
+    }
+
+    public static void onConfigFix(JsonObject savedConfig) {
+        ConfigJsonUtils.renameSetting(savedConfig, "playerMessages.enabled", "partOrderEnabled");
     }
 }

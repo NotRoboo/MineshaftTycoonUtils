@@ -32,7 +32,8 @@ public class PlayerMessageHandler {
         GlyphCategory.GlyphMode otherGlyphMode = ConfigManager.config.glyph.otherMessageGlyphs;
         boolean emojiEnabled = ConfigManager.config.emoji.emojisEnabled;
 
-        if (!cfg.enabled && !cfg.sameChatColor && !playerGlyphMode.isEnabled() && !otherGlyphMode.isEnabled() && !emojiEnabled) return true;
+        if (!cfg.partOrderEnabled && !cfg.formatSystemMessages && !cfg.sameChatColor
+                && !playerGlyphMode.isEnabled() && !otherGlyphMode.isEnabled() && !emojiEnabled) return true;
         if (message == null) return true;
 
         Style interactiveStyle = ComponentTextUtils.findInteractiveStyle(message);
@@ -49,7 +50,7 @@ public class PlayerMessageHandler {
             raw = emojiEnabled ? EmojiTextUtils.substitute(originalRaw, true) : originalRaw;
         }
 
-        if (cfg.enabled || cfg.sameChatColor || playerGlyphMode.isEnabled()) {
+        if (cfg.partOrderEnabled || cfg.formatSystemMessages || cfg.sameChatColor || playerGlyphMode.isEnabled()) {
             Component formatted = PlayerMessageFormatter.format(raw, interactiveStyle);
             if (formatted != null) {
                 mc.gui.getChat().addMessage(formatted);
