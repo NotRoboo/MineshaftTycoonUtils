@@ -1,5 +1,6 @@
 package com.roboo.mineshafttycoonutils.mixin;
 
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
@@ -18,8 +19,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Mixin(CommandSuggestions.class)
@@ -52,6 +55,7 @@ public abstract class CommandSuggestionsMixin {
 
         String prefix;
         List<String> matches;
+        Map<String, String> tooltips = null;
 
         if (lower.startsWith(VISIT_PREFIX)) {
             prefix = VISIT_PREFIX;
@@ -81,8 +85,16 @@ public abstract class CommandSuggestionsMixin {
             prefix = text.substring(0, colonIndex + 1);
             String lowerPartial = partial.toLowerCase(Locale.ROOT);
             matches = new ArrayList<>();
+            tooltips = new LinkedHashMap<>();
             for (String shortcode : EmojiData.allShortcodes()) {
-                if (shortcode.startsWith(lowerPartial)) matches.add(shortcode + ":");
+                if (!shortcode.startsWith(lowerPartial)) continue;
+                String match = shortcode + ":";
+                matches.add(match);
+
+                Integer codepoint = EmojiData.codepointFor(shortcode);
+                if (codepoint != null) {
+                    tooltips.put(match, new String(Character.toChars(codepoint)) + " :" + shortcode + ":");
+                }
             }
         } else {
             return;
@@ -92,7 +104,12 @@ public abstract class CommandSuggestionsMixin {
 
         SuggestionsBuilder builder = new SuggestionsBuilder(text, prefix.length());
         for (String match : matches) {
-            builder.suggest(match);
+            String tooltip = tooltips != null ? tooltips.get(match) : null;
+            if (tooltip != null) {
+                builder.suggest(match, new LiteralMessage(tooltip));
+            } else {
+                builder.suggest(match);
+            }
         }
 
         this.pendingSuggestions = builder.buildFuture();

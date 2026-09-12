@@ -35,6 +35,10 @@ public class MSTUConfig extends Config {
     public FishingCategory fishing = new FishingCategory();
 
     @Expose
+    @Category(name = "Lava Fishing", desc = "Lava fishing settings")
+    public LavaFishingCategory lavaFishing = new LavaFishingCategory();
+
+    @Expose
     @Category(name = "PvE", desc = "PvE kill tracker HUD settings")
     public PvECategory pve = new PvECategory();
 

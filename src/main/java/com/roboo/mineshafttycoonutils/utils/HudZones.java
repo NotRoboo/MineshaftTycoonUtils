@@ -32,12 +32,20 @@ public class HudZones {
             Zone.of(-21, 204, 102, -61, 240, 136)
     );
 
+    private static final List<Zone> LAVA_FISHING_ZONES = List.of(
+            Zone.of(-108, 100, 38, -122, 140, 80)
+    );
+
     public static boolean isInFishingZone(BlockPos pos) {
         return isInZone(FISHING_ZONES, pos);
     }
 
     public static boolean isInPveZone(BlockPos pos) {
         return isInZone(PVE_ZONES, pos);
+    }
+
+    public static boolean isInLavaFishingZone(BlockPos pos) {
+        return isInZone(LAVA_FISHING_ZONES, pos);
     }
 
     private static boolean isInZone(List<Zone> zones, BlockPos pos) {

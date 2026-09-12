@@ -6,7 +6,9 @@
     "CommandSuggestionsMixin",
     "NameTagGlyphMixin",
     "PlayerTabOverlayMixin",
-    "ScoreboardMixin"
+    "ScoreboardMixin",
+    "SoundPlayMixin",
+    "TitleMixin"
   ],
   "injectors": {
     "defaultRequire": 1
