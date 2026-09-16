@@ -75,6 +75,10 @@ public class MSTUConfig extends Config {
     public ItemLoreCategory itemLore = new ItemLoreCategory();
 
     @Expose
+    @Category(name = "Wiki", desc = "Export container contents for wiki template creation")
+    public WikiCategory wiki = new WikiCategory();
+
+    @Expose
     @Category(name = "Misc", desc = "Miscellaneous quality-of-life settings")
     public MiscCategory misc = new MiscCategory();
 }

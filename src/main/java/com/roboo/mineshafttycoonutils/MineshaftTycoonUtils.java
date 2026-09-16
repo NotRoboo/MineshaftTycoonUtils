@@ -8,6 +8,7 @@ import com.roboo.mineshafttycoonutils.features.chat.PlayerMessageHandler;
 import com.roboo.mineshafttycoonutils.features.fishing.FishingHud;
 import com.roboo.mineshafttycoonutils.features.fishing.FishingTracker;
 import com.roboo.mineshafttycoonutils.features.informationhud.InformationHud;
+import com.roboo.mineshafttycoonutils.features.misc.HousingVerifier;
 import com.roboo.mineshafttycoonutils.features.misc.NightVisionBlocker;
 import com.roboo.mineshafttycoonutils.features.pets.PetsHelper;
 import com.roboo.mineshafttycoonutils.features.profit.BagHud;
@@ -25,6 +26,7 @@ import com.roboo.mineshafttycoonutils.features.scoreboard.ScoreboardHud;
 import com.roboo.mineshafttycoonutils.features.timers.*;
 import com.roboo.mineshafttycoonutils.features.update.UpdateChecker;
 import com.roboo.mineshafttycoonutils.features.warp.WarpHelper;
+import com.roboo.mineshafttycoonutils.features.wiki.WikiExporter;
 import com.roboo.mineshafttycoonutils.utils.ActionBarDebugUtils;
 import com.roboo.mineshafttycoonutils.utils.MinecraftOptionUtils;
 import net.fabricmc.api.ClientModInitializer;
@@ -39,6 +41,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         configManager = new ConfigManager();
         configManager.firstLoad();
 
+        HousingVerifier.init();
         FishingTracker.init();
         PvETracker.init();
         OreDropTracker.init();
@@ -70,6 +73,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         NightVisionBlocker.init();
         PotionToggleHelper.init();
         UpdateChecker.init();
+        WikiExporter.init();
         ConfigGuiManager.init();
         Commands.init();
 

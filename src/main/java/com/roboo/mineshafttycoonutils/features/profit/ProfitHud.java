@@ -2,6 +2,7 @@ package com.roboo.mineshafttycoonutils.features.profit;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.ProfitCategory;
+import com.roboo.mineshafttycoonutils.features.misc.HousingVerifier;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
@@ -30,7 +31,7 @@ public class ProfitHud {
 
         @Override
         public boolean isMasterEnabled() {
-            return ConfigManager.config.profit.tracker.profitTrackerEnabled;
+            return ConfigManager.config.profit.tracker.profitTrackerEnabled && HousingVerifier.isVerified();
         }
 
         @Override
@@ -87,6 +88,7 @@ public class ProfitHud {
                 (graphics, tickCounter) -> {
                     ProfitCategory cfg = ConfigManager.config.profit;
                     if (mc.player == null || !cfg.tracker.profitTrackerEnabled) return;
+                    if (!HousingVerifier.isVerified()) return;
                     if (cfg.tracker.hideInOtherZones
                             && (HudZones.isInFishingZone(mc.player.blockPosition()) || HudZones.isInPveZone(mc.player.blockPosition())))
                         return;

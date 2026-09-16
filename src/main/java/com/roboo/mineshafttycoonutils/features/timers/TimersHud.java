@@ -2,6 +2,7 @@ package com.roboo.mineshafttycoonutils.features.timers;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.TimersCategory;
+import com.roboo.mineshafttycoonutils.features.misc.HousingVerifier;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
@@ -29,7 +30,7 @@ public class TimersHud {
 
         @Override
         public boolean isMasterEnabled() {
-            return ConfigManager.config.timers.hudEnabled;
+            return ConfigManager.config.timers.hudEnabled && HousingVerifier.isVerified();
         }
 
         @Override
@@ -86,6 +87,7 @@ public class TimersHud {
                 (graphics, tickCounter) -> {
                     TimersCategory cfg = ConfigManager.config.timers;
                     if (mc.player == null || !cfg.hudEnabled) return;
+                    if (!HousingVerifier.isVerified()) return;
 
                     List<String> lines = calcLines(cfg);
                     if (lines.isEmpty()) return;

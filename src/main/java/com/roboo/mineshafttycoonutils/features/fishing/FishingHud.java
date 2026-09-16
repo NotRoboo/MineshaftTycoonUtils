@@ -2,6 +2,7 @@ package com.roboo.mineshafttycoonutils.features.fishing;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.FishingCategory;
+import com.roboo.mineshafttycoonutils.features.misc.HousingVerifier;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
@@ -31,7 +32,7 @@ public class FishingHud {
 
         @Override
         public boolean isMasterEnabled() {
-            return cfg().hudEnabled;
+            return cfg().hudEnabled && HousingVerifier.isVerified();
         }
 
         @Override
@@ -88,6 +89,7 @@ public class FishingHud {
                 (graphics, tickCounter) -> {
                     FishingCategory cfg = cfg();
                     if (mc.player == null || !cfg.hudEnabled) return;
+                    if (!HousingVerifier.isVerified()) return;
                     if (cfg.hideInOtherZones && !HudZones.isInFishingZone(mc.player.blockPosition())) return;
 
                     int totalHeight = Math.round(calcHeight() * HudScale.normalize(cfg.scale));
