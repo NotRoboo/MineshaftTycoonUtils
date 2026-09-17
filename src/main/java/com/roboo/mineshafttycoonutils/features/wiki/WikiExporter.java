@@ -3,7 +3,6 @@ package com.roboo.mineshafttycoonutils.features.wiki;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
 import com.roboo.mineshafttycoonutils.utils.SystemMessages;
-import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -17,8 +16,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.component.ItemLore;
-import net.minecraft.world.item.component.ResolvableProfile;
 import org.apache.commons.io.FileUtils;
 import org.lwjgl.glfw.GLFW;
 
@@ -27,12 +26,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class WikiExporter {
 
@@ -41,31 +37,23 @@ public class WikiExporter {
     private static final File ITEM_DIR = new File(WIKI_DIR, "items");
     private static final int GRID_COLUMNS = 9;
 
-    private static final Pattern TEXTURE_HASH_PATTERN =
-            Pattern.compile("textures\\.minecraft\\.net/texture/(\\w+)");
-
-    // Mirrors Module:UI's own id -> file name table, so generic items resolve
     private static final Map<String, String> ID_FILE_OVERRIDES = Map.ofEntries(
-            Map.entry("minecraft:white_stained_glass_pane", "White Stained Glass"),
-            Map.entry("minecraft:orange_stained_glass_pane", "Orange Stained Glass"),
-            Map.entry("minecraft:magenta_stained_glass_pane", "Magenta Stained Glass"),
-            Map.entry("minecraft:light_blue_stained_glass_pane", "Light Blue Stained Glass"),
-            Map.entry("minecraft:yellow_stained_glass_pane", "Yellow Stained Glass"),
-            Map.entry("minecraft:lime_stained_glass_pane", "Lime Stained Glass"),
-            Map.entry("minecraft:pink_stained_glass_pane", "Pink Stained Glass"),
-            Map.entry("minecraft:gray_stained_glass_pane", "Gray Stained Glass"),
-            Map.entry("minecraft:light_gray_stained_glass_pane", "Light Gray Stained Glass"),
-            Map.entry("minecraft:cyan_stained_glass_pane", "Cyan Stained Glass"),
-            Map.entry("minecraft:purple_stained_glass_pane", "Purple Stained Glass"),
-            Map.entry("minecraft:blue_stained_glass_pane", "Blue Stained Glass"),
-            Map.entry("minecraft:brown_stained_glass_pane", "Brown Stained Glass"),
-            Map.entry("minecraft:green_stained_glass_pane", "Green Stained Glass"),
-            Map.entry("minecraft:red_stained_glass_pane", "Red Stained Glass"),
-            Map.entry("minecraft:black_stained_glass_pane", "Black Stained Glass")
+            Map.entry("minecraft:diamond_block", "Block Of Diamond"),
+            Map.entry("minecraft:netherite_block", "Block Of Netherite"),
+            Map.entry("minecraft:redstone_block", "Block Of Redstone"),
+            Map.entry("minecraft:emerald_block", "Block Of Emerald"),
+            Map.entry("minecraft:gold_block", "Block Of Gold"),
+            Map.entry("minecraft:iron_block", "Block Of Iron"),
+            Map.entry("minecraft:coal_block", "Block Of Coal"),
+            Map.entry("minecraft:lapis_block", "Block Of Lapis Lazuli"),
+            Map.entry("minecraft:copper_block", "Block Of Copper"),
+            Map.entry("minecraft:raw_iron_block", "Block Of Raw Iron"),
+            Map.entry("minecraft:raw_gold_block", "Block Of Raw Gold"),
+            Map.entry("minecraft:raw_copper_block", "Block Of Raw Copper"),
+            Map.entry("minecraft:quartz_block", "Block Of Quartz"),
+            Map.entry("minecraft:amethyst_block", "Block Of Amethyst")
     );
 
-    // Mirrors Module:UI's DYEABLE_ARMOR table (id -> which armor piece to
-    // mask/tint via |piece#=).
     private static final Map<String, String> DYEABLE_ARMOR_PIECE = Map.of(
             "minecraft:leather_helmet", "helmet",
             "minecraft:leather_chestplate", "chestplate",
@@ -77,7 +65,6 @@ public class WikiExporter {
     private static boolean lastItemKeyDown = false;
 
     private static final Field HOVERED_SLOT_FIELD = resolveHoveredSlotField();
-    private static final Field PROFILE_FIELD = resolveProfileField();
 
     private record SlotIcon(String icon, String piece, String dye) {
         static SlotIcon plain(String icon) {
@@ -125,7 +112,6 @@ public class WikiExporter {
         lastItemKeyDown = itemKeyDown;
     }
 
-    // Full container export
     private static void exportContainer(AbstractContainerScreen<?> screen) {
         if (mc.player == null) return;
 
@@ -181,7 +167,6 @@ public class WikiExporter {
             Integer duplicateOf = firstSeenIndex.get(key);
 
             if (duplicateOf != null) {
-                // slot# = slot# already carries the slot's icon/piece/dye
                 sb.append("|slot").append(slotNumber).append(" = slot").append(duplicateOf).append("\n");
             } else {
                 firstSeenIndex.put(key, slotNumber);
@@ -214,7 +199,6 @@ public class WikiExporter {
         return new int[]{cols, rows};
     }
 
-    // Single hovered-item export
     private static void exportHoveredItem(AbstractContainerScreen<?> screen) {
         if (mc.player == null) return;
 
@@ -285,17 +269,6 @@ public class WikiExporter {
         }
     }
 
-    private static Field resolveProfileField() {
-        for (Field f : ResolvableProfile.class.getDeclaredFields()) {
-            if (GameProfile.class.isAssignableFrom(f.getType())) {
-                f.setAccessible(true);
-                return f;
-            }
-        }
-        return null;
-    }
-
-    // Icon / piece / dye resolution
     private static SlotIcon resolveIcon(ItemStack stack) {
         String id = itemId(stack);
 
@@ -308,17 +281,31 @@ public class WikiExporter {
             return SlotIcon.dyedArmor(piece, dye);
         }
 
-        ResolvableProfile profile = stack.get(DataComponents.PROFILE);
-        if (profile != null) {
-            String hash = extractTextureHash(profile);
-            if (hash != null) {
-                return SlotIcon.plain("https://mc-heads.net/head/" + hash + "/32.png");
-            }
+        if (id.equals("minecraft:player_head")) {
+            String plainName = stack.getHoverName().getString().trim();
+            if (plainName.isEmpty()) plainName = "Unknown Skull";
+            return SlotIcon.plain(plainName + ".png");
         }
 
         String fileName = ID_FILE_OVERRIDES.getOrDefault(id, prettifyId(id));
         if (fileName == null || fileName.isEmpty()) return null;
+
+        if (isEnchanted(stack)) {
+            fileName = "Enchanted " + fileName;
+        }
+
         return SlotIcon.plain(fileName + ".png");
+    }
+
+    private static boolean isEnchanted(ItemStack stack) {
+        Boolean glintOverride = stack.get(DataComponents.ENCHANTMENT_GLINT_OVERRIDE);
+        if (Boolean.TRUE.equals(glintOverride)) return true;
+
+        ItemEnchantments enchantments = stack.get(DataComponents.ENCHANTMENTS);
+        if (enchantments != null && !enchantments.isEmpty()) return true;
+
+        ItemEnchantments stored = stack.get(DataComponents.STORED_ENCHANTMENTS);
+        return stored != null && !stored.isEmpty();
     }
 
     private static void appendIconParams(StringBuilder sb, int slotNumber, SlotIcon icon) {
@@ -333,31 +320,6 @@ public class WikiExporter {
                 sb.append("|dye").append(slotNumber).append(" = ").append(icon.dye()).append("\n");
             }
         }
-    }
-
-    private static String extractTextureHash(ResolvableProfile profile) {
-        if (PROFILE_FIELD == null) return null;
-
-        GameProfile gameProfile;
-        try {
-            gameProfile = (GameProfile) PROFILE_FIELD.get(profile);
-        } catch (IllegalAccessException e) {
-            return null;
-        }
-        if (gameProfile == null) return null;
-
-        var textures = gameProfile.properties().get("textures");
-        if (textures.isEmpty()) return null;
-
-        String base64Value = textures.iterator().next().value();
-        try {
-            String decoded = new String(Base64.getDecoder().decode(base64Value), StandardCharsets.UTF_8);
-            Matcher m = TEXTURE_HASH_PATTERN.matcher(decoded);
-            if (m.find()) return m.group(1);
-        } catch (IllegalArgumentException ignored) {
-            // unexpected texture payload - fall through to no icon
-        }
-        return null;
     }
 
     private static String itemId(ItemStack stack) {
@@ -378,7 +340,6 @@ public class WikiExporter {
         return sb.toString();
     }
 
-    // Shared helpers
     private static SlotEntry readSlot(ItemStack stack) {
         if (stack.isEmpty()) return null;
 
@@ -406,8 +367,6 @@ public class WikiExporter {
         return sb.toString();
     }
 
-    // Converts § legacy codes to the wiki module's & format. §k has no CSS
-    // equivalent on the wiki side, so it's dropped rather than mistranslated.
     private static String legacyToAmpersand(String text) {
         if (text == null || text.isEmpty()) return text;
 
@@ -431,8 +390,6 @@ public class WikiExporter {
         return sb.toString();
     }
 
-    // Strips &-format codes (produced by legacyToAmpersand) so a raw name
-    // can be used safely as a file name.
     private static String stripFormatting(String text) {
         if (text == null) return "";
         return text.replaceAll("(?i)&[0-9a-fklmnor]", "");
@@ -443,9 +400,6 @@ public class WikiExporter {
         return stripped.isEmpty() ? "Unknown" : stripped;
     }
 
-    // Appends " (2)", " (3)", ... if a file with that base name already
-    // exists in the target directory, so same-named items/containers don't
-    // silently overwrite each other.
     private static String uniqueFileName(File dir, String baseName) {
         String fileName = baseName + ".txt";
         if (!new File(dir, fileName).exists()) return fileName;

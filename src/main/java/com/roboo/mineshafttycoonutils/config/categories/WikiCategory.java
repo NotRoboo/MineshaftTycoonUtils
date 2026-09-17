@@ -19,6 +19,18 @@ public class WikiCategory {
     @ConfigEditorInfoText
     @SuppressWarnings("unused")
     public boolean wikiExporterPreview = false;
+    
+    @ConfigOption(
+            name = "More Info",
+            desc = """
+                    §7Player Skulls will export to display <Display Name>.png \
+                    to get them to show up on the wiki either source the file from somewhere \
+                    or use the WikiRenderer Mod.
+                    """
+    )
+    @ConfigEditorInfoText
+    @SuppressWarnings("unused")
+    public boolean wikiExporterPreview2 = false;
 
     @Expose
     @ConfigOption(
