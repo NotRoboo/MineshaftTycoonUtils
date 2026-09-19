@@ -87,7 +87,7 @@ public class PvEHud {
                 (graphics, tickCounter) -> {
                     PvECategory cfg = cfg();
                     if (mc.player == null || !cfg.hudEnabled) return;
-                    if (HousingVerifier.isVerified()) return;
+                    if (!HousingVerifier.isVerified()) return;
                     if (cfg.hideInOtherZones && !HudZones.isInPveZone(mc.player.blockPosition())) return;
 
                     int totalHeight = Math.round(calcHeight() * HudScale.normalize(cfg.scale));
