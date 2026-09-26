@@ -33,6 +33,7 @@ public class RankTierData {
     static {
         TAG_DISPLAY_ALIASES.put("ADMN", "ADMIN");
         TAG_DISPLAY_ALIASES.put("BUILDER", "BUILD");
+        TAG_DISPLAY_ALIASES.put("S", "SYSTEM");
     }
 
     public static final Map<String, String> TIER_GLYPHS = new LinkedHashMap<>();

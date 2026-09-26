@@ -154,21 +154,28 @@ public class WarpHelper {
     }
 
     public static void init() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-                dispatcher.register(ClientCommandManager.literal("warp")
-                        .executes(ctx -> {
-                            runWarp(null);
-                            return 1;
-                        })
-                        .then(ClientCommandManager.argument("target", StringArgumentType.greedyString())
-                                .suggests(SUGGESTIONS)
-                                .executes(ctx -> {
-                                    runWarp(StringArgumentType.getString(ctx, "target"));
-                                    return 1;
-                                })
-                        )
-                )
-        );
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(ClientCommandManager.literal("warp")
+                    .executes(ctx -> {
+                        runWarp(null);
+                        return 1;
+                    })
+                    .then(ClientCommandManager.argument("target", StringArgumentType.greedyString())
+                            .suggests(SUGGESTIONS)
+                            .executes(ctx -> {
+                                runWarp(StringArgumentType.getString(ctx, "target"));
+                                return 1;
+                            })
+                    )
+            );
+
+            dispatcher.register(ClientCommandManager.literal("swarp")
+                    .executes(ctx -> {
+                        sendRawCommand("warp");
+                        return 1;
+                    })
+            );
+        });
 
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             if (pendingEntry != null && WarpMenu.fromScreen(screen) != null) {

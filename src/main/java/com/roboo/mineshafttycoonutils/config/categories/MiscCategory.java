@@ -4,6 +4,12 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory;
+import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver;
+import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor;
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOption;
+import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
+import io.github.notenoughupdates.moulconfig.gui.GuiContext;
 import org.lwjgl.glfw.GLFW;
 
 public class MiscCategory {
@@ -40,5 +46,13 @@ public class MiscCategory {
                     "those not on tab list will still be hidden")
     @ConfigEditorBoolean
     public boolean forceTabListSort = false;
+
+    @Expose
+    @ConfigOption(
+            name = "WorldEdit Style Cmds",
+            desc = "Adds /thru, /top, /jumpto, /ceil, /ascend and /descend, which teleport you using /tp. " +
+                    "§eWhen disabled these are sent to the server unchanged - §cRequires /tp permission")
+    @ConfigEditorBoolean
+    public boolean worldEditCommands = false;
 
 }

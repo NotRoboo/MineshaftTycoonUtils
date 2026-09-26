@@ -43,6 +43,10 @@ public class MSTUConfig extends Config {
     public PvECategory pve = new PvECategory();
 
     @Expose
+    @Category(name = "Plasma Generator", desc = "Plasma Smithery, Flare Value, and Solar Flare HUD settings")
+    public PlasmaCategory plasma = new PlasmaCategory();
+
+    @Expose
     @Category(name = "Timers", desc = "Buff, Petad, and Il's Restock timer settings")
     public TimersCategory timers = new TimersCategory();
 

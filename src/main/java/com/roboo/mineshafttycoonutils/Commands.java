@@ -1,11 +1,13 @@
 package com.roboo.mineshafttycoonutils;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.roboo.mineshafttycoonutils.config.ConfigGuiManager;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.ScoreboardCategory;
 import com.roboo.mineshafttycoonutils.features.fishing.FishingTracker;
+import com.roboo.mineshafttycoonutils.features.plasma.SolarFlareTracker;
 import com.roboo.mineshafttycoonutils.features.profit.OreDropTracker;
 import com.roboo.mineshafttycoonutils.features.profit.ProfitTracker;
 import com.roboo.mineshafttycoonutils.features.pve.PvETracker;
@@ -135,6 +137,16 @@ public class Commands {
                                 })
                         )
                 )
+                .then(ClientCommandManager.literal("targetheat")
+                        .then(ClientCommandManager.argument("value", IntegerArgumentType.integer(0))
+                                .executes(ctx -> {
+                                    int value = IntegerArgumentType.getInteger(ctx, "value");
+                                    SolarFlareTracker.setManualHeatGoal(value);
+                                    infoMsg("Target Heat forced to " + value);
+                                    return 1;
+                                })
+                        )
+                )
                 .then(ClientCommandManager.literal("hudpositionsreset")
                         .executes(ctx -> {
                             ConfigManager.config.fishing.hudX = DEFAULT_FISHING_HUD_X;
@@ -205,6 +217,13 @@ public class Commands {
         message.append(Component.literal("Reset!")
                 .withStyle(Style.EMPTY.withColor(0xFF5555)));
 
+        mc.player.displayClientMessage(SystemMessages.buildPrefix().append(message), false);
+    }
+
+    private static void infoMsg(String text) {
+        if (mc.player == null) return;
+        MutableComponent message = Component.literal(" " + text)
+                .withStyle(Style.EMPTY.withColor(0xAAAAAA));
         mc.player.displayClientMessage(SystemMessages.buildPrefix().append(message), false);
     }
 }

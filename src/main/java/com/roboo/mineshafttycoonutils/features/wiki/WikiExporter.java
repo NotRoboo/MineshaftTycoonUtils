@@ -15,7 +15,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.component.ItemLore;
 import org.apache.commons.io.FileUtils;
@@ -29,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class WikiExporter {
 
@@ -54,11 +54,9 @@ public class WikiExporter {
             Map.entry("minecraft:amethyst_block", "Block Of Amethyst")
     );
 
-    private static final Map<String, String> DYEABLE_ARMOR_PIECE = Map.of(
-            "minecraft:leather_helmet", "helmet",
-            "minecraft:leather_chestplate", "chestplate",
-            "minecraft:leather_leggings", "leggings",
-            "minecraft:leather_boots", "boots"
+    private static final Set<String> LEATHER_ARMOR_IDS = Set.of(
+            "minecraft:leather_helmet", "minecraft:leather_chestplate",
+            "minecraft:leather_leggings", "minecraft:leather_boots"
     );
 
     private static boolean lastContainerKeyDown = false;
@@ -66,22 +64,16 @@ public class WikiExporter {
 
     private static final Field HOVERED_SLOT_FIELD = resolveHoveredSlotField();
 
-    private record SlotIcon(String icon, String piece, String dye) {
+    private record SlotIcon(String icon) {
         static SlotIcon plain(String icon) {
-            return new SlotIcon(icon, null, null);
-        }
-
-        static SlotIcon dyedArmor(String piece, String dye) {
-            return new SlotIcon(null, piece, dye);
+            return new SlotIcon(icon);
         }
     }
 
     private record SlotEntry(String name, String count, List<String> lore, SlotIcon icon) {
         String contentKey() {
             return name + "\u0000" + count + "\u0000" + String.join("\u0001", lore)
-                    + "\u0000" + (icon != null ? icon.icon() : "")
-                    + "\u0000" + (icon != null ? icon.piece() : "")
-                    + "\u0000" + (icon != null ? icon.dye() : "");
+                    + "\u0000" + (icon != null ? icon.icon() : "");
         }
     }
 
@@ -272,18 +264,9 @@ public class WikiExporter {
     private static SlotIcon resolveIcon(ItemStack stack) {
         String id = itemId(stack);
 
-        String piece = DYEABLE_ARMOR_PIECE.get(id);
-        if (piece != null) {
-            DyedItemColor dyedColor = stack.get(DataComponents.DYED_COLOR);
-            String dye = dyedColor != null
-                    ? String.format("#%06X", dyedColor.rgb() & 0xFFFFFF)
-                    : null;
-            return SlotIcon.dyedArmor(piece, dye);
-        }
-
-        if (id.equals("minecraft:player_head")) {
+        if (id.equals("minecraft:player_head") || LEATHER_ARMOR_IDS.contains(id)) {
             String plainName = stack.getHoverName().getString().trim();
-            if (plainName.isEmpty()) plainName = "Unknown Skull";
+            if (plainName.isEmpty()) plainName = "Unknown Item";
             return SlotIcon.plain(plainName + ".png");
         }
 
@@ -309,17 +292,8 @@ public class WikiExporter {
     }
 
     private static void appendIconParams(StringBuilder sb, int slotNumber, SlotIcon icon) {
-        if (icon == null) return;
-
-        if (icon.icon() != null) {
-            sb.append("|icon").append(slotNumber).append(" = ").append(icon.icon()).append("\n");
-        }
-        if (icon.piece() != null) {
-            sb.append("|piece").append(slotNumber).append(" = ").append(icon.piece()).append("\n");
-            if (icon.dye() != null) {
-                sb.append("|dye").append(slotNumber).append(" = ").append(icon.dye()).append("\n");
-            }
-        }
+        if (icon == null || icon.icon() == null) return;
+        sb.append("|icon").append(slotNumber).append(" = ").append(icon.icon()).append("\n");
     }
 
     private static String itemId(ItemStack stack) {

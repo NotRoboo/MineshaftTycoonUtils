@@ -5,8 +5,14 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class OreDropTracker {
+
+    private static final long LAST_DROP_WINDOW_MS = 100L;
+
+    private static final Pattern RAVEN_PET_DIG_PATTERN =
+            Pattern.compile("(?i)^\\*\\s*pets!\\s*your raven pet dug up another ore!\\s*\\(\\d+(?:\\.\\d+)?%\\)$");
 
     private static final LinkedHashMap<String, String> ORE_CHAT_PATTERNS = new LinkedHashMap<>();
     static {
@@ -26,6 +32,9 @@ public class OreDropTracker {
 
     private static final Map<String, Integer> counts = new LinkedHashMap<>();
 
+    private static String lastDropName = null;
+    private static long lastDropAtMillis = -1;
+
     public static void init() {
         ClientReceiveMessageEvents.ALLOW_GAME.register((msg, overlay) -> {
             handleMessage(msg.getString());
@@ -44,12 +53,30 @@ public class OreDropTracker {
         if (stripped.isEmpty()) return;
         String lower = stripped.toLowerCase(Locale.ROOT);
 
+        if (RAVEN_PET_DIG_PATTERN.matcher(stripped).matches()) {
+            registerRavenProc();
+            return;
+        }
+
         for (Map.Entry<String, String> entry : ORE_CHAT_PATTERNS.entrySet()) {
             if (lower.contains(entry.getKey())) {
-                counts.merge(entry.getValue(), 1, Integer::sum);
+                registerDrop(entry.getValue());
                 return;
             }
         }
+    }
+
+    private static void registerDrop(String name) {
+        counts.merge(name, 1, Integer::sum);
+        lastDropName = name;
+        lastDropAtMillis = System.currentTimeMillis();
+    }
+
+    private static void registerRavenProc() {
+        if (lastDropName == null) return;
+        if (System.currentTimeMillis() - lastDropAtMillis > LAST_DROP_WINDOW_MS) return;
+
+        counts.merge(lastDropName, 1, Integer::sum);
     }
 
     public static LinkedHashMap<String, Integer> getBreakdown() {
@@ -63,5 +90,7 @@ public class OreDropTracker {
 
     public static void reset() {
         counts.clear();
+        lastDropName = null;
+        lastDropAtMillis = -1;
     }
 }
