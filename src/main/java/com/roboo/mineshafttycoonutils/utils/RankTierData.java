@@ -75,6 +75,27 @@ public class RankTierData {
         }
     }
 
+    private static final Map<Character, String> GLYPH_TAGS = new LinkedHashMap<>();
+    static {
+        for (Map.Entry<String, String> entry : TIER_GLYPHS.entrySet()) {
+            String key = entry.getKey();
+            String tag = null;
+            for (Map.Entry<String, StaffRank> staff : STAFF_RANKS.entrySet()) {
+                if (staff.getValue().display().equals(key)) {
+                    tag = staff.getKey();
+                    break;
+                }
+            }
+            if (tag == null) tag = key.substring(1);
+            GLYPH_TAGS.put(entry.getValue().charAt(0), tag);
+        }
+    }
+
+    public static String tagForGlyph(char glyph) {
+        char base = glyph >= 0xE100 && glyph <= 0xE2FF ? (char) (0xE000 | (glyph & 0xFF)) : glyph;
+        return GLYPH_TAGS.get(base);
+    }
+
     public static final List<String> TIER_SORT_ORDER = List.of(
             "OWNER", "MANAGER", "ADMIN", "DEV", "BUILD", "MOD", "HELPER", "SYSTEM",
             "4T5", "6T5", "7T5",

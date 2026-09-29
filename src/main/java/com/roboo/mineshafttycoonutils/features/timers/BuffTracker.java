@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
+import com.roboo.mineshafttycoonutils.utils.TimeParseUtils;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,10 +21,9 @@ public class BuffTracker {
 
     private static final Minecraft mc = Minecraft.getInstance();
     private static final String CONTAINER_TITLE = "Buff Duration Menu";
-    static final String MENU_BUTTON_MARKER = "Menu Button";
 
     private static final Pattern TIME_LEFT_PATTERN =
-            Pattern.compile("(?i)time left:\\s*([0-9,]+)s");
+            Pattern.compile("(?i)time left:\\s*(.*)");
 
     public enum Buff {
         T4_POTION("T4 Fortune Potion"),
@@ -67,9 +67,13 @@ public class BuffTracker {
     }
 
     private static void readContainer(AbstractContainerMenu menu) {
+        if (mc.player == null) return;
+
         long now = System.currentTimeMillis();
 
         for (var slot : menu.slots) {
+            if (slot.container == mc.player.getInventory()) continue;
+
             ItemStack stack = slot.getItem();
             if (stack.isEmpty()) continue;
 
@@ -80,7 +84,6 @@ public class BuffTracker {
             ItemLore lore = stack.get(DataComponents.LORE);
             List<Component> loreLines = lore != null ? lore.lines() : List.of();
 
-            boolean isMenuButton = false;
             boolean enabledFound = false;
             boolean enabled = false;
             boolean timeFound = false;
@@ -88,10 +91,6 @@ public class BuffTracker {
 
             for (Component loreLine : loreLines) {
                 String text = ChatFormatting.stripFormatting(loreLine.getString()).trim();
-
-                if (text.contains(MENU_BUTTON_MARKER)) {
-                    isMenuButton = true;
-                }
 
                 if (text.contains("ENABLED!")) {
                     enabled = true;
@@ -103,17 +102,18 @@ public class BuffTracker {
 
                 Matcher timeLeft = TIME_LEFT_PATTERN.matcher(text);
                 if (timeLeft.find()) {
-                    try {
-                        secondsLeft = Long.parseLong(timeLeft.group(1).replace(",", ""));
+                    long parsed = TimeParseUtils.parseSeconds(timeLeft.group(1));
+                    if (parsed >= 0) {
+                        secondsLeft = parsed;
                         timeFound = true;
-                    } catch (NumberFormatException ignored) {}
+                    }
                 }
             }
 
-            if (!isMenuButton) continue;
+            if (!enabledFound) continue;
 
             if (timeFound) {
-                readings.put(buff, new Reading(enabledFound && enabled, secondsLeft, now));
+                readings.put(buff, new Reading(enabled, secondsLeft, now));
             } else {
                 readings.remove(buff);
             }
@@ -170,15 +170,10 @@ public class BuffTracker {
         ItemLore lore = stack.get(DataComponents.LORE);
         if (lore == null) return null;
 
-        boolean isMenuButton = false;
         Boolean enabled = null;
 
         for (Component loreLine : lore.lines()) {
             String text = ChatFormatting.stripFormatting(loreLine.getString()).trim();
-
-            if (text.contains(MENU_BUTTON_MARKER)) {
-                isMenuButton = true;
-            }
 
             if (text.contains("ENABLED!")) {
                 enabled = true;
@@ -187,7 +182,7 @@ public class BuffTracker {
             }
         }
 
-        return isMenuButton ? enabled : null;
+        return enabled;
     }
 
     public static boolean isPotionActive(Buff buff) {

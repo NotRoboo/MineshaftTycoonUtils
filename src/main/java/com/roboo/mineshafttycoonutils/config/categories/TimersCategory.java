@@ -1,5 +1,8 @@
 package com.roboo.mineshafttycoonutils.config.categories;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.roboo.mineshafttycoonutils.hud.HudScale;
 import io.github.notenoughupdates.moulconfig.ChromaColour;
@@ -65,6 +68,11 @@ public class TimersCategory {
         T1_POTION("T1 Potion"),
         PETAD("Petad"),
         ILS_RESTOCK("Il's Restock"),
+        COMPACTOR_1("Compactor 1"),
+        COMPACTOR_2("Compactor 2"),
+        PLASMA_GEN_1("Plasma Gen 1"),
+        PLASMA_GEN_2("Plasma Gen 2"),
+        REFUEL("Refuel"),
         IRONVINE("Ironvine"),
         REDROOT("Redroot"),
         AURORA_FRUIT("Aurora Fruit"),
@@ -83,6 +91,25 @@ public class TimersCategory {
         @Override
         public String toString() {
             return displayName;
+        }
+    }
+
+    public static void onConfigFix(JsonObject savedConfig) {
+        if (!savedConfig.has("timers") || !savedConfig.get("timers").isJsonObject()) return;
+
+        JsonObject timers = savedConfig.getAsJsonObject("timers");
+        if (!timers.has("order") || !timers.get("order").isJsonArray()) return;
+
+        JsonArray order = timers.getAsJsonArray("order");
+        for (String name : List.of("COMPACTOR_1", "COMPACTOR_2", "PLASMA_GEN_1", "PLASMA_GEN_2", "REFUEL")) {
+            boolean present = false;
+            for (JsonElement element : order) {
+                if (element.isJsonPrimitive() && name.equals(element.getAsString())) {
+                    present = true;
+                    break;
+                }
+            }
+            if (!present) order.add(name);
         }
     }
 }

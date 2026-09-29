@@ -3,6 +3,8 @@ package com.roboo.mineshafttycoonutils.features.timers;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.TimersCategory;
 import com.roboo.mineshafttycoonutils.features.misc.HousingVerifier;
+import com.roboo.mineshafttycoonutils.features.plasma.PlasmaSmitheryTracker;
+import com.roboo.mineshafttycoonutils.features.plasma.SolarFlareTracker;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.hud.MovableHud;
@@ -170,6 +172,11 @@ public class TimersHud {
             case FISHING_BUFF -> renderBuff("Fishing Buff: ", BuffTracker.Buff.FISHING_BUFF, cfg);
             case PETAD -> renderPetad(cfg);
             case ILS_RESTOCK -> renderIlsRestock(cfg);
+            case COMPACTOR_1 -> renderTimed("Compactor 1: ", CompactorTracker.getSecondsLeft(CompactorTracker.Compactor.FIRST), cfg);
+            case COMPACTOR_2 -> renderTimed("Compactor 2: ", CompactorTracker.getSecondsLeft(CompactorTracker.Compactor.SECOND), cfg);
+            case PLASMA_GEN_1 -> renderTimed("Plasma Gen 1: ", PlasmaSmitheryTracker.getGen1SecondsLeft(), cfg);
+            case PLASMA_GEN_2 -> renderTimed("Plasma Gen 2: ", PlasmaSmitheryTracker.getGen2SecondsLeft(), cfg);
+            case REFUEL -> renderRefuel(cfg);
             case GREENHOUSE -> null;
         };
     }
@@ -201,6 +208,19 @@ public class TimersHud {
         boolean enabled = BuffTracker.isEnabled(buff);
         String color = enabled ? "§e" : "§c";
         return "§7" + label + color + time;
+    }
+
+    private static String renderTimed(String label, long secondsLeft, TimersCategory cfg) {
+        if (secondsLeft <= 0) return null;
+        return "§7" + label + "§e" + formatDuration(secondsLeft, cfg);
+    }
+
+    private static String renderRefuel(TimersCategory cfg) {
+        long secondsLeft = SolarFlareTracker.getRefuelSecondsLeft();
+        if (secondsLeft < 0) return null;
+        if (secondsLeft == 0) return "§7Refuel: §cNow";
+
+        return "§7Refuel: §e" + formatDuration(secondsLeft, cfg);
     }
 
     private static String renderPetad(TimersCategory cfg) {

@@ -1,5 +1,6 @@
 package com.roboo.mineshafttycoonutils.features.timers;
 
+import com.roboo.mineshafttycoonutils.utils.TimeParseUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -25,7 +26,7 @@ public class IlsRestockTracker {
     private static final String RESTOCK_MESSAGE = "I've restocked my wares.";
 
     private static final Pattern TIME_PATTERN =
-            Pattern.compile("(?i)time until restock:\\s*(?:(\\d+)h\\s*)?(?:(\\d+)m\\s*)?(?:(\\d+)s)?");
+            Pattern.compile("(?i)time until restock:\\s*(.*)");
 
     private static boolean known = false;
     private static long endTime = -1;
@@ -87,16 +88,14 @@ public class IlsRestockTracker {
             for (Component loreLine : loreLines) {
                 String text = ChatFormatting.stripFormatting(loreLine.getString()).trim();
                 Matcher time = TIME_PATTERN.matcher(text);
-                if (time.find() && (time.group(1) != null || time.group(2) != null || time.group(3) != null)) {
-                    int hours = time.group(1) != null ? Integer.parseInt(time.group(1)) : 0;
-                    int minutes = time.group(2) != null ? Integer.parseInt(time.group(2)) : 0;
-                    int seconds = time.group(3) != null ? Integer.parseInt(time.group(3)) : 0;
-                    long totalSeconds = hours * 3600L + minutes * 60L + seconds;
+                if (!time.find()) continue;
 
-                    known = true;
-                    endTime = System.currentTimeMillis() + totalSeconds * 1000L;
-                    return;
-                }
+                long totalSeconds = TimeParseUtils.parseSeconds(time.group(1));
+                if (totalSeconds < 0) continue;
+
+                known = true;
+                endTime = System.currentTimeMillis() + totalSeconds * 1000L;
+                return;
             }
         }
     }

@@ -56,7 +56,7 @@ public class Commands {
                     mc.execute(() -> ConfigGuiManager.openConfigGui(null));
                     return 1;
                 })
-                .then(ClientCommandManager.argument("search", StringArgumentType.greedyString())
+                .then(ClientCommandManager.argument("search", new SearchArgumentType())
                         .executes(ctx -> {
                             String search = StringArgumentType.getString(ctx, "search");
                             mc.execute(() -> ConfigGuiManager.openConfigGui(search));

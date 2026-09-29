@@ -35,6 +35,7 @@ import com.roboo.mineshafttycoonutils.features.update.UpdateChecker;
 import com.roboo.mineshafttycoonutils.features.warp.WarpHelper;
 import com.roboo.mineshafttycoonutils.features.wiki.WikiExporter;
 import com.roboo.mineshafttycoonutils.utils.ActionBarDebugUtils;
+import com.roboo.mineshafttycoonutils.utils.LogNoiseFilter;
 import com.roboo.mineshafttycoonutils.utils.MinecraftOptionUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -45,6 +46,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        LogNoiseFilter.install();
         configManager = new ConfigManager();
         configManager.firstLoad();
 
@@ -74,6 +76,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         WarpHelper.init();
         BuffTracker.init();
         IlsRestockTracker.init();
+        CompactorTracker.init();
         GreenhouseTracker.init();
         TimersHud.init();
         PlasmaSmitheryTracker.init();

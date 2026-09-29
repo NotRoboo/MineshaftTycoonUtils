@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EmojiData {
 
@@ -20,6 +17,7 @@ public class EmojiData {
 
     private static final Map<String, Integer> SHORTCODE_TO_CODEPOINT = new LinkedHashMap<>();
     private static final Map<String, Integer> FLAG_TO_CODEPOINT = new LinkedHashMap<>();
+    private static final Map<Integer, String> CODEPOINT_TO_SHORTCODE = new HashMap<>();
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private static class Mapping {
@@ -43,6 +41,10 @@ public class EmojiData {
 
             Mapping mapping = new Gson().fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), Mapping.class);
             if (mapping == null) return;
+
+            registerReverse(mapping.emotes);
+            registerReverse(mapping.custom);
+            registerReverse(mapping.flags);
 
             if (mapping.emotes != null) {
                 SHORTCODE_TO_CODEPOINT.putAll(mapping.emotes);
@@ -75,5 +77,18 @@ public class EmojiData {
         combined.addAll(SHORTCODE_TO_CODEPOINT.keySet());
         combined.addAll(FLAG_TO_CODEPOINT.keySet());
         return combined;
+    }
+
+    private static void registerReverse(Map<String, Integer> source) {
+        if (source == null) return;
+        for (Map.Entry<String, Integer> entry : source.entrySet()) {
+            if (entry.getValue() >= 0xF0000) {
+                CODEPOINT_TO_SHORTCODE.putIfAbsent(entry.getValue(), entry.getKey());
+            }
+        }
+    }
+
+    public static String shortcodeFor(int codepoint) {
+        return CODEPOINT_TO_SHORTCODE.get(codepoint);
     }
 }

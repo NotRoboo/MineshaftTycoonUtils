@@ -1,6 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.timers;
 
 import com.roboo.mineshafttycoonutils.utils.HologramUtils;
+import com.roboo.mineshafttycoonutils.utils.TimeParseUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.Minecraft;
@@ -22,17 +23,17 @@ public class PetAdTracker {
     private static final int SCAN_INTERVAL_TICKS = 10;
 
     private static final Pattern TIMER_NOW_PATTERN =
-            Pattern.compile("(?i)adventure timer?\\s*is now\\s*(?:(\\d+)h\\s*)?(?:(\\d+)m\\s*)?(?:(\\d+)s)?");
+            Pattern.compile("(?i)adventure timer?\\s*is now\\s*(.*)");
 
     private static final Pattern CHAT_PATTERN =
-            Pattern.compile("(?i)adventure time left:\\s*(?:(\\d+)h\\s*)?(?:(\\d+)m\\s*)?(?:(\\d+)s)?");
+            Pattern.compile("(?i)adventure time left:\\s*(.*)");
 
     private static final Pattern HOLOGRAM_PATTERN =
-            Pattern.compile("(?i)adventure time:\\s*(?:(\\d+)h\\s*)?(?:(\\d+)m\\s*)?(?:(\\d+)s)?");
+            Pattern.compile("(?i)adventure time:\\s*(.*)");
 
     private static boolean known = false;
     private static long endTime = -1;
-    private static int lastSeenSeconds = -1;
+    private static long lastSeenSeconds = -1;
     private static int tickCounter = 0;
 
     public static void init() {
@@ -49,7 +50,6 @@ public class PetAdTracker {
         ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
     }
 
-    // Check if petad is inactive
     private static void handleMessage(String msg) {
         if (msg == null) return;
         String stripped = msg.replaceAll("§.", "").trim();
@@ -66,20 +66,21 @@ public class PetAdTracker {
         }
 
         Matcher advTime = CHAT_PATTERN.matcher(stripped);
-        if (advTime.find() && lower.contains("adventure time left:")) {
-            applyReading(parseSeconds(advTime));
+        if (advTime.find()) {
+            long seconds = TimeParseUtils.parseSeconds(advTime.group(1));
+            if (seconds >= 0) applyReading(seconds);
             return;
         }
 
         if (lower.contains("adventure time") && lower.contains("is now")) {
             Matcher nowMatcher = TIMER_NOW_PATTERN.matcher(stripped);
             if (nowMatcher.find()) {
-                applyReading(parseSeconds(nowMatcher));
+                long seconds = TimeParseUtils.parseSeconds(nowMatcher.group(1));
+                if (seconds >= 0) applyReading(seconds);
             }
         }
     }
 
-    // read petad time from hologram
     private static void onTick() {
         if (mc.player == null || mc.level == null) return;
 
@@ -93,25 +94,18 @@ public class PetAdTracker {
         tickCounter = 0;
 
         for (String name : HologramUtils.findNearbyHologramLines(PETAD_X, PETAD_Y, PETAD_Z, HOLOGRAM_SEARCH_RADIUS)) {
-            String lower = name.toLowerCase(Locale.ROOT);
-            if (!lower.contains("adventure time:")) continue;
-
             Matcher hologramMatcher = HOLOGRAM_PATTERN.matcher(name);
-            if (hologramMatcher.find()) {
-                applyReading(parseSeconds(hologramMatcher));
-                break;
-            }
+            if (!hologramMatcher.find()) continue;
+
+            long seconds = TimeParseUtils.parseSeconds(hologramMatcher.group(1));
+            if (seconds < 0) continue;
+
+            applyReading(seconds);
+            break;
         }
     }
 
-    private static int parseSeconds(Matcher time) {
-        int hours = time.group(1) != null ? Integer.parseInt(time.group(1)) : 0;
-        int minutes = time.group(2) != null ? Integer.parseInt(time.group(2)) : 0;
-        int seconds = time.group(3) != null ? Integer.parseInt(time.group(3)) : 0;
-        return hours * 3600 + minutes * 60 + seconds;
-    }
-
-    private static void applyReading(int totalSeconds) {
+    private static void applyReading(long totalSeconds) {
         known = true;
         long projectedEnd = System.currentTimeMillis() + totalSeconds * 1000L;
 

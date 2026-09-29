@@ -3,6 +3,7 @@
   "package": "com.roboo.mineshafttycoonutils.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "ChatLogMixin",
     "CommandSuggestionsMixin",
     "NameTagGlyphMixin",
     "PlayerTabOverlayMixin",

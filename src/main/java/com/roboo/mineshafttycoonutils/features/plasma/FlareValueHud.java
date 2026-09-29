@@ -13,6 +13,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class FlareValueHud {
 
     private static final Minecraft mc = Minecraft.getInstance();
@@ -82,12 +86,51 @@ public class FlareValueHud {
         drawContent(graphics, cfg.flareValueHudX, cfg.flareValueHudY);
     }
 
+    private static List<String> targetLines() {
+        List<String> lines = new ArrayList<>();
+        long target = SolarFlareTracker.computeTarget();
+
+        if (target < 0) {
+            lines.add("§lTarget: §cUnknown");
+            return lines;
+        }
+
+        lines.add("§lTarget: §e" + String.format("%,d", target)
+                + (SolarFlareTracker.isManualHeatGoalActive() ? " §7(forced)" : ""));
+
+        if (target == 0) {
+            lines.add("§7- §aGenerators Full");
+            return lines;
+        }
+
+        lines.add("§lWithdraw:");
+
+        long deficit = target - FlareValueTracker.getTotalInventoryValue();
+        if (deficit <= 0) {
+            lines.add("§7- §aInventory has enough");
+            return lines;
+        }
+
+        Map<PlasmaCategory.FlareEntry, Long> withdrawal = SolarFlareTracker.computeWithdrawal(deficit);
+        if (withdrawal.isEmpty()) {
+            lines.add("§7- §cNot enough flares");
+            return lines;
+        }
+
+        for (Map.Entry<PlasmaCategory.FlareEntry, Long> entry : withdrawal.entrySet()) {
+            lines.add("§7- x" + entry.getValue() + " " + entry.getKey().getShortName());
+        }
+
+        return lines;
+    }
+
     private static void drawContent(GuiGraphics graphics, int anchorX, int y) {
         PlasmaCategory cfg = ConfigManager.config.plasma;
+        List<String> targetLines = targetLines();
         boolean rightAligned = HudTextUtils.isRightAligned(anchorX, cfg.disableRightAlignFlip);
         int titleColor = HudTextUtils.chromaToArgb(cfg.titleColor);
         float scale = HudScale.normalize(cfg.flareValueHudScale);
-        int unscaledWidth = calcUnscaledWidth();
+        int unscaledWidth = calcUnscaledWidth(targetLines);
         int screenLeft = rightAligned ? anchorX - Math.round(unscaledWidth * scale) : anchorX;
         int localAnchorX = rightAligned ? unscaledWidth : 0;
 
@@ -110,7 +153,11 @@ public class FlareValueHud {
                 localAnchorX, LINE_HEIGHT * line++, rightAligned, titleColor);
 
         HudTextUtils.drawLine(graphics, "§lInventory Fuel: §e" + String.format("%,d", FlareValueTracker.getTotalInventoryValue()),
-                localAnchorX, LINE_HEIGHT * line, rightAligned, titleColor);
+                localAnchorX, LINE_HEIGHT * line++, rightAligned, titleColor);
+
+        for (String targetLine : targetLines) {
+            HudTextUtils.drawLine(graphics, targetLine, localAnchorX, LINE_HEIGHT * line++, rightAligned);
+        }
 
         graphics.pose().popMatrix();
     }
@@ -119,7 +166,7 @@ public class FlareValueHud {
         return "§7- x" + quantity + " " + entry.getShortName() + " = §e" + String.format("%,d", value);
     }
 
-    private static int calcUnscaledWidth() {
+    private static int calcUnscaledWidth(List<String> targetLines) {
         PlasmaCategory cfg = ConfigManager.config.plasma;
         int width = mc.font.width("§lFlare Value:");
 
@@ -134,10 +181,14 @@ public class FlareValueHud {
         width = Math.max(width, mc.font.width("§lTotal: §e" + String.format("%,d", FlareValueTracker.getTotalValue())));
         width = Math.max(width, mc.font.width("§lInventory Fuel: §e" + String.format("%,d", FlareValueTracker.getTotalInventoryValue())));
 
+        for (String targetLine : targetLines) {
+            width = Math.max(width, mc.font.width(targetLine));
+        }
+
         return width;
     }
 
-    private static int calcUnscaledHeight() {
+    private static int calcUnscaledHeight(List<String> targetLines) {
         PlasmaCategory cfg = ConfigManager.config.plasma;
         int lines = 1;
 
@@ -147,16 +198,17 @@ public class FlareValueHud {
         }
 
         lines += 2;
+        lines += targetLines.size();
         return lines * LINE_HEIGHT;
     }
 
     private static int calcWidth() {
         float scale = HudScale.normalize(ConfigManager.config.plasma.flareValueHudScale);
-        return Math.round(calcUnscaledWidth() * scale);
+        return Math.round(calcUnscaledWidth(targetLines()) * scale);
     }
 
     private static int calcHeight() {
         float scale = HudScale.normalize(ConfigManager.config.plasma.flareValueHudScale);
-        return Math.round(calcUnscaledHeight() * scale);
+        return Math.round(calcUnscaledHeight(targetLines()) * scale);
     }
 }
