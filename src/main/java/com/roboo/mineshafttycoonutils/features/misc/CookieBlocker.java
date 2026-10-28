@@ -29,7 +29,7 @@ public class CookieBlocker {
     }
 
     private static InteractionResult check(Player player, Level level, InteractionHand hand) {
-        if (!level.isClientSide() || !ConfigManager.config.misc.cookieSlotLock) return InteractionResult.PASS;
+        if (!level.isClientSide() || !ConfigManager.config.misc.cookieBlocker) return InteractionResult.PASS;
         if (!player.getItemInHand(hand).is(Items.COOKIE)) return InteractionResult.PASS;
         if (hand == InteractionHand.MAIN_HAND && player.getInventory().getSelectedSlot() == REQUIRED_SLOT) {
             return InteractionResult.PASS;

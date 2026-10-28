@@ -3,11 +3,13 @@
   "package": "com.roboo.mineshafttycoonutils.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "AbstractContainerScreenAccessor",
     "ChatLogMixin",
     "CommandSuggestionsMixin",
     "NameTagGlyphMixin",
     "PlayerTabOverlayMixin",
-    "ScoreboardMixin"
+    "ScoreboardMixin",
+    "SlotLockClickMixin"
   ],
   "injectors": {
     "defaultRequire": 1

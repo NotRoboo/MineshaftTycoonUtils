@@ -1,43 +1,30 @@
 package com.roboo.mineshafttycoonutils.config.categories;
 
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.config.migration.ConfigJsonUtils;
+import com.roboo.mineshafttycoonutils.config.misc.KeybindsConfig;
+import com.roboo.mineshafttycoonutils.config.misc.SlotLockingConfig;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory;
-import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver;
-import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor;
-import io.github.notenoughupdates.moulconfig.processor.ProcessedOption;
-import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
-import io.github.notenoughupdates.moulconfig.gui.GuiContext;
-import org.lwjgl.glfw.GLFW;
 
 public class MiscCategory {
 
     @Expose
-    @ConfigOption(
-            name = "Toggle Attack Keybind",
-            desc = "Press to flip Minecraft's §e`Toggle Attack' §foption on/off \n" +
-                    "§eThis is just the setting state, not actually clicking"
-    )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    public int toggleAttackKeybind = GLFW.GLFW_KEY_UNKNOWN;
+    @Category(name = "Keybinds", desc = "Keyboard shortcuts for toggles and commands")
+    public KeybindsConfig keybinds = new KeybindsConfig();
 
     @Expose
-    @ConfigOption(
-            name = "Toggle Use Keybind",
-            desc = "Press to flip Minecraft's §e'Toggle Use' §foption on/off \n" +
-                    "§eThis is just the setting state, not actually clicking"
-    )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    public int toggleUseKeybind = GLFW.GLFW_KEY_UNKNOWN;
+    @Category(name = "Slot Locking", desc = "Lock inventory slots")
+    public SlotLockingConfig slotLocking = new SlotLockingConfig();
 
     @Expose
     @ConfigOption(
             name = "Cookie Blocker",
             desc = "Blocks right clicking while holding cookies unless they are in hotbar slot 5")
     @ConfigEditorBoolean
-    public boolean cookieSlotLock = true;
+    public boolean cookieBlocker = true;
 
     @Expose
     @ConfigOption(
@@ -62,4 +49,15 @@ public class MiscCategory {
     @ConfigEditorBoolean
     public boolean worldEditCommands = false;
 
+    public static void onConfigFix(JsonObject savedConfig) {
+        if (!savedConfig.has("misc") || !savedConfig.get("misc").isJsonObject()) return;
+
+        JsonObject misc = savedConfig.getAsJsonObject("misc");
+        if (!misc.has("keybinds") || !misc.get("keybinds").isJsonObject()) {
+            misc.add("keybinds", new JsonObject());
+        }
+
+        ConfigJsonUtils.moveSetting(savedConfig, "misc.toggleAttackKeybind", "misc.keybinds.toggleAttackKeybind");
+        ConfigJsonUtils.moveSetting(savedConfig, "misc.toggleUseKeybind", "misc.keybinds.toggleUseKeybind");
+    }
 }

@@ -2,14 +2,16 @@ package com.roboo.mineshafttycoonutils.utils;
 
 import com.roboo.mineshafttycoonutils.MineshaftTycoonUtils;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.config.misc.KeybindsConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.protocol.game.ServerboundChatCommandPacket;
 import org.lwjgl.glfw.GLFW;
 
-public class MinecraftOptionUtils {
+public class HotkeyUtils {
 
     private static final Minecraft mc = Minecraft.getInstance();
     private static final double PIXEL_ART_LINE_SPACING = 0.15;
@@ -17,6 +19,8 @@ public class MinecraftOptionUtils {
     private static boolean lastPixelArtTags = false;
     private static boolean lastToggleAttackKeyDown = false;
     private static boolean lastToggleUseKeyDown = false;
+    private static boolean lastVisibilityZeroKeyDown = false;
+    private static boolean lastVisibilityThousandKeyDown = false;
 
     public static void init() {
         lastPixelArtTags = ConfigManager.config.glyph.playerMessageGlyphs.isEnabled();
@@ -49,12 +53,14 @@ public class MinecraftOptionUtils {
         if (mc.screen != null) {
             lastToggleAttackKeyDown = false;
             lastToggleUseKeyDown = false;
+            lastVisibilityZeroKeyDown = false;
+            lastVisibilityThousandKeyDown = false;
             return;
         }
 
-        var misc = ConfigManager.config.misc;
+        KeybindsConfig keybinds = ConfigManager.config.misc.keybinds;
 
-        boolean attackDown = isKeyDown(misc.toggleAttackKeybind);
+        boolean attackDown = isKeyDown(keybinds.toggleAttackKeybind);
         if (attackDown && !lastToggleAttackKeyDown) {
             boolean newState = !mc.options.toggleAttack().get();
             mc.options.toggleAttack().set(newState);
@@ -63,7 +69,7 @@ public class MinecraftOptionUtils {
         }
         lastToggleAttackKeyDown = attackDown;
 
-        boolean useDown = isKeyDown(misc.toggleUseKeybind);
+        boolean useDown = isKeyDown(keybinds.toggleUseKeybind);
         if (useDown && !lastToggleUseKeyDown) {
             boolean newState = !mc.options.toggleUse().get();
             mc.options.toggleUse().set(newState);
@@ -71,6 +77,23 @@ public class MinecraftOptionUtils {
             msg("Toggle Right Click", newState);
         }
         lastToggleUseKeyDown = useDown;
+
+        boolean visibilityZeroDown = isKeyDown(keybinds.visibilityZeroKeybind);
+        if (visibilityZeroDown && !lastVisibilityZeroKeyDown) {
+            sendCommand("visibility 0");
+        }
+        lastVisibilityZeroKeyDown = visibilityZeroDown;
+
+        boolean visibilityThousandDown = isKeyDown(keybinds.visibilityThousandKeybind);
+        if (visibilityThousandDown && !lastVisibilityThousandKeyDown) {
+            sendCommand("visibility 1000");
+        }
+        lastVisibilityThousandKeyDown = visibilityThousandDown;
+    }
+
+    private static void sendCommand(String command) {
+        if (mc.player == null) return;
+        mc.player.connection.send(new ServerboundChatCommandPacket(command));
     }
 
     private static void msg(String label, boolean enabled) {
