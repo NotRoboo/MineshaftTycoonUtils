@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(ChatComponent.class)
 public class ChatLogMixin {
-
+    // remove stupid NPC texture log spam
     @ModifyVariable(method = "logChatMessage", at = @At("STORE"), ordinal = 0, require = 0)
     private static String mstu$restoreLoggedText(String original) {
         return LogTextUtils.restore(original);
