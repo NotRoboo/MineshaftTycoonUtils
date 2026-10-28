@@ -9,8 +9,6 @@ import net.minecraft.client.Minecraft;
 import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class GreenhouseTracker {
 
@@ -19,15 +17,6 @@ public class GreenhouseTracker {
     private static final double NEARBY_RANGE = 40.0;
     private static final double HOLOGRAM_SEARCH_RADIUS = 5.0;
     private static final int SCAN_INTERVAL_TICKS = 10;
-
-    private static final Pattern STATUS_PATTERN =
-            Pattern.compile("(?i)status:\\s*(idle|growing|ready)");
-
-    private static final Pattern PLANTED_PATTERN =
-            Pattern.compile("(?i)successfully planted .+? in plot (\\d+)!");
-
-    private static final Pattern READY_PATTERN =
-            Pattern.compile("(?i)your .+? in plot (\\d+) is ready to be claimed");
 
     public enum State {
         UNKNOWN("§cUnknown"),
@@ -94,27 +83,38 @@ public class GreenhouseTracker {
 
     private static void handleMessage(String msg) {
         if (msg == null) return;
-        String stripped = ChatFormatting.stripFormatting(msg).trim();
-        if (stripped.isEmpty()) return;
+        String lower = ChatFormatting.stripFormatting(msg).trim().toLowerCase(Locale.ROOT);
+        if (lower.isEmpty()) return;
 
-        Matcher planted = PLANTED_PATTERN.matcher(stripped);
-        if (planted.find()) {
-            setPlotState(planted.group(1), State.GROWING);
+        if (lower.contains("successfully planted ")) {
+            setPlotState(numberAfter(lower, "in plot "), State.GROWING);
             return;
         }
 
-        Matcher ready = READY_PATTERN.matcher(stripped);
-        if (ready.find()) {
-            setPlotState(ready.group(1), State.GROWN);
+        if (lower.contains("your ") && lower.contains("is ready to be claimed")) {
+            setPlotState(numberAfter(lower, "in plot "), State.GROWN);
         }
     }
 
-    private static void setPlotState(String numberText, State state) {
+    private static int numberAfter(String text, String marker) {
+        int at = text.indexOf(marker);
+        if (at < 0) return -1;
+
+        int start = at + marker.length();
+        int end = start;
+        while (end < text.length() && Character.isDigit(text.charAt(end))) end++;
+        if (end == start) return -1;
+
         try {
-            int number = Integer.parseInt(numberText);
-            Plot plot = Plot.fromNumber(number);
-            if (plot != null) states.put(plot, state);
-        } catch (NumberFormatException ignored) {}
+            return Integer.parseInt(text.substring(start, end));
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private static void setPlotState(int number, State state) {
+        Plot plot = Plot.fromNumber(number);
+        if (plot != null) states.put(plot, state);
     }
 
     private static void onTick() {
@@ -127,22 +127,25 @@ public class GreenhouseTracker {
             if (distSq > NEARBY_RANGE * NEARBY_RANGE) continue;
 
             for (String line : HologramUtils.findNearbyHologramLines(plot.x, plot.y, plot.z, HOLOGRAM_SEARCH_RADIUS)) {
-                Matcher m = STATUS_PATTERN.matcher(line);
-                if (m.find()) {
-                    states.put(plot, stateFromStatus(m.group(1)));
+                State state = stateFromHologram(line);
+                if (state != null) {
+                    states.put(plot, state);
                     break;
                 }
             }
         }
     }
 
-    private static State stateFromStatus(String status) {
-        return switch (status.toLowerCase(Locale.ROOT)) {
-            case "idle" -> State.EMPTY;
-            case "growing" -> State.GROWING;
-            case "ready" -> State.GROWN;
-            default -> State.UNKNOWN;
-        };
+    private static State stateFromHologram(String line) {
+        String lower = line.toLowerCase(Locale.ROOT);
+        int at = lower.indexOf("status:");
+        if (at < 0) return null;
+
+        String status = lower.substring(at + "status:".length()).trim();
+        if (status.startsWith("idle")) return State.EMPTY;
+        if (status.startsWith("growing")) return State.GROWING;
+        if (status.startsWith("ready")) return State.GROWN;
+        return null;
     }
 
     public static State getState(Plot plot) {
@@ -152,5 +155,15 @@ public class GreenhouseTracker {
     public static void reset() {
         for (Plot plot : Plot.values()) states.put(plot, State.UNKNOWN);
         tickCounter = 0;
+    }
+
+    static void applyPercent(int number, double percent) {
+        Plot plot = Plot.fromNumber(number);
+        if (plot == null) return;
+
+        State state = percent <= 0 ? State.EMPTY
+                : percent >= 100 ? State.GROWN
+                  : State.GROWING;
+        states.put(plot, state);
     }
 }

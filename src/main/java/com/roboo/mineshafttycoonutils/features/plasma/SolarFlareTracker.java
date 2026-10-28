@@ -216,7 +216,8 @@ public class SolarFlareTracker {
         if (first < 0 || second < 0) return -1;
 
         long stored = isCollectorKnown() ? getActualStored() : 0;
-        long runOutAt = Math.min(first, second) + (stored + absorbedFuel) * PlasmaSmitheryTracker.MILLIS_PER_FUEL;
+        long bonusMillis = (stored + absorbedFuel) * PlasmaSmitheryTracker.MILLIS_PER_FUEL / 2;
+        long runOutAt = Math.min(first, second) + bonusMillis;
 
         return Math.max(0, (runOutAt - System.currentTimeMillis()) / 1000);
     }

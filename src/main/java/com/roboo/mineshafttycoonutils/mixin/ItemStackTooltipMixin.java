@@ -37,8 +37,8 @@ public class ItemStackTooltipMixin {
             String raw = ComponentTextUtils.formattedText(line);
             String result = raw;
 
-            if (numbersEnabled) result = LoreNumbers.shortenLargeNumbers(result);
             if (timeEnabled) result = LoreTimes.shortenSeconds(result);
+            if (numbersEnabled) result = LoreNumbers.shortenLargeNumbers(result);
 
             if (result.equals(raw)) {
                 replaced.add(line);

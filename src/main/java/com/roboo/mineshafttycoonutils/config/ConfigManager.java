@@ -14,6 +14,9 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("ALL")
 public class ConfigManager {
@@ -39,6 +42,7 @@ public class ConfigManager {
                 ConfigMigrations.upgradeSavedConfig(savedConfig, savedVersion);
 
                 config = gson.fromJson(savedConfig, MSTUConfig.class);
+                removeNullEntries(config);
                 config.configVersion = ConfigMigrations.CURRENT_VERSION;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -50,6 +54,23 @@ public class ConfigManager {
             saveConfig();
         }
         recreateProcessor();
+    }
+
+    private static void removeNullEntries(MSTUConfig loaded) {
+        List<List<?>> lists = new ArrayList<>();
+        lists.add(loaded.information.order);
+        lists.add(loaded.profit.magma.order);
+        lists.add(loaded.fishing.hudLineOrder);
+        lists.add(loaded.fishing.treasure.order);
+        lists.add(loaded.fishing.trophyFish.order);
+        lists.add(loaded.fishing.seaCreatures.order);
+        lists.add(loaded.fishing.crates.order);
+        lists.add(loaded.pve.hudLineOrder);
+        lists.add(loaded.plasma.flareValueOrder);
+        lists.add(loaded.timers.order);
+        for (List<?> list : lists) {
+            if (list != null) list.removeIf(Objects::isNull);
+        }
     }
 
     public void saveConfig() {

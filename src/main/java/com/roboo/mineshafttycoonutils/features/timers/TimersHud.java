@@ -227,7 +227,7 @@ public class TimersHud {
         if (!PetAdTracker.isKnown()) return null;
 
         long secondsLeft = PetAdTracker.getSecondsLeft();
-        if (secondsLeft <= 0) return "§7Petad: §cPetad Ready!";
+        if (secondsLeft <= 0) return "§7Petad: §aReady!";
 
         return "§7Petad: §e" + formatDuration(secondsLeft, cfg);
     }

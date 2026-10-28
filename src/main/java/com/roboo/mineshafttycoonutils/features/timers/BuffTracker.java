@@ -13,7 +13,9 @@ import com.roboo.mineshafttycoonutils.utils.TimeParseUtils;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +52,8 @@ public class BuffTracker {
     );
 
     private record Reading(boolean enabled, long secondsAtRead, long readAt) {}
+
+    record PotdurPotion(long seconds, boolean playing) {}
 
     private static final Map<Buff, Reading> readings = new LinkedHashMap<>();
 
@@ -118,6 +122,75 @@ public class BuffTracker {
                 readings.remove(buff);
             }
         }
+    }
+
+    static void applyPotdurPotions(Map<Buff, PotdurPotion> potions) {
+        long now = System.currentTimeMillis();
+
+        int playingIdx = -1;
+        for (int i = 0; i < POTION_PRIORITY.size(); i++) {
+            PotdurPotion p = potions.get(POTION_PRIORITY.get(i));
+            if (p != null && p.playing() && p.seconds() > 0) {
+                playingIdx = i;
+                break;
+            }
+        }
+
+        for (int i = 0; i < POTION_PRIORITY.size(); i++) {
+            Buff buff = POTION_PRIORITY.get(i);
+            PotdurPotion p = potions.get(buff);
+            if (p == null) continue;
+
+            Reading previous = readings.get(buff);
+            boolean enabled;
+            if (p.playing()) {
+                enabled = true;
+            } else if (playingIdx >= 0 && i < playingIdx && p.seconds() > 0) {
+                enabled = false;
+            } else {
+                enabled = previous == null || previous.enabled();
+            }
+
+            readings.put(buff, new Reading(enabled, p.seconds(), now));
+        }
+    }
+
+    static void applyPotdurBuff(Buff buff, boolean enabled, long seconds) {
+        if (seconds <= 0) {
+            readings.remove(buff);
+            return;
+        }
+        readings.put(buff, new Reading(enabled, seconds, System.currentTimeMillis()));
+    }
+
+    static void finishPotdur(Set<Buff> seen, boolean sawPausedLine) {
+        long now = System.currentTimeMillis();
+
+        for (Buff buff : Buff.values()) {
+            if (POTION_PRIORITY.contains(buff) || buff == Buff.FISHING_BUFF || seen.contains(buff)) continue;
+
+            Reading r = readings.get(buff);
+            if (r == null || !r.enabled()) continue;
+
+            if (sawPausedLine) {
+                long elapsed = (now - r.readAt()) / 1000;
+                readings.put(buff, new Reading(false, Math.max(0, r.secondsAtRead() - elapsed), now));
+            } else {
+                readings.remove(buff);
+            }
+        }
+    }
+
+    static Buff fromPotdurName(String name) {
+        return switch (name.trim().toLowerCase(Locale.ROOT)) {
+            case "ironvine" -> Buff.IRONVINE;
+            case "redroot" -> Buff.REDROOT;
+            case "aurora fruit" -> Buff.AURORA_FRUIT;
+            case "andromeda squash", "squash" -> Buff.SQUASH;
+            case "dustgrain" -> Buff.DUSTGRAIN;
+            case "sunflower seed", "sunflower seeds", "sunflower" -> Buff.SUNFLOWER;
+            default -> null;
+        };
     }
 
     private static Buff fromItemName(String name) {

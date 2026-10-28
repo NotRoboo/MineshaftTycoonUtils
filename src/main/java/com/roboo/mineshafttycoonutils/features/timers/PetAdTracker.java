@@ -4,11 +4,10 @@ import com.roboo.mineshafttycoonutils.utils.HologramUtils;
 import com.roboo.mineshafttycoonutils.utils.TimeParseUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PetAdTracker {
 
@@ -21,15 +20,6 @@ public class PetAdTracker {
     private static final double HOLOGRAM_SEARCH_RADIUS = 5;
     private static final long ANCHOR_THRESHOLD_MS = 1500;
     private static final int SCAN_INTERVAL_TICKS = 10;
-
-    private static final Pattern TIMER_NOW_PATTERN =
-            Pattern.compile("(?i)adventure timer?\\s*is now\\s*(.*)");
-
-    private static final Pattern CHAT_PATTERN =
-            Pattern.compile("(?i)adventure time left:\\s*(.*)");
-
-    private static final Pattern HOLOGRAM_PATTERN =
-            Pattern.compile("(?i)adventure time:\\s*(.*)");
 
     private static boolean known = false;
     private static long endTime = -1;
@@ -50,10 +40,15 @@ public class PetAdTracker {
         ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
     }
 
+    private static String textAfter(String text, String marker) {
+        int at = text.indexOf(marker);
+        if (at < 0) return null;
+        return text.substring(at + marker.length()).trim();
+    }
+
     private static void handleMessage(String msg) {
         if (msg == null) return;
-        String stripped = msg.replaceAll("§.", "").trim();
-        String lower = stripped.toLowerCase(Locale.ROOT);
+        String lower = ChatFormatting.stripFormatting(msg).trim().toLowerCase(Locale.ROOT);
 
         if (lower.contains("no pet adventure active")) {
             applyReading(0);
@@ -65,19 +60,18 @@ public class PetAdTracker {
             return;
         }
 
-        Matcher advTime = CHAT_PATTERN.matcher(stripped);
-        if (advTime.find()) {
-            long seconds = TimeParseUtils.parseSeconds(advTime.group(1));
+        String timeLeft = textAfter(lower, "adventure time left:");
+        if (timeLeft != null) {
+            long seconds = TimeParseUtils.parseSeconds(timeLeft);
             if (seconds >= 0) applyReading(seconds);
             return;
         }
 
-        if (lower.contains("adventure time") && lower.contains("is now")) {
-            Matcher nowMatcher = TIMER_NOW_PATTERN.matcher(stripped);
-            if (nowMatcher.find()) {
-                long seconds = TimeParseUtils.parseSeconds(nowMatcher.group(1));
-                if (seconds >= 0) applyReading(seconds);
-            }
+        String timerNow = textAfter(lower, "adventure timer is now");
+        if (timerNow == null) timerNow = textAfter(lower, "adventure time is now");
+        if (timerNow != null) {
+            long seconds = TimeParseUtils.parseSeconds(timerNow);
+            if (seconds >= 0) applyReading(seconds);
         }
     }
 
@@ -94,10 +88,10 @@ public class PetAdTracker {
         tickCounter = 0;
 
         for (String name : HologramUtils.findNearbyHologramLines(PETAD_X, PETAD_Y, PETAD_Z, HOLOGRAM_SEARCH_RADIUS)) {
-            Matcher hologramMatcher = HOLOGRAM_PATTERN.matcher(name);
-            if (!hologramMatcher.find()) continue;
+            String remaining = textAfter(name.toLowerCase(Locale.ROOT), "adventure time:");
+            if (remaining == null) continue;
 
-            long seconds = TimeParseUtils.parseSeconds(hologramMatcher.group(1));
+            long seconds = TimeParseUtils.parseSeconds(remaining);
             if (seconds < 0) continue;
 
             applyReading(seconds);
@@ -105,7 +99,7 @@ public class PetAdTracker {
         }
     }
 
-    private static void applyReading(long totalSeconds) {
+    static void applyReading(long totalSeconds) {
         known = true;
         long projectedEnd = System.currentTimeMillis() + totalSeconds * 1000L;
 

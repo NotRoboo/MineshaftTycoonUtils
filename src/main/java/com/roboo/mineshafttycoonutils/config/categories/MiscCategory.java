@@ -34,6 +34,13 @@ public class MiscCategory {
 
     @Expose
     @ConfigOption(
+            name = "Cookie Blocker",
+            desc = "Blocks right clicking while holding cookies unless they are in hotbar slot 5")
+    @ConfigEditorBoolean
+    public boolean cookieSlotLock = true;
+
+    @Expose
+    @ConfigOption(
             name = "Night Vision Blocker",
             desc = "Removes the Night Vision effect")
     @ConfigEditorBoolean

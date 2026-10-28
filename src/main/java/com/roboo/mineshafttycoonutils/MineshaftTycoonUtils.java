@@ -8,6 +8,7 @@ import com.roboo.mineshafttycoonutils.features.chat.PlayerMessageHandler;
 import com.roboo.mineshafttycoonutils.features.fishing.FishingHud;
 import com.roboo.mineshafttycoonutils.features.fishing.FishingTracker;
 import com.roboo.mineshafttycoonutils.features.informationhud.InformationHud;
+import com.roboo.mineshafttycoonutils.features.misc.CookieBlocker;
 import com.roboo.mineshafttycoonutils.features.misc.HousingVerifier;
 import com.roboo.mineshafttycoonutils.features.misc.NightVisionBlocker;
 import com.roboo.mineshafttycoonutils.features.misc.WorldEditCommands;
@@ -70,6 +71,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         ProfitHud.init();
         RefineryPetTracker.init();
         BagValueTracker.init();
+        CookieBlocker.init();
         BagHud.init();
         MagmaValueTracker.init();
         MagmaHud.init();
@@ -88,6 +90,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         MinecraftOptionUtils.init();
         NightVisionBlocker.init();
         PotionToggleHelper.init();
+        PotDurTracker.init();
         UpdateChecker.init();
         WikiExporter.init();
         WorldEditCommands.init();

@@ -6,6 +6,7 @@ import com.roboo.mineshafttycoonutils.config.categories.PlasmaCategory;
 import com.roboo.mineshafttycoonutils.hud.ContainerHudDragHandler;
 import com.roboo.mineshafttycoonutils.hud.HudScale;
 import com.roboo.mineshafttycoonutils.utils.HudTextUtils;
+import com.roboo.mineshafttycoonutils.utils.NumberFormatUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;
@@ -22,6 +23,7 @@ public class FlareValueHud {
     private static final Minecraft mc = Minecraft.getInstance();
     private static final int LINE_HEIGHT = 10;
     private static final String CONTAINER_TITLE = "Space Ores Bag";
+    private static final long SELL_VALUE_PER_FUEL = 100_000_000_000L;
 
     private static final ContainerHudDragHandler dragHandler = new ContainerHudDragHandler();
 
@@ -124,6 +126,20 @@ public class FlareValueHud {
         return lines;
     }
 
+    private static String totalLine() {
+        return "§lTotal: §e" + String.format("%,d", FlareValueTracker.getTotalValue());
+    }
+
+    private static String sellValueLine() {
+        long fuel = FlareValueTracker.getTotalSellFuel();
+        return "§lSell Value: §e" + String.format("%,d", fuel)
+                + " §7($" + NumberFormatUtils.formatShortened(fuel * SELL_VALUE_PER_FUEL, true) + ")";
+    }
+
+    private static String inventoryLine() {
+        return "§lInventory Fuel: §e" + String.format("%,d", FlareValueTracker.getTotalInventoryValue());
+    }
+
     private static void drawContent(GuiGraphics graphics, int anchorX, int y) {
         PlasmaCategory cfg = ConfigManager.config.plasma;
         List<String> targetLines = targetLines();
@@ -149,11 +165,11 @@ public class FlareValueHud {
             HudTextUtils.drawLine(graphics, lineText(entry, quantity, value), localAnchorX, LINE_HEIGHT * line++, rightAligned);
         }
 
-        HudTextUtils.drawLine(graphics, "§lTotal: §e" + String.format("%,d", FlareValueTracker.getTotalValue()),
-                localAnchorX, LINE_HEIGHT * line++, rightAligned, titleColor);
+        HudTextUtils.drawLine(graphics, totalLine(), localAnchorX, LINE_HEIGHT * line++, rightAligned, titleColor);
 
-        HudTextUtils.drawLine(graphics, "§lInventory Fuel: §e" + String.format("%,d", FlareValueTracker.getTotalInventoryValue()),
-                localAnchorX, LINE_HEIGHT * line++, rightAligned, titleColor);
+        HudTextUtils.drawLine(graphics, sellValueLine(), localAnchorX, LINE_HEIGHT * line++, rightAligned, titleColor);
+
+        HudTextUtils.drawLine(graphics, inventoryLine(), localAnchorX, LINE_HEIGHT * line++, rightAligned, titleColor);
 
         for (String targetLine : targetLines) {
             HudTextUtils.drawLine(graphics, targetLine, localAnchorX, LINE_HEIGHT * line++, rightAligned);
@@ -178,8 +194,9 @@ public class FlareValueHud {
             width = Math.max(width, mc.font.width(lineText(entry, quantity, value)));
         }
 
-        width = Math.max(width, mc.font.width("§lTotal: §e" + String.format("%,d", FlareValueTracker.getTotalValue())));
-        width = Math.max(width, mc.font.width("§lInventory Fuel: §e" + String.format("%,d", FlareValueTracker.getTotalInventoryValue())));
+        width = Math.max(width, mc.font.width(totalLine()));
+        width = Math.max(width, mc.font.width(sellValueLine()));
+        width = Math.max(width, mc.font.width(inventoryLine()));
 
         for (String targetLine : targetLines) {
             width = Math.max(width, mc.font.width(targetLine));
@@ -197,7 +214,7 @@ public class FlareValueHud {
             lines++;
         }
 
-        lines += 2;
+        lines += 3;
         lines += targetLines.size();
         return lines * LINE_HEIGHT;
     }

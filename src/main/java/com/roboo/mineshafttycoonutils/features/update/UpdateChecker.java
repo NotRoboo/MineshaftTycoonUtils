@@ -17,6 +17,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UpdateChecker {
 
@@ -58,7 +60,7 @@ public class UpdateChecker {
             String latest = body.get("tag_name").getAsString().trim();
             String current = currentVersion();
 
-            if (!normalize(latest).equalsIgnoreCase(normalize(current))) {
+            if (isNewer(latest, current)) {
                 mc.execute(() -> notify(latest));
             }
         } catch (Exception ignored) {
@@ -76,6 +78,42 @@ public class UpdateChecker {
         String v = version.trim();
         if (v.startsWith("v") || v.startsWith("V")) v = v.substring(1);
         return v;
+    }
+
+    private static List<Integer> numbers(String version) {
+        List<Integer> result = new ArrayList<>();
+        int value = 0;
+        boolean inNumber = false;
+
+        for (int i = 0; i < version.length(); i++) {
+            char c = version.charAt(i);
+            if (Character.isDigit(c)) {
+                value = value * 10 + (c - '0');
+                inNumber = true;
+            } else if (c == '.' && inNumber) {
+                result.add(value);
+                value = 0;
+                inNumber = false;
+            } else {
+                break;
+            }
+        }
+
+        if (inNumber) result.add(value);
+        return result;
+    }
+
+    private static boolean isNewer(String latest, String current) {
+        List<Integer> a = numbers(normalize(latest));
+        List<Integer> b = numbers(normalize(current));
+
+        for (int i = 0; i < Math.max(a.size(), b.size()); i++) {
+            int x = i < a.size() ? a.get(i) : 0;
+            int y = i < b.size() ? b.get(i) : 0;
+            if (x != y) return x > y;
+        }
+
+        return normalize(current).indexOf('-') >= 0;
     }
 
     private static void notify(String latestVersion) {

@@ -13,6 +13,7 @@ import net.minecraft.world.item.component.ItemLore;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Set;
 
 public class CompactorTracker {
 
@@ -35,6 +36,13 @@ public class CompactorTracker {
                 if (compactor.itemName.equalsIgnoreCase(name)) return compactor;
             }
             return null;
+        }
+        static Compactor fromNumber(int number) {
+            return switch (number) {
+                case 1 -> FIRST;
+                case 2 -> SECOND;
+                default -> null;
+            };
         }
     }
 
@@ -89,6 +97,18 @@ public class CompactorTracker {
         }
 
         return -1;
+    }
+
+    static void applyPotdurReading(Compactor compactor, long seconds) {
+        if (seconds <= 0) {
+            readings.remove(compactor);
+            return;
+        }
+        readings.put(compactor, new Reading(seconds, System.currentTimeMillis()));
+    }
+
+    static void finishPotdur(Set<Compactor> seen) {
+        readings.keySet().removeIf(compactor -> !seen.contains(compactor));
     }
 
     public static long getSecondsLeft(Compactor compactor) {

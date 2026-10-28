@@ -1,5 +1,6 @@
 package com.roboo.mineshafttycoonutils.features.misc;
 
+import com.roboo.mineshafttycoonutils.features.timers.PotDurTracker;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -56,8 +57,9 @@ public class HousingVerifier {
         String stripped = ChatFormatting.stripFormatting(msg).trim();
         if (stripped.isEmpty()) return true;
 
-        if (stripped.contains(VERIFICATION_TOKEN)) {
+        if (stripped.contains(VERIFICATION_TOKEN) && !verified) {
             verified = true;
+            PotDurTracker.onVerified();
         }
 
         return !isVerificationNoise(stripped);

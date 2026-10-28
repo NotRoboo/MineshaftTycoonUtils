@@ -63,7 +63,7 @@ public class PlayerMessageFormatter {
             return assembleMessage(cfg, messageMatch, interactiveStyle);
         }
 
-        if (cfg.sameChatColor || ConfigManager.config.glyph.playerMessageGlyphs.isEnabled()) {
+        if (cfg.sameChatColor || cfg.rankHider || ConfigManager.config.glyph.playerMessageGlyphs.isEnabled()) {
             return assembleUnformattedMessage(cfg, rawWithCodes, messageMatch, interactiveStyle);
         }
 
@@ -245,6 +245,11 @@ public class PlayerMessageFormatter {
         String prefixText = glyphMode.isEnabled()
                 ? substituteTierGlyph(rawWithCodes, chatMatch, glyphMode)
                 : rawWithCodes.substring(0, chatMatch.start(5));
+
+        if (cfg.rankHider && chatMatch.group(3).contains("[")) {
+            String rankSegment = rawWithCodes.substring(chatMatch.start(3), chatMatch.start(4));
+            prefixText = prefixText.replace(rankSegment, "§" + chatMatch.group(3).charAt(1));
+        }
 
         MutableComponent result = Component.empty();
         result.append(preserveClickAndHover(Component.literal(prefixText), interactiveStyle));

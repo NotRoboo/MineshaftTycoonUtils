@@ -198,6 +198,12 @@ public class Commands {
                                     return 1;
                                 })
                         )
+                        .then(ClientCommandManager.literal("printtablist")
+                                .executes(ctx -> {
+                                    com.roboo.mineshafttycoonutils.utils.TabListDebugUtils.printTabList();
+                                    return 1;
+                                })
+                        )
                 )
                 .then(ClientCommandManager.literal("edithud")
                         .executes(ctx -> {

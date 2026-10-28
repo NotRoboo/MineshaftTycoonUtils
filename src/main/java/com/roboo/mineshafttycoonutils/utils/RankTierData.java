@@ -102,6 +102,7 @@ public class RankTierData {
             "9T4", "3T4",
             "cT3", "eT2", "aT1"
     );
+
     private static final Map<Character, Character> GREEK_HOMOGLYPHS = new LinkedHashMap<>();
     static {
         GREEK_HOMOGLYPHS.put('Α', 'A');
@@ -120,11 +121,46 @@ public class RankTierData {
         GREEK_HOMOGLYPHS.put('Χ', 'X');
     }
 
+    private static final Map<Character, Character> CYRILLIC_HOMOGLYPHS = new LinkedHashMap<>();
+    static {
+        CYRILLIC_HOMOGLYPHS.put('Ѕ', 'S');
+        CYRILLIC_HOMOGLYPHS.put('І', 'I');
+        CYRILLIC_HOMOGLYPHS.put('Ј', 'J');
+        CYRILLIC_HOMOGLYPHS.put('А', 'A');
+        CYRILLIC_HOMOGLYPHS.put('В', 'B');
+        CYRILLIC_HOMOGLYPHS.put('Е', 'E');
+        CYRILLIC_HOMOGLYPHS.put('К', 'K');
+        CYRILLIC_HOMOGLYPHS.put('М', 'M');
+        CYRILLIC_HOMOGLYPHS.put('Н', 'H');
+        CYRILLIC_HOMOGLYPHS.put('О', 'O');
+        CYRILLIC_HOMOGLYPHS.put('Р', 'P');
+        CYRILLIC_HOMOGLYPHS.put('С', 'C');
+        CYRILLIC_HOMOGLYPHS.put('Т', 'T');
+        CYRILLIC_HOMOGLYPHS.put('У', 'Y');
+        CYRILLIC_HOMOGLYPHS.put('Х', 'X');
+    }
+
     public static String resolveTag(String rawTag) {
         if (rawTag == null) return null;
-        String normalized = normalizeFullwidth(normalizeGreekHomoglyphs(rawTag));
-        String upper = normalized.toUpperCase(Locale.ROOT).trim();
-        return TAG_DISPLAY_ALIASES.getOrDefault(upper, upper);
+        String upper = rawTag.toUpperCase(Locale.ROOT);
+        String normalized = normalizeFullwidth(normalizeHomoglyphs(upper));
+        String trimmed = normalized.toUpperCase(Locale.ROOT).trim();
+        return TAG_DISPLAY_ALIASES.getOrDefault(trimmed, trimmed);
+    }
+
+    private static String normalizeHomoglyphs(String input) {
+        StringBuilder sb = new StringBuilder(input.length());
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            Character greek = GREEK_HOMOGLYPHS.get(c);
+            if (greek != null) {
+                sb.append(greek);
+                continue;
+            }
+            Character cyrillic = CYRILLIC_HOMOGLYPHS.get(c);
+            sb.append(cyrillic != null ? cyrillic : c);
+        }
+        return sb.toString();
     }
 
     public static boolean isStaff(String resolvedTag) {
@@ -151,15 +187,6 @@ public class RankTierData {
         String key = isStaff(resolvedTag) ? resolvedTag : (colorChar + resolvedTag);
         int idx = TIER_SORT_ORDER.indexOf(key);
         return idx == -1 ? Integer.MAX_VALUE : idx;
-    }
-
-    private static String normalizeGreekHomoglyphs(String input) {
-        StringBuilder sb = new StringBuilder(input.length());
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            sb.append(GREEK_HOMOGLYPHS.getOrDefault(c, c));
-        }
-        return sb.toString();
     }
 
     private static String normalizeFullwidth(String input) {

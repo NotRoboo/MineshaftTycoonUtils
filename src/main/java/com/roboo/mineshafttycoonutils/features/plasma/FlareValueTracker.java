@@ -132,6 +132,14 @@ public class FlareValueTracker {
         return total;
     }
 
+    public static long getTotalSellFuel() {
+        long total = 0;
+        for (PlasmaCategory.FlareEntry entry : ConfigManager.config.plasma.flareValueOrder) {
+            total += getQuantity(entry) * entry.getBaseFuelValue();
+        }
+        return total;
+    }
+
     public static long getTotalInventoryValue() {
         long total = 0;
         for (PlasmaCategory.FlareEntry entry : PlasmaCategory.FlareEntry.values()) {

@@ -51,29 +51,28 @@ public class WorldEditCommands {
         });
     }
 
+    private static boolean isActive() {
+        return ConfigManager.config.misc.worldEditCommands && mc.getSingleplayerServer() == null;
+    }
+
     private static void register(CommandDispatcher<FabricClientCommandSource> dispatcher, List<String> names,
                                  boolean takesLevels, Finder finder) {
         for (String name : names) {
             var root = ClientCommandManager.literal(name)
-                    .executes(ctx -> run(name, null, finder));
+                    .requires(source -> isActive())
+                    .executes(ctx -> run(null, finder));
 
             if (takesLevels) {
                 root.then(ClientCommandManager.argument("levels", IntegerArgumentType.integer(1, MAX_LEVELS))
-                        .executes(ctx -> run(name, IntegerArgumentType.getInteger(ctx, "levels"), finder)));
+                        .executes(ctx -> run(IntegerArgumentType.getInteger(ctx, "levels"), finder)));
             }
 
             dispatcher.register(root);
         }
     }
 
-    private static int run(String name, Integer amount, Finder finder) {
+    private static int run(Integer amount, Finder finder) {
         if (mc.player == null || mc.level == null) return 0;
-
-        if (!ConfigManager.config.misc.worldEditCommands || mc.getSingleplayerServer() != null) {
-            String raw = amount == null ? name : name + " " + amount;
-            mc.player.connection.send(new ServerboundChatCommandPacket(raw));
-            return 1;
-        }
 
         BlockPos target = finder.find(mc.level, mc.player, amount == null ? 1 : amount);
         if (target == null) {
