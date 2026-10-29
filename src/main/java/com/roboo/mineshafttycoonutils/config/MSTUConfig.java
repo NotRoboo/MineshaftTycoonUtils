@@ -51,7 +51,7 @@ public class MSTUConfig extends Config {
     public TimersCategory timers = new TimersCategory();
 
     @Expose
-    @Category(name = "Chat Filters", desc = "Chat message filtering settings")
+    @Category(name = "Chat", desc = "Chat message filtering settings")
     public ChatCategory chat = new ChatCategory();
 
     @Expose

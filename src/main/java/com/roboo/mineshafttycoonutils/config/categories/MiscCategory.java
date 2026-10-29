@@ -36,8 +36,7 @@ public class MiscCategory {
     @Expose
     @ConfigOption(
             name = "Force Tab List Sort",
-            desc = "Reorders the tab list when its broken. §eNote: Will only reorder visible players, " +
-                    "those not on tab list will still be hidden")
+            desc = "Reorders the tab list when its broken.")
     @ConfigEditorBoolean
     public boolean forceTabListSort = false;
 

@@ -6,6 +6,8 @@ import com.roboo.mineshafttycoonutils.features.tablist.TabListEntryParser;
 import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
 import com.roboo.mineshafttycoonutils.utils.RankTierData;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -16,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -28,6 +31,10 @@ public class PlayerTabOverlayMixin {
     private static long mineshaftUtils$lastSortTime = 0L;
     @Unique
     private static final long mineshaftUtils$SORT_INTERVAL_MS = 500L;
+    @Unique
+    private static final int mineshaftUtils$MAX_ENTRIES = 80;
+    @Unique
+    private static int mineshaftUtils$cachedSourceSize = -1;
 
     @Inject(method = "getNameForDisplay", at = @At("RETURN"), cancellable = true)
     private void mineshaftUtils$rewriteDisplayName(PlayerInfo info, CallbackInfoReturnable<Component> cir) {
@@ -60,15 +67,19 @@ public class PlayerTabOverlayMixin {
     private void mineshaftUtils$forceSort(CallbackInfoReturnable<List<PlayerInfo>> cir) {
         if (!ConfigManager.config.misc.forceTabListSort) return;
 
-        List<PlayerInfo> source = cir.getReturnValue();
-        if (source == null) return;
+        ClientPacketListener connection = Minecraft.getInstance().getConnection();
+        if (connection == null) return;
+
+        Collection<PlayerInfo> source = connection.getListedOnlinePlayers();
 
         long now = System.currentTimeMillis();
         if (now - mineshaftUtils$lastSortTime >= mineshaftUtils$SORT_INTERVAL_MS
-                || mineshaftUtils$cachedSorted.size() != source.size()) {
-            List<PlayerInfo> resorted = new ArrayList<>(source);
-            resorted.sort(mineshaftUtils$comparator());
-            mineshaftUtils$cachedSorted = resorted;
+                || mineshaftUtils$cachedSourceSize != source.size()) {
+            mineshaftUtils$cachedSorted = source.stream()
+                    .sorted(mineshaftUtils$comparator())
+                    .limit(mineshaftUtils$MAX_ENTRIES)
+                    .toList();
+            mineshaftUtils$cachedSourceSize = source.size();
             mineshaftUtils$lastSortTime = now;
         }
 

@@ -1,12 +1,18 @@
 package com.roboo.mineshafttycoonutils.config.categories;
 
 import com.google.gson.annotations.Expose;
+import com.roboo.mineshafttycoonutils.config.chat.ChatCompact;
 import com.roboo.mineshafttycoonutils.config.chat.JoinMessages;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ChatCategory {
+
+    @Expose
+    @Accordion
+    @ConfigOption(name = "Compact Chat", desc = "Merge repeated messages into one line with a counter")
+    public ChatCompact compact = new ChatCompact();
 
     @Expose
     @Accordion
