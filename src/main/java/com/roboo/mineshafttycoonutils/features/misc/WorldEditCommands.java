@@ -20,10 +20,13 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class WorldEditCommands {
 
     private static final Minecraft mc = Minecraft.getInstance();
+
+    public static final Set<String> NAMES = Set.of("thru", "top", "jumpto", "j", "ceil", "ascend", "descend", "desc");
 
     private static final int THRU_RANGE = 50;
     private static final double RAY_STEP = 0.2;

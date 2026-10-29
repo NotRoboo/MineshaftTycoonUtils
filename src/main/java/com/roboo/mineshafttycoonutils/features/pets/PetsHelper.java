@@ -12,7 +12,6 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -89,25 +88,23 @@ public class PetsHelper {
 
     private enum Phase {
         NONE,
-        WAIT_TO_SELECT,
-        WAIT_TO_VERIFY,
-        WAIT_TO_CONFIRM_CLOSE
+        SELECT,
+        VERIFY,
+        CLOSE
     }
 
-    private static final int OPEN_DELAY_TICKS = 4;
-    private static final int SLOT_RETRY_DELAY_TICKS = 5;
-    private static final int MAX_SELECT_RETRIES = 3;
-    private static final int VERIFY_POLL_DELAY_TICKS = 4;
-    private static final int MAX_VERIFY_POLLS = 4;
+    private static final int CLICK_COOLDOWN_TICKS = 2;
+    private static final int MAX_SELECT_WAIT_TICKS = 60;
+    private static final int MAX_VERIFY_WAIT_TICKS = 40;
     private static final int CLOSE_CONFIRM_DELAY_TICKS = 2;
     private static final int MAX_CLOSE_RETRIES = 3;
 
     private static PetEntry pendingEntry = null;
     private static Phase phase = Phase.NONE;
-    private static int ticksRemaining = -1;
-    private static int selectRetriesLeft = 0;
-    private static int verifyPollsLeft = 0;
+    private static int waitedTicks = 0;
+    private static int cooldownTicks = 0;
     private static int closeRetriesLeft = 0;
+    private static int staleContainerId = Integer.MIN_VALUE;
 
     private static final SuggestionProvider<net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource> SUGGESTIONS =
             (ctx, builder) -> {
@@ -132,20 +129,10 @@ public class PetsHelper {
             registerCommand(dispatcher, "pet");
         });
 
-        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (pendingEntry != null && phase == Phase.NONE && isPetsMenu(screen)) {
-                schedule(Phase.WAIT_TO_SELECT, OPEN_DELAY_TICKS);
-            }
-        });
-
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (ticksRemaining > 0 && --ticksRemaining == 0) {
-                runPhase();
-            }
-        });
+        ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
 
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
-            if (phase == Phase.NONE || !isPetsMenu(mc.screen)) return;
+            if (phase == Phase.NONE || isNotPetsMenu(mc.screen)) return;
 
             String text = message.getString();
             if (text.contains(CHAT_DENY_1) || text.contains(CHAT_DENY_2)) {
@@ -171,9 +158,9 @@ public class PetsHelper {
         );
     }
 
-    private static boolean isPetsMenu(Screen screen) {
-        if (!(screen instanceof AbstractContainerScreen<?>)) return false;
-        return PETS_CONTAINER_NAME.equalsIgnoreCase(screen.getTitle().getString().trim());
+    private static boolean isNotPetsMenu(Screen screen) {
+        if (!(screen instanceof AbstractContainerScreen<?>)) return true;
+        return !PETS_CONTAINER_NAME.equalsIgnoreCase(screen.getTitle().getString().trim());
     }
 
     private static void runPets(String target) {
@@ -194,8 +181,9 @@ public class PetsHelper {
                 return;
             }
             pendingEntry = entry;
-            selectRetriesLeft = MAX_SELECT_RETRIES;
+            phase = Phase.SELECT;
             closeRetriesLeft = MAX_CLOSE_RETRIES;
+            if (mc.player != null) staleContainerId = mc.player.containerMenu.containerId;
         }
 
         sendRawCommand();
@@ -215,60 +203,62 @@ public class PetsHelper {
         mc.player.connection.send(new ServerboundChatCommandPacket("pets"));
     }
 
-    private static void schedule(Phase newPhase, int delayTicks) {
-        phase = newPhase;
-        ticksRemaining = delayTicks;
-    }
+    private static void tick() {
+        if (phase == Phase.NONE) return;
+        if (mc.player == null || mc.gameMode == null) {
+            reset();
+            return;
+        }
+        if (cooldownTicks > 0) {
+            cooldownTicks--;
+            return;
+        }
 
-    private static void runPhase() {
         switch (phase) {
-            case WAIT_TO_SELECT -> trySelectPet();
-            case WAIT_TO_VERIFY -> verifySelection();
-            case WAIT_TO_CONFIRM_CLOSE -> confirmClose();
+            case SELECT -> trySelectPet();
+            case VERIFY -> verifySelection();
+            case CLOSE -> confirmClose();
             default -> {}
         }
     }
 
     private static void trySelectPet() {
-        if (pendingEntry == null || mc.player == null || !isPetsMenu(mc.screen)) {
+        if (pendingEntry == null || ++waitedTicks > MAX_SELECT_WAIT_TICKS) {
             reset();
             return;
         }
+        if (isNotPetsMenu(mc.screen)) return;
 
-        AbstractContainerMenu menu = mc.player.containerMenu;
+        var player = mc.player;
+        if (player == null) return;
+
+        AbstractContainerMenu menu = player.containerMenu;
+        if (menu.containerId == staleContainerId) return;
+
         Slot targetSlot = findSlot(menu, pendingEntry.pattern());
+        if (targetSlot == null) return;
 
-        if (targetSlot != null) {
-            ItemStack stack = targetSlot.getItem();
-            PetStatusUtils.Status status = PetStatusUtils.resolveStatus(stack);
+        PetStatusUtils.Status status = PetStatusUtils.resolveStatus(targetSlot.getItem());
 
-            if (status == PetStatusUtils.Status.ON_ADVENTURE) {
-                reset();
-                closeContainerNow();
-                return;
-            }
-
-            if (status == PetStatusUtils.Status.EQUIPPED) {
-                requestClose();
-                return;
-            }
-
-            clickSlot(targetSlot.index, ClickType.PICKUP, 0);
-            selectRetriesLeft = 0;
-            verifyPollsLeft = MAX_VERIFY_POLLS;
-            schedule(Phase.WAIT_TO_VERIFY, VERIFY_POLL_DELAY_TICKS);
+        if (status == PetStatusUtils.Status.ON_ADVENTURE) {
+            reset();
+            closeContainerNow();
             return;
         }
 
-        if (selectRetriesLeft-- > 0) {
-            schedule(Phase.WAIT_TO_SELECT, SLOT_RETRY_DELAY_TICKS);
-        } else {
-            reset();
+        if (status == PetStatusUtils.Status.EQUIPPED) {
+            requestClose();
+            return;
         }
+
+        clickSlot(targetSlot.index, ClickType.PICKUP, 0);
+        phase = Phase.VERIFY;
+        waitedTicks = 0;
+        cooldownTicks = CLICK_COOLDOWN_TICKS;
     }
 
     private static void verifySelection() {
-        if (pendingEntry == null || mc.player == null) {
+        if (pendingEntry == null) {
             reset();
             return;
         }
@@ -278,14 +268,7 @@ public class PetsHelper {
             return;
         }
 
-        if (!isPetsMenu(mc.screen)) {
-            reset();
-            return;
-        }
-
-        if (verifyPollsLeft-- > 0) {
-            schedule(Phase.WAIT_TO_VERIFY, VERIFY_POLL_DELAY_TICKS);
-        } else {
+        if (isNotPetsMenu(mc.screen) || ++waitedTicks > MAX_VERIFY_WAIT_TICKS) {
             reset();
         }
     }
@@ -293,18 +276,19 @@ public class PetsHelper {
     private static void requestClose() {
         pendingEntry = null;
         closeContainerNow();
-        schedule(Phase.WAIT_TO_CONFIRM_CLOSE, CLOSE_CONFIRM_DELAY_TICKS);
+        phase = Phase.CLOSE;
+        cooldownTicks = CLOSE_CONFIRM_DELAY_TICKS;
     }
 
     private static void confirmClose() {
-        if (!isPetsMenu(mc.screen)) {
+        if (isNotPetsMenu(mc.screen)) {
             reset();
             return;
         }
 
         if (closeRetriesLeft-- > 0) {
             closeContainerNow();
-            schedule(Phase.WAIT_TO_CONFIRM_CLOSE, CLOSE_CONFIRM_DELAY_TICKS);
+            cooldownTicks = CLOSE_CONFIRM_DELAY_TICKS;
         } else {
             reset();
         }
@@ -339,7 +323,9 @@ public class PetsHelper {
     private static void reset() {
         pendingEntry = null;
         phase = Phase.NONE;
-        ticksRemaining = -1;
+        waitedTicks = 0;
+        cooldownTicks = 0;
+        staleContainerId = Integer.MIN_VALUE;
     }
 
     private static Slot findSlot(AbstractContainerMenu menu, Pattern pattern) {

@@ -5,6 +5,8 @@
   "client": [
     "AbstractContainerScreenAccessor",
     "ChatCompactMixin",
+    "ChatComponentAccessor",
+    "ChatCopyMixin",
     "ChatLogMixin",
     "CommandSuggestionsMixin",
     "NameTagGlyphMixin",

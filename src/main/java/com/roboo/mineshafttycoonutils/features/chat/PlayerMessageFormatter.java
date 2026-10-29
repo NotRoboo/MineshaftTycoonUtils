@@ -10,6 +10,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -285,6 +286,50 @@ public class PlayerMessageFormatter {
         if (interactiveStyle.getClickEvent() != null) merged = merged.withClickEvent(interactiveStyle.getClickEvent());
         if (interactiveStyle.getHoverEvent() != null) merged = merged.withHoverEvent(interactiveStyle.getHoverEvent());
         return copy.setStyle(merged);
+    }
+
+    public static String copyText(String rawWithCodes) {
+        if (rawWithCodes == null) return null;
+
+        Matcher match = MST_PLAYER_PATTERN.matcher(rawWithCodes);
+        if (!match.matches()) {
+            match = MOD_USERS_PATTERN.matcher(rawWithCodes);
+        }
+        if (!match.matches()) return null;
+
+        PlayerMessagesCategory cfg = ConfigManager.config.playerMessages;
+        List<PlayerMessagesCategory.Part> order = cfg.partOrderEnabled
+                ? cfg.partOrder
+                : List.of(PlayerMessagesCategory.Part.values());
+
+        String tier = "[" + RankTierData.resolveTag(match.group(2)) + "]";
+
+        String rank = null;
+        String rankSegment = match.group(3);
+        int open = rankSegment.indexOf('[');
+        int close = rankSegment.lastIndexOf(']');
+        if (!cfg.rankHider && open >= 0 && close > open) {
+            rank = "[" + RankTierData.resolveTag(rankSegment.substring(open + 1, close)) + "]";
+        }
+
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+
+        for (PlayerMessagesCategory.Part part : order) {
+            String segment = switch (part) {
+                case TIER -> tier;
+                case RANK -> rank;
+                case PLAYER_NAME -> match.group(4);
+                case MESSAGE -> ": " + match.group(6);
+            };
+
+            if (segment == null) continue;
+            if (part != PlayerMessagesCategory.Part.MESSAGE && !first) result.append(' ');
+            result.append(segment);
+            first = false;
+        }
+
+        return result.toString();
     }
 
     private static Component styledWithColor(String text, int hex) {

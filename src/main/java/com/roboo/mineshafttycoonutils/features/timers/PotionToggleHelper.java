@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -33,10 +32,9 @@ public class PotionToggleHelper {
     private static final Minecraft mc = Minecraft.getInstance();
 
     private static final String CONTAINER_TITLE = "Buff Duration Menu";
-    private static final int OPEN_DELAY_TICKS = 4;
-    private static final int SLOT_RETRY_DELAY_TICKS = 5;
-    private static final int MAX_SLOT_RETRIES = 3;
-    private static final int VERIFY_DELAY_TICKS = 4;
+    private static final int CLICK_COOLDOWN_TICKS = 2;
+    private static final int MAX_CLICK_WAIT_TICKS = 60;
+    private static final int MAX_VERIFY_WAIT_TICKS = 40;
     private static final int CLOSE_DELAY_TICKS = 2;
 
     private static final Map<String, BuffTracker.Buff> BUFF_ITEMS = new LinkedHashMap<>();
@@ -56,15 +54,17 @@ public class PotionToggleHelper {
 
     private enum Phase {
         NONE,
-        WAIT_TO_CLICK,
-        WAIT_TO_VERIFY,
-        WAIT_TO_CLOSE
+        CLICK,
+        VERIFY,
+        CLOSE
     }
 
     private static BuffTracker.Buff pendingBuff = null;
     private static Phase phase = Phase.NONE;
-    private static int ticksRemaining = -1;
-    private static int slotRetriesLeft = 0;
+    private static int waitedTicks = 0;
+    private static int cooldownTicks = 0;
+    private static int staleContainerId = Integer.MIN_VALUE;
+    private static Boolean stateBeforeClick = null;
 
     private static final SuggestionProvider<FabricClientCommandSource> SUGGESTIONS =
             (ctx, builder) -> {
@@ -100,17 +100,7 @@ public class PotionToggleHelper {
                 )
         );
 
-        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (pendingBuff != null && phase == Phase.NONE && isBuffMenu(screen)) {
-                schedule(Phase.WAIT_TO_CLICK, OPEN_DELAY_TICKS);
-            }
-        });
-
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (ticksRemaining > 0 && --ticksRemaining == 0) {
-                runPhase();
-            }
-        });
+        ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
     }
 
     private static boolean isBuffMenu(Screen screen) {
@@ -131,9 +121,10 @@ public class PotionToggleHelper {
             return;
         }
 
-        if (buff != null) {
+        if (buff != null && mc.player != null) {
             pendingBuff = buff;
-            slotRetriesLeft = MAX_SLOT_RETRIES;
+            phase = Phase.CLICK;
+            staleContainerId = mc.player.containerMenu.containerId;
         }
 
         sendRawCommand();
@@ -144,63 +135,85 @@ public class PotionToggleHelper {
         mc.player.connection.send(new ServerboundChatCommandPacket("potsoff"));
     }
 
-    private static void schedule(Phase newPhase, int delayTicks) {
-        phase = newPhase;
-        ticksRemaining = delayTicks;
-    }
+    private static void tick() {
+        if (phase == Phase.NONE) return;
+        if (mc.player == null || mc.gameMode == null) {
+            reset();
+            return;
+        }
+        if (cooldownTicks > 0) {
+            cooldownTicks--;
+            return;
+        }
 
-    private static void runPhase() {
         switch (phase) {
-            case WAIT_TO_CLICK -> tryClickBuff();
-            case WAIT_TO_VERIFY -> verifyAndReport();
-            case WAIT_TO_CLOSE -> confirmClose();
+            case CLICK -> tryClickBuff();
+            case VERIFY -> verifyAndReport();
+            case CLOSE -> confirmClose();
             default -> {}
         }
     }
 
     private static void tryClickBuff() {
-        if (pendingBuff == null || mc.player == null || !isBuffMenu(mc.screen)) {
+        if (++waitedTicks > MAX_CLICK_WAIT_TICKS) {
+            if (isBuffMenu(mc.screen) && pendingBuff != null) {
+                errorMsg("Could not find " + pendingBuff.itemName + " in the menu.");
+            }
             reset();
             return;
         }
+        if (pendingBuff == null || !isBuffMenu(mc.screen)) return;
 
-        AbstractContainerMenu menu = mc.player.containerMenu;
+        var player = mc.player;
+        if (player == null) return;
+
+        AbstractContainerMenu menu = player.containerMenu;
+        if (menu.containerId == staleContainerId) return;
+
         Integer slotIndex = findBuffSlot(menu, pendingBuff);
+        if (slotIndex == null) return;
 
-        if (slotIndex != null) {
-            clickSlot(slotIndex);
-            schedule(Phase.WAIT_TO_VERIFY, VERIFY_DELAY_TICKS);
-            return;
-        }
-
-        if (slotRetriesLeft-- > 0) {
-            schedule(Phase.WAIT_TO_CLICK, SLOT_RETRY_DELAY_TICKS);
-        } else {
-            errorMsg("Could not find " + pendingBuff.itemName + " in the menu.");
-            reset();
-        }
+        stateBeforeClick = BuffTracker.readEnabledState(menu.slots.get(slotIndex).getItem());
+        clickSlot(slotIndex);
+        phase = Phase.VERIFY;
+        waitedTicks = 0;
+        cooldownTicks = CLICK_COOLDOWN_TICKS;
     }
 
     private static void verifyAndReport() {
-        if (pendingBuff == null || mc.player == null || !isBuffMenu(mc.screen)) {
+        if (pendingBuff == null || !isBuffMenu(mc.screen)) {
             reset();
             return;
         }
 
-        AbstractContainerMenu menu = mc.player.containerMenu;
-        Integer slotIndex = findBuffSlot(menu, pendingBuff);
-        Boolean nowEnabled = slotIndex != null ? BuffTracker.readEnabledState(menu.slots.get(slotIndex).getItem()) : null;
-        String buffName = pendingBuff.itemName;
-
-        if (nowEnabled != null) {
-            reportToggled(buffName, nowEnabled);
-        } else {
-            errorMsg("Could not read the new state for " + buffName + ".");
+        var player = mc.player;
+        if (player == null) {
+            reset();
+            return;
         }
 
+        String buffName = pendingBuff.itemName;
+        AbstractContainerMenu menu = player.containerMenu;
+        Integer slotIndex = findBuffSlot(menu, pendingBuff);
+        Boolean nowEnabled = slotIndex != null ? BuffTracker.readEnabledState(menu.slots.get(slotIndex).getItem()) : null;
+
+        if (nowEnabled != null && !nowEnabled.equals(stateBeforeClick)) {
+            reportToggled(buffName, nowEnabled);
+            beginClose();
+            return;
+        }
+
+        if (++waitedTicks > MAX_VERIFY_WAIT_TICKS) {
+            errorMsg("Could not read the new state for " + buffName + ".");
+            beginClose();
+        }
+    }
+
+    private static void beginClose() {
         pendingBuff = null;
         closeContainerNow();
-        schedule(Phase.WAIT_TO_CLOSE, CLOSE_DELAY_TICKS);
+        phase = Phase.CLOSE;
+        cooldownTicks = CLOSE_DELAY_TICKS;
     }
 
     private static void confirmClose() {
@@ -248,8 +261,10 @@ public class PotionToggleHelper {
     private static void reset() {
         pendingBuff = null;
         phase = Phase.NONE;
-        ticksRemaining = -1;
-        slotRetriesLeft = 0;
+        waitedTicks = 0;
+        cooldownTicks = 0;
+        staleContainerId = Integer.MIN_VALUE;
+        stateBeforeClick = null;
     }
 
     private static void reportToggled(String buffName, boolean enabled) {

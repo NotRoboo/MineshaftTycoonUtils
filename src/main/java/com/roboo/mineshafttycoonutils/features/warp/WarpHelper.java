@@ -8,7 +8,6 @@ import com.roboo.mineshafttycoonutils.utils.SystemMessages;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -121,15 +120,15 @@ public class WarpHelper {
     }
 
     private static final String PREVIOUS_PAGE_NAME = "Previous Page";
-    private static final int RETRY_DELAY_TICKS = 5;
-    private static final int INITIAL_ATTEMPT_DELAY_TICKS = 3;
-    private static final int NAV_RETRIES = 2;
-    private static final int TARGET_RETRIES = 3;
+    private static final int CLICK_COOLDOWN_TICKS = 2;
+    private static final int MAX_WAIT_TICKS = 60;
+    private static final int MAX_NAV_CLICKS = 2;
 
     private static WarpEntry pendingEntry = null;
-    private static int retryTicks = -1;
-    private static int navRetriesLeft = 0;
-    private static int targetRetriesLeft = 0;
+    private static int waitedTicks = 0;
+    private static int cooldownTicks = 0;
+    private static int navClicksLeft = 0;
+    private static int lastClickedContainerId = Integer.MIN_VALUE;
 
     private static final SuggestionProvider<net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource> SUGGESTIONS =
             (ctx, builder) -> {
@@ -177,17 +176,7 @@ public class WarpHelper {
             );
         });
 
-        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (pendingEntry != null && WarpMenu.fromScreen(screen) != null) {
-                retryTicks = INITIAL_ATTEMPT_DELAY_TICKS;
-            }
-        });
-
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (retryTicks > 0 && --retryTicks == 0) {
-                attemptClick();
-            }
-        });
+        ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
     }
 
     private static void runWarp(String target) {
@@ -195,25 +184,33 @@ public class WarpHelper {
         String key = target == null ? null : target.toLowerCase(Locale.ROOT).trim();
 
         if (enabled && key != null && COMMAND_ALIASES.containsKey(key)) {
-            pendingEntry = null;
-            retryTicks = -1;
+            cancelPending();
             sendRawCommand(COMMAND_ALIASES.get(key));
             return;
         }
 
         if (enabled && key != null && !WARP_ITEMS.containsKey(key)) {
             errorMsg("Unknown warp: " + key);
-            pendingEntry = null;
-            retryTicks = -1;
+            cancelPending();
             return;
         }
 
+        cancelPending();
         pendingEntry = (enabled && key != null) ? WARP_ITEMS.get(key) : null;
-        navRetriesLeft = NAV_RETRIES;
-        targetRetriesLeft = TARGET_RETRIES;
-        retryTicks = -1;
+        if (pendingEntry != null && mc.player != null) {
+            navClicksLeft = MAX_NAV_CLICKS;
+            lastClickedContainerId = mc.player.containerMenu.containerId;
+        }
 
         sendRawCommand("warp");
+    }
+
+    private static void cancelPending() {
+        pendingEntry = null;
+        waitedTicks = 0;
+        cooldownTicks = 0;
+        navClicksLeft = 0;
+        lastClickedContainerId = Integer.MIN_VALUE;
     }
 
     private static void errorMsg(String text) {
@@ -230,36 +227,32 @@ public class WarpHelper {
         mc.player.connection.send(new ServerboundChatCommandPacket(command));
     }
 
-    private static void attemptClick() {
-        WarpMenu currentMenu = pendingEntry == null ? null : WarpMenu.fromScreen(mc.screen);
-        if (currentMenu == null || mc.player == null) {
-            pendingEntry = null;
+    private static void tick() {
+        if (pendingEntry == null) return;
+        if (mc.player == null || mc.gameMode == null || ++waitedTicks > MAX_WAIT_TICKS) {
+            cancelPending();
             return;
         }
+        if (cooldownTicks > 0) {
+            cooldownTicks--;
+            return;
+        }
+
+        WarpMenu currentMenu = WarpMenu.fromScreen(mc.screen);
+        if (currentMenu == null) return;
 
         AbstractContainerMenu menu = mc.player.containerMenu;
+        if (menu.containerId == lastClickedContainerId) return;
 
-        if (currentMenu == pendingEntry.menu()) {
-            Integer targetSlot = findSlot(menu, pendingEntry.displayName());
-            if (targetSlot != null) {
-                clickSlot(targetSlot, ClickType.PICKUP, 0);
-                pendingEntry = null;
-                return;
-            }
+        boolean onTargetMenu = currentMenu == pendingEntry.menu();
+        Integer slot = findSlot(menu, onTargetMenu ? pendingEntry.displayName() : PREVIOUS_PAGE_NAME);
+        if (slot == null) return;
 
-            if (targetRetriesLeft-- > 0) {
-                retryTicks = RETRY_DELAY_TICKS;
-            } else {
-                pendingEntry = null;
-            }
-            return;
-        }
+        clickSlot(slot, ClickType.PICKUP, 0);
+        lastClickedContainerId = menu.containerId;
+        cooldownTicks = CLICK_COOLDOWN_TICKS;
 
-        if (navRetriesLeft-- > 0) {
-            Integer prevPageSlot = findSlot(menu, PREVIOUS_PAGE_NAME);
-            if (prevPageSlot != null) clickSlot(prevPageSlot, ClickType.PICKUP, 0);
-            retryTicks = RETRY_DELAY_TICKS;
-        } else {
+        if (onTargetMenu || --navClicksLeft <= 0) {
             pendingEntry = null;
         }
     }

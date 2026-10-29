@@ -47,7 +47,7 @@ public class MSTUConfig extends Config {
     public PlasmaCategory plasma = new PlasmaCategory();
 
     @Expose
-    @Category(name = "Timers", desc = "Buff, Petad, and Il's Restock timer settings")
+    @Category(name = "Timers", desc = "Effect Durations & Petad Timers")
     public TimersCategory timers = new TimersCategory();
 
     @Expose

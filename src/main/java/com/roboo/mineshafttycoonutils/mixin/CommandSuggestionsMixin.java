@@ -1,21 +1,28 @@
 package com.roboo.mineshafttycoonutils.mixin;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.LiteralMessage;
+import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.brigadier.ParseResults;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
+import com.roboo.mineshafttycoonutils.features.misc.WorldEditCommands;
 import com.roboo.mineshafttycoonutils.features.pets.PetsHelper;
 import com.roboo.mineshafttycoonutils.features.timers.PotionToggleHelper;
 import com.roboo.mineshafttycoonutils.features.warp.WarpHelper;
 import com.roboo.mineshafttycoonutils.utils.EmojiData;
+import com.roboo.mineshafttycoonutils.utils.OnlinePlayers;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
@@ -32,6 +39,14 @@ public abstract class CommandSuggestionsMixin {
     private static final String VISIT_PREFIX = "/visit ";
     @Unique
     private static final String VISIT_SUGGESTION = "masterplaysxd";
+    @Unique
+    private static final String LOBBY_PREFIX = "/lobby ";
+    @Unique
+    private static final String LOBBY_SUGGESTION = "housing";
+    @Unique
+    private static final String MSG_PREFIX = "/msg ";
+    @Unique
+    private static final String TARGET_PREFIX = "/target ";
     @Unique
     private static final String WARP_PREFIX = "/warp ";
     @Unique
@@ -62,6 +77,17 @@ public abstract class CommandSuggestionsMixin {
             if (cursor < prefix.length()) return;
             String partial = text.substring(prefix.length(), cursor).toLowerCase(Locale.ROOT);
             matches = VISIT_SUGGESTION.startsWith(partial) ? List.of(VISIT_SUGGESTION) : List.of();
+        } else if (lower.startsWith(LOBBY_PREFIX)) {
+            prefix = LOBBY_PREFIX;
+            if (cursor < prefix.length()) return;
+            String partial = text.substring(prefix.length(), cursor).toLowerCase(Locale.ROOT);
+            matches = LOBBY_SUGGESTION.startsWith(partial) ? List.of(LOBBY_SUGGESTION) : List.of();
+        } else if (lower.startsWith(MSG_PREFIX) || lower.startsWith(TARGET_PREFIX)) {
+            prefix = lower.startsWith(MSG_PREFIX) ? MSG_PREFIX : TARGET_PREFIX;
+            if (cursor < prefix.length()) return;
+            String partial = text.substring(prefix.length(), cursor);
+            if (partial.indexOf(' ') >= 0) return;
+            matches = mstu$matchingPlayers(partial);
         } else if (ConfigManager.config.general.warpHelperEnabled && lower.startsWith(WARP_PREFIX)) {
             prefix = WARP_PREFIX;
             if (cursor < prefix.length()) return;
@@ -102,7 +128,7 @@ public abstract class CommandSuggestionsMixin {
 
         if (matches.isEmpty()) return;
 
-        SuggestionsBuilder builder = new SuggestionsBuilder(text, prefix.length());
+        SuggestionsBuilder builder = new SuggestionsBuilder(text.substring(0, cursor), prefix.length());
         for (String match : matches) {
             String tooltip = tooltips != null ? tooltips.get(match) : null;
             if (tooltip != null) {
@@ -114,6 +140,41 @@ public abstract class CommandSuggestionsMixin {
 
         this.pendingSuggestions = builder.buildFuture();
         this.showSuggestions(false);
+    }
+
+    @Redirect(
+            method = "updateCommandInfo",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/mojang/brigadier/CommandDispatcher;getCompletionSuggestions(Lcom/mojang/brigadier/ParseResults;I)Ljava/util/concurrent/CompletableFuture;"))
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private CompletableFuture<Suggestions> mstu$filterWorldEdit(CommandDispatcher dispatcher, ParseResults parse, int cursor) {
+        CompletableFuture<Suggestions> future = dispatcher.getCompletionSuggestions(parse, cursor);
+        if (ConfigManager.config.misc.worldEditCommands) return future;
+
+        String text = this.input.getValue();
+        if (!text.startsWith("/") || text.indexOf(' ') >= 0) return future;
+
+        return future.thenApply(suggestions -> {
+            List<Suggestion> kept = suggestions.getList().stream()
+                    .filter(suggestion -> !WorldEditCommands.NAMES.contains(suggestion.getText().toLowerCase(Locale.ROOT)))
+                    .toList();
+            return kept.size() == suggestions.getList().size()
+                    ? suggestions
+                    : new Suggestions(suggestions.getRange(), kept);
+        });
+    }
+
+    @Unique
+    private static List<String> mstu$matchingPlayers(String partial) {
+        String lowerPartial = partial.toLowerCase(Locale.ROOT);
+        List<String> names = new ArrayList<>();
+        for (PlayerInfo info : OnlinePlayers.all()) {
+            String name = info.getProfile().name();
+            if (name.toLowerCase(Locale.ROOT).startsWith(lowerPartial)) names.add(name);
+        }
+        names.sort(String.CASE_INSENSITIVE_ORDER);
+        return names;
     }
 
     @Unique

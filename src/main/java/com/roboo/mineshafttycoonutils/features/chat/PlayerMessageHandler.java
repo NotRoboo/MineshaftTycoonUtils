@@ -53,6 +53,7 @@ public class PlayerMessageHandler {
         if (cfg.partOrderEnabled || cfg.formatSystemMessages || cfg.sameChatColor || cfg.rankHider || playerGlyphMode.isEnabled()) {
             Component formatted = PlayerMessageFormatter.format(raw, interactiveStyle);
             if (formatted != null) {
+                ChatMessageCopier.remember(formatted, originalRaw);
                 mc.gui.getChat().addMessage(formatted);
                 return false;
             }
@@ -64,7 +65,9 @@ public class PlayerMessageHandler {
         }
 
         if (!replaced.equals(originalRaw)) {
-            mc.gui.getChat().addMessage(preserveClickAndHover(Component.literal(replaced), interactiveStyle));
+            Component rebuilt = preserveClickAndHover(Component.literal(replaced), interactiveStyle);
+            ChatMessageCopier.remember(rebuilt, originalRaw);
+            mc.gui.getChat().addMessage(rebuilt);
             return false;
         }
 

@@ -62,12 +62,8 @@ public class TimersCategory {
     public float scale = HudScale.DEFAULT;
 
     public enum Entry {
-        T4_POTION("T4 Potion"),
-        T3_POTION("T3 Potion"),
-        T2_POTION("T2 Potion"),
-        T1_POTION("T1 Potion"),
+        POTION("Fortune Pots"),
         PETAD("Petad"),
-        ILS_RESTOCK("Il's Restock"),
         COMPACTOR_1("Compactor 1"),
         COMPACTOR_2("Compactor 2"),
         PLASMA_GEN_1("Plasma Gen 1"),
@@ -111,5 +107,35 @@ public class TimersCategory {
             }
             if (!present) order.add(name);
         }
+    }
+
+    public static void onPotionMergeFix(JsonObject savedConfig) {
+        if (!savedConfig.has("timers") || !savedConfig.get("timers").isJsonObject()) return;
+
+        JsonObject timers = savedConfig.getAsJsonObject("timers");
+        if (!timers.has("order") || !timers.get("order").isJsonArray()) return;
+
+        List<String> potionTiers = List.of("T4_POTION", "T3_POTION", "T2_POTION", "T1_POTION");
+        JsonArray updated = new JsonArray();
+        boolean potionAdded = false;
+
+        for (JsonElement element : timers.getAsJsonArray("order")) {
+            if (!element.isJsonPrimitive()) continue;
+            String name = element.getAsString();
+
+            if ("ILS_RESTOCK".equals(name)) continue;
+
+            if (potionTiers.contains(name)) {
+                if (!potionAdded) {
+                    updated.add("POTION");
+                    potionAdded = true;
+                }
+                continue;
+            }
+
+            updated.add(name);
+        }
+
+        timers.add("order", updated);
     }
 }

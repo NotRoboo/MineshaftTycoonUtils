@@ -3,14 +3,13 @@ package com.roboo.mineshafttycoonutils.mixin;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.GlyphCategory;
 import com.roboo.mineshafttycoonutils.features.tablist.TabListEntryParser;
-import com.roboo.mineshafttycoonutils.utils.ComponentTextUtils;
+import com.roboo.mineshafttycoonutils.utils.OnlinePlayers;
 import com.roboo.mineshafttycoonutils.utils.RankTierData;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.scores.PlayerTeam;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,8 +17,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 @Mixin(PlayerTabOverlay.class)
@@ -40,7 +37,7 @@ public class PlayerTabOverlayMixin {
     private void mineshaftUtils$rewriteDisplayName(PlayerInfo info, CallbackInfoReturnable<Component> cir) {
         if (!ConfigManager.config.glyph.tablistGlyphs.isEnabled()) return;
 
-        TabListEntryParser.Parsed parsed = mineshaftUtils$parse(info);
+        TabListEntryParser.Parsed parsed = OnlinePlayers.parse(info);
         if (parsed == null) return;
         if (parsed.rankTag() == null && parsed.tierTag() == null) return;
 
@@ -67,16 +64,13 @@ public class PlayerTabOverlayMixin {
     private void mineshaftUtils$forceSort(CallbackInfoReturnable<List<PlayerInfo>> cir) {
         if (!ConfigManager.config.misc.forceTabListSort) return;
 
-        ClientPacketListener connection = Minecraft.getInstance().getConnection();
-        if (connection == null) return;
-
-        Collection<PlayerInfo> source = connection.getListedOnlinePlayers();
+        List<PlayerInfo> source = OnlinePlayers.all();
+        if (source.isEmpty()) return;
 
         long now = System.currentTimeMillis();
         if (now - mineshaftUtils$lastSortTime >= mineshaftUtils$SORT_INTERVAL_MS
                 || mineshaftUtils$cachedSourceSize != source.size()) {
-            mineshaftUtils$cachedSorted = source.stream()
-                    .sorted(mineshaftUtils$comparator())
+            mineshaftUtils$cachedSorted = OnlinePlayers.sorted().stream()
                     .limit(mineshaftUtils$MAX_ENTRIES)
                     .toList();
             mineshaftUtils$cachedSourceSize = source.size();
@@ -105,37 +99,11 @@ public class PlayerTabOverlayMixin {
 
     @Unique
     private static String mineshaftUtils$nameColor(PlayerInfo info, TabListEntryParser.Parsed parsed) {
-        if (info.getTeam() != null && info.getTeam().getColor() != null && info.getTeam().getColor().isColor()) {
-            return "§" + info.getTeam().getColor().getChar();
+        PlayerTeam team = info.getTeam();
+        if (team != null && team.getColor().isColor()) {
+            return "§" + team.getColor().getChar();
         }
         if (parsed.usernameColorCode() != null) return parsed.usernameColorCode();
         return "§7";
-    }
-
-    @Unique
-    private static String mineshaftUtils$withTeamAffixes(PlayerInfo info, Component name) {
-        String raw = ComponentTextUtils.formattedText(name);
-        if (info.getTeam() == null) return raw;
-
-        String prefix = ComponentTextUtils.formattedText(info.getTeam().getPlayerPrefix());
-        String suffix = ComponentTextUtils.formattedText(info.getTeam().getPlayerSuffix());
-        return prefix + raw + suffix;
-    }
-
-    @Unique
-    private static TabListEntryParser.Parsed mineshaftUtils$parse(PlayerInfo info) {
-        Component name = info.getTabListDisplayName() != null
-                ? info.getTabListDisplayName()
-                : Component.literal(info.getProfile().name());
-        String raw = mineshaftUtils$withTeamAffixes(info, name);
-        return TabListEntryParser.parse(raw);
-    }
-
-    @Unique
-    private Comparator<PlayerInfo> mineshaftUtils$comparator() {
-        return Comparator
-                .comparingInt((PlayerInfo info) -> TabListEntryParser.tierSortIndex(mineshaftUtils$parse(info)))
-                .thenComparingInt(info -> TabListEntryParser.resolveHypixelRank(mineshaftUtils$parse(info)).ordinal())
-                .thenComparing(info -> info.getProfile().name(), String.CASE_INSENSITIVE_ORDER);
     }
 }

@@ -24,6 +24,15 @@ public class TimersHud {
     private static final Minecraft mc = Minecraft.getInstance();
     private static final int LINE_HEIGHT = 10;
 
+    private record PotionTier(BuffTracker.Buff buff, String label) {}
+
+    private static final List<PotionTier> POTION_TIERS = List.of(
+            new PotionTier(BuffTracker.Buff.T4_POTION, "T4 Pot: "),
+            new PotionTier(BuffTracker.Buff.T3_POTION, "T3 Pot: "),
+            new PotionTier(BuffTracker.Buff.T2_POTION, "T2 Pot: "),
+            new PotionTier(BuffTracker.Buff.T1_POTION, "T1 Pot: ")
+    );
+
     private static final MovableHud TIMER_BOX = new MovableHud() {
         @Override
         public String getDisplayName() {
@@ -159,10 +168,7 @@ public class TimersHud {
 
     private static String renderEntry(TimersCategory.Entry entry, TimersCategory cfg) {
         return switch (entry) {
-            case T4_POTION -> renderPotion("T4 Pot: ", BuffTracker.Buff.T4_POTION, cfg);
-            case T3_POTION -> renderPotion("T3 Pot: ", BuffTracker.Buff.T3_POTION, cfg);
-            case T2_POTION -> renderPotion("T2 Pot: ", BuffTracker.Buff.T2_POTION, cfg);
-            case T1_POTION -> renderPotion("T1 Pot: ", BuffTracker.Buff.T1_POTION, cfg);
+            case POTION -> renderPotion(cfg);
             case IRONVINE -> renderBuff("Ironvine: ", BuffTracker.Buff.IRONVINE, cfg);
             case REDROOT -> renderBuff("Redroot: ", BuffTracker.Buff.REDROOT, cfg);
             case AURORA_FRUIT -> renderBuff("Aurora Fruit: ", BuffTracker.Buff.AURORA_FRUIT, cfg);
@@ -171,7 +177,6 @@ public class TimersHud {
             case SUNFLOWER -> renderBuff("Sunflower: ", BuffTracker.Buff.SUNFLOWER, cfg);
             case FISHING_BUFF -> renderBuff("Fishing Buff: ", BuffTracker.Buff.FISHING_BUFF, cfg);
             case PETAD -> renderPetad(cfg);
-            case ILS_RESTOCK -> renderIlsRestock(cfg);
             case COMPACTOR_1 -> renderTimed("Compactor 1: ", CompactorTracker.getSecondsLeft(CompactorTracker.Compactor.FIRST), cfg);
             case COMPACTOR_2 -> renderTimed("Compactor 2: ", CompactorTracker.getSecondsLeft(CompactorTracker.Compactor.SECOND), cfg);
             case PLASMA_GEN_1 -> renderTimed("Plasma Gen 1: ", PlasmaSmitheryTracker.getGen1SecondsLeft(), cfg);
@@ -181,14 +186,20 @@ public class TimersHud {
         };
     }
 
-    private static String renderPotion(String label, BuffTracker.Buff buff, TimersCategory cfg) {
-        long secondsLeft = BuffTracker.getPotionSecondsLeft(buff);
-        if (secondsLeft <= 0) return null;
+    private static String renderPotion(TimersCategory cfg) {
+        for (PotionTier tier : POTION_TIERS) {
+            if (!BuffTracker.isPotionActive(tier.buff())) continue;
+            long secondsLeft = BuffTracker.getPotionSecondsLeft(tier.buff());
+            if (secondsLeft > 0) return "§7" + tier.label() + "§e" + formatDuration(secondsLeft, cfg);
+        }
 
-        String time = formatDuration(secondsLeft, cfg);
-        boolean active = BuffTracker.isPotionActive(buff);
-        String color = active ? "§e" : "§c";
-        return "§7" + label + color + time;
+        for (PotionTier tier : POTION_TIERS) {
+            if (BuffTracker.isEnabled(tier.buff())) continue;
+            long secondsLeft = BuffTracker.getPotionSecondsLeft(tier.buff());
+            if (secondsLeft > 0) return "§7" + tier.label() + "§c" + formatDuration(secondsLeft, cfg);
+        }
+
+        return null;
     }
 
     private static List<String> renderGreenhouseLines() {
@@ -230,13 +241,6 @@ public class TimersHud {
         if (secondsLeft <= 0) return "§7Petad: §aReady!";
 
         return "§7Petad: §e" + formatDuration(secondsLeft, cfg);
-    }
-
-    private static String renderIlsRestock(TimersCategory cfg) {
-        if (!IlsRestockTracker.isKnown()) return "§7Il's Restock: §c(Talk to Il)";
-
-        long secondsLeft = IlsRestockTracker.getSecondsLeft();
-        return "§7Il's Restock: §e" + formatDuration(secondsLeft, cfg);
     }
 
     private static String formatDuration(long totalSeconds, TimersCategory cfg) {
