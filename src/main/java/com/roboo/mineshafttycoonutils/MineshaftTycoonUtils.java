@@ -3,6 +3,7 @@ package com.roboo.mineshafttycoonutils;
 import com.roboo.mineshafttycoonutils.config.*;
 import com.roboo.mineshafttycoonutils.features.actionbar.*;
 import com.roboo.mineshafttycoonutils.features.chat.*;
+import com.roboo.mineshafttycoonutils.features.eggvalue.*;
 import com.roboo.mineshafttycoonutils.features.fishing.*;
 import com.roboo.mineshafttycoonutils.features.informationhud.*;
 import com.roboo.mineshafttycoonutils.features.misc.*;
@@ -33,7 +34,7 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         FishingTracker.init();
         PvETracker.init();
         OreDropTracker.init();
-        PetAdTracker.init();
+//        PetAdTracker.init();
         CustomScoreboardManager.init();
         ScoreboardHud.init();
         ActionBarDebugUtils.init();
@@ -43,6 +44,8 @@ public class MineshaftTycoonUtils implements ClientModInitializer {
         ActionBarFormatter.init();
 
         CommandAliases.init();
+        EggValueTracker.init();
+        EggValueHud.init();
         FishingHud.init();
         PvEHud.init();
         InformationHud.init();

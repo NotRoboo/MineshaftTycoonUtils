@@ -177,8 +177,9 @@ public class TimersHud {
             case SUNFLOWER -> renderBuff("Sunflower: ", BuffTracker.Buff.SUNFLOWER, cfg);
             case FISHING_BUFF -> renderBuff("Fishing Buff: ", BuffTracker.Buff.FISHING_BUFF, cfg);
             case PETAD -> renderPetad(cfg);
-            case COMPACTOR_1 -> renderTimed("Compactor 1: ", CompactorTracker.getSecondsLeft(CompactorTracker.Compactor.FIRST), cfg);
-            case COMPACTOR_2 -> renderTimed("Compactor 2: ", CompactorTracker.getSecondsLeft(CompactorTracker.Compactor.SECOND), cfg);
+            case EVENT -> renderEvent(cfg);
+            case COMPACTOR_1 -> renderCompactor("Compactor 1: ", CompactorTracker.getSecondsLeft(CompactorTracker.Compactor.FIRST), cfg);
+            case COMPACTOR_2 -> renderCompactor("Compactor 2: ", CompactorTracker.getSecondsLeft(CompactorTracker.Compactor.SECOND), cfg);
             case PLASMA_GEN_1 -> renderTimed("Plasma Gen 1: ", PlasmaSmitheryTracker.getGen1SecondsLeft(), cfg);
             case PLASMA_GEN_2 -> renderTimed("Plasma Gen 2: ", PlasmaSmitheryTracker.getGen2SecondsLeft(), cfg);
             case REFUEL -> renderRefuel(cfg);
@@ -205,8 +206,8 @@ public class TimersHud {
     private static List<String> renderGreenhouseLines() {
         List<String> lines = new ArrayList<>();
         for (GreenhouseTracker.Plot plot : GreenhouseTracker.Plot.values()) {
-            GreenhouseTracker.State state = GreenhouseTracker.getState(plot);
-            lines.add("§7Plot " + plot.number + ": " + state.label());
+            String text = GreenhouseTracker.describe(plot);
+            if (text != null) lines.add("§7Plot " + plot.number + ": " + text);
         }
         return lines;
     }
@@ -226,6 +227,12 @@ public class TimersHud {
         return "§7" + label + "§e" + formatDuration(secondsLeft, cfg);
     }
 
+    private static String renderCompactor(String label, long secondsLeft, TimersCategory cfg) {
+        if (secondsLeft < 0) return null;
+        if (secondsLeft == 0) return "§7" + label + "§aDone";
+        return "§7" + label + "§e" + formatDuration(secondsLeft, cfg);
+    }
+
     private static String renderRefuel(TimersCategory cfg) {
         long secondsLeft = SolarFlareTracker.getRefuelSecondsLeft();
         if (secondsLeft < 0) return null;
@@ -235,12 +242,21 @@ public class TimersHud {
     }
 
     private static String renderPetad(TimersCategory cfg) {
-        if (!PetAdTracker.isKnown()) return null;
+        return switch (PetAdTracker.getState()) {
+            case UNKNOWN -> null;
+            case INACTIVE -> "§7Petad: §cInactive!";
+            case READY -> "§7Petad: §aReady!";
+            case TIMING -> "§7Petad: §e" + formatDuration(PetAdTracker.getSecondsLeft(), cfg);
+        };
+    }
 
-        long secondsLeft = PetAdTracker.getSecondsLeft();
-        if (secondsLeft <= 0) return "§7Petad: §aReady!";
+    private static String renderEvent(TimersCategory cfg) {
+        long secondsLeft = EventTimerTracker.getSecondsLeft();
+        if (secondsLeft < 0) return null;
 
-        return "§7Petad: §e" + formatDuration(secondsLeft, cfg);
+        String name = EventTimerTracker.getName();
+        if (secondsLeft == 0) return "§7" + name + ": §aNow!";
+        return "§7" + name + ": §e" + formatDuration(secondsLeft, cfg);
     }
 
     private static String formatDuration(long totalSeconds, TimersCategory cfg) {

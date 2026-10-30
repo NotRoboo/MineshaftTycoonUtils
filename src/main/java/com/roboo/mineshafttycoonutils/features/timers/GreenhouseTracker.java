@@ -1,10 +1,7 @@
 package com.roboo.mineshafttycoonutils.features.timers;
 
-import com.roboo.mineshafttycoonutils.utils.HologramUtils;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 
 import java.util.EnumMap;
 import java.util.Locale;
@@ -12,44 +9,24 @@ import java.util.Map;
 
 public class GreenhouseTracker {
 
-    private static final Minecraft mc = Minecraft.getInstance();
-
-    private static final double NEARBY_RANGE = 40.0;
-    private static final double HOLOGRAM_SEARCH_RADIUS = 5.0;
-    private static final int SCAN_INTERVAL_TICKS = 10;
+    private static final int PLANT_POTDUR_DELAY_TICKS = 100;
 
     public enum State {
-        UNKNOWN("§cUnknown"),
-        GROWING("§eGrowing"),
-        GROWN("§aReady"),
-        EMPTY("§cEmpty");
-
-        private final String label;
-
-        State(String label) {
-            this.label = label;
-        }
-
-        public String label() {
-            return label;
-        }
+        UNKNOWN,
+        GROWING,
+        GROWN,
+        EMPTY
     }
 
     public enum Plot {
-        PLOT_1(1, -29, 107, 39),
-        PLOT_2(2, -43, 107, 39),
-        PLOT_3(3, -36, 113, 39);
+        PLOT_1(1),
+        PLOT_2(2),
+        PLOT_3(3);
 
         public final int number;
-        public final double x;
-        public final double y;
-        public final double z;
 
-        Plot(int number, double x, double y, double z) {
+        Plot(int number) {
             this.number = number;
-            this.x = x;
-            this.y = y;
-            this.z = z;
         }
 
         public static Plot fromNumber(int number) {
@@ -61,11 +38,11 @@ public class GreenhouseTracker {
     }
 
     private static final Map<Plot, State> states = new EnumMap<>(Plot.class);
+    private static final Map<Plot, Double> percents = new EnumMap<>(Plot.class);
+
     static {
         for (Plot plot : Plot.values()) states.put(plot, State.UNKNOWN);
     }
-
-    private static int tickCounter = 0;
 
     public static void init() {
         ClientReceiveMessageEvents.ALLOW_GAME.register((msg, overlay) -> {
@@ -77,8 +54,6 @@ public class GreenhouseTracker {
             handleMessage(msg.getString());
             return true;
         });
-
-        ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
     }
 
     private static void handleMessage(String msg) {
@@ -88,6 +63,7 @@ public class GreenhouseTracker {
 
         if (lower.contains("successfully planted ")) {
             setPlotState(numberAfter(lower, "in plot "), State.GROWING);
+            PotDurTracker.scheduleDebounced(PLANT_POTDUR_DELAY_TICKS);
             return;
         }
 
@@ -114,47 +90,14 @@ public class GreenhouseTracker {
 
     private static void setPlotState(int number, State state) {
         Plot plot = Plot.fromNumber(number);
-        if (plot != null) states.put(plot, state);
-    }
+        if (plot == null) return;
 
-    private static void onTick() {
-        if (mc.player == null) return;
-        if (++tickCounter < SCAN_INTERVAL_TICKS) return;
-        tickCounter = 0;
-
-        for (Plot plot : Plot.values()) {
-            double distSq = mc.player.position().distanceToSqr(plot.x, plot.y, plot.z);
-            if (distSq > NEARBY_RANGE * NEARBY_RANGE) continue;
-
-            for (String line : HologramUtils.findNearbyHologramLines(plot.x, plot.y, plot.z, HOLOGRAM_SEARCH_RADIUS)) {
-                State state = stateFromHologram(line);
-                if (state != null) {
-                    states.put(plot, state);
-                    break;
-                }
-            }
+        states.put(plot, state);
+        switch (state) {
+            case GROWN -> percents.put(plot, 100.0);
+            case EMPTY -> percents.put(plot, 0.0);
+            default -> percents.remove(plot);
         }
-    }
-
-    private static State stateFromHologram(String line) {
-        String lower = line.toLowerCase(Locale.ROOT);
-        int at = lower.indexOf("status:");
-        if (at < 0) return null;
-
-        String status = lower.substring(at + "status:".length()).trim();
-        if (status.startsWith("idle")) return State.EMPTY;
-        if (status.startsWith("growing")) return State.GROWING;
-        if (status.startsWith("ready")) return State.GROWN;
-        return null;
-    }
-
-    public static State getState(Plot plot) {
-        return states.getOrDefault(plot, State.UNKNOWN);
-    }
-
-    public static void reset() {
-        for (Plot plot : Plot.values()) states.put(plot, State.UNKNOWN);
-        tickCounter = 0;
     }
 
     static void applyPercent(int number, double percent) {
@@ -165,5 +108,36 @@ public class GreenhouseTracker {
                 : percent >= 100 ? State.GROWN
                   : State.GROWING;
         states.put(plot, state);
+        percents.put(plot, Math.min(percent, 100.0));
+    }
+
+    public static State getState(Plot plot) {
+        return states.getOrDefault(plot, State.UNKNOWN);
+    }
+
+    public static boolean anyGrowing() {
+        return states.containsValue(State.GROWING);
+    }
+
+    public static String describe(Plot plot) {
+        double percent = percents.getOrDefault(plot, -1.0);
+        return switch (getState(plot)) {
+            case EMPTY -> null;
+            case GROWN -> "§a100%";
+            case GROWING -> percent > 0
+                    ? "§e" + formatPercent(percent) + "%"
+                    : "§eGrowing";
+            case UNKNOWN -> "§cUnknown";
+        };
+    }
+
+    private static String formatPercent(double percent) {
+        double floored = Math.floor(Math.min(percent, 99.99) * 100) / 100;
+        return String.format(Locale.ROOT, "%.2f", floored);
+    }
+
+    public static void reset() {
+        for (Plot plot : Plot.values()) states.put(plot, State.UNKNOWN);
+        percents.clear();
     }
 }

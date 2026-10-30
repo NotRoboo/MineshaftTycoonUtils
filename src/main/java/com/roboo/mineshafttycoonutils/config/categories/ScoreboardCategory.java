@@ -55,6 +55,9 @@ public class ScoreboardCategory {
     public float scale = HudScale.DEFAULT;
 
     @Expose
+    public long magmaCapacity = -1;
+
+    @Expose
     public Map<Line, String> lastKnownLines = new EnumMap<>(Line.class);
     public enum Line {
         BY_ITV("By [ITV]", "By [ITV]", false),

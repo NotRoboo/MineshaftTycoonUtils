@@ -3,8 +3,19 @@ package com.roboo.mineshafttycoonutils.features.scoreboard;
 import com.roboo.mineshafttycoonutils.MineshaftTycoonUtils;
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.ScoreboardCategory;
+import com.roboo.mineshafttycoonutils.utils.SystemMessages;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemLore;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -15,14 +26,17 @@ import java.util.regex.Pattern;
 
 public class CustomScoreboardManager {
 
+    private static final Minecraft mc = Minecraft.getInstance();
+
     private static final Pattern DATE_PATTERN = Pattern.compile("^\\d{2}/\\d{2}/\\d{2}\\b");
     private static final String TITLE_TEXT = "§4§lMINESHAFT §c§lTYCOON";
 
+    private static final String FORGE_CONTAINER_TITLE = "Galactic Forge";
+    private static final String MAGMA_UPGRADE_ITEM = "Upgrade Magma Storage";
+    private static final Pattern MAGMA_CAPACITY_PATTERN = Pattern.compile("\\(\\s*([0-9,]+)\\s*➜");
+
     private static final Pattern PET_MAGMA_PATTERN =
             Pattern.compile("(?i)^\\*?\\s*pets!\\s*your\\s+.+?\\s+pet mined up\\s+(\\d+)\\s+magma for you!$");
-
-    private static final Pattern MAGMA_OVERFLOW_PATTERN =
-            Pattern.compile("(?i)^\\*?\\s*magma!\\s*you had too much magma and it bubbled out of your storage!$");
 
     private static final Pattern SCOREBOARD_MAGMA_PATTERN = Pattern.compile("(?<!§)([0-9][0-9,]*)");
 
@@ -38,17 +52,68 @@ public class CustomScoreboardManager {
             handlePetMagmaMessage(msg.getString());
             return true;
         });
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
+    }
+
+    private static void onTick() {
+        if (!(mc.screen instanceof AbstractContainerScreen<?> screen)) return;
+        if (!FORGE_CONTAINER_TITLE.equalsIgnoreCase(screen.getTitle().getString().trim())) return;
+
+        for (Slot slot : screen.getMenu().slots) {
+            ItemStack stack = slot.getItem();
+            if (stack.isEmpty()) continue;
+
+            String name = ChatFormatting.stripFormatting(stack.getHoverName().getString()).trim();
+            if (!MAGMA_UPGRADE_ITEM.equalsIgnoreCase(name)) continue;
+
+            readCapacity(stack);
+            return;
+        }
+    }
+
+    private static void readCapacity(ItemStack stack) {
+        ItemLore lore = stack.get(DataComponents.LORE);
+        if (lore == null) return;
+
+        for (Component line : lore.lines()) {
+            String text = ChatFormatting.stripFormatting(line.getString());
+            Matcher m = MAGMA_CAPACITY_PATTERN.matcher(text);
+            if (!m.find()) continue;
+
+            long capacity;
+            try {
+                capacity = Long.parseLong(m.group(1).replace(",", ""));
+            } catch (NumberFormatException e) {
+                return;
+            }
+
+            ScoreboardCategory cfg = ConfigManager.config.scoreboard;
+            if (cfg.magmaCapacity != capacity) {
+                cfg.magmaCapacity = capacity;
+                MineshaftTycoonUtils.configManager.saveConfig();
+                updateCapacityMsg();
+            }
+            return;
+        }
+    }
+
+    private static void updateCapacityMsg() {
+        if (mc.player == null) return;
+
+        MutableComponent message = Component.literal(" Magma capacity ")
+                .withStyle(Style.EMPTY.withColor(0xAAAAAA));
+
+        message.append(Component.literal("Updated!")
+                .withStyle(Style.EMPTY.withColor(0x55FF55)));
+
+        mc.player.displayClientMessage(SystemMessages.buildPrefix().append(message), false);
     }
 
     private static void handlePetMagmaMessage(String msg) {
         if (msg == null) return;
         String stripped = ChatFormatting.stripFormatting(msg).trim();
         if (stripped.isEmpty()) return;
-
-        if (MAGMA_OVERFLOW_PATTERN.matcher(stripped).matches()) {
-            addMagma(-1);
-            return;
-        }
 
         Matcher m = PET_MAGMA_PATTERN.matcher(stripped);
         if (!m.matches()) return;
@@ -79,6 +144,11 @@ public class CustomScoreboardManager {
         }
 
         long updated = current + amount;
+        if (amount > 0 && cfg.magmaCapacity >= 0) {
+            if (current >= cfg.magmaCapacity) return;
+            updated = Math.min(updated, cfg.magmaCapacity);
+        }
+
         String updatedLine = known.substring(0, numberMatch.start())
                 + String.format("%,d", updated)
                 + known.substring(numberMatch.end());

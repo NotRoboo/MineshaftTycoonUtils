@@ -37,6 +37,7 @@ public class CompactorTracker {
             }
             return null;
         }
+
         static Compactor fromNumber(int number) {
             return switch (number) {
                 case 1 -> FIRST;
@@ -100,7 +101,7 @@ public class CompactorTracker {
     }
 
     static void applyPotdurReading(Compactor compactor, long seconds) {
-        if (seconds <= 0) {
+        if (seconds < 0) {
             readings.remove(compactor);
             return;
         }

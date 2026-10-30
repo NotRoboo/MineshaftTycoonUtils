@@ -64,6 +64,7 @@ public class TimersCategory {
     public enum Entry {
         POTION("Fortune Pots"),
         PETAD("Petad"),
+        EVENT("Event"),
         COMPACTOR_1("Compactor 1"),
         COMPACTOR_2("Compactor 2"),
         PLASMA_GEN_1("Plasma Gen 1"),
@@ -91,13 +92,22 @@ public class TimersCategory {
     }
 
     public static void onConfigFix(JsonObject savedConfig) {
+        addMissingOrderEntries(savedConfig,
+                List.of("COMPACTOR_1", "COMPACTOR_2", "PLASMA_GEN_1", "PLASMA_GEN_2", "REFUEL"));
+    }
+
+    public static void onEventFix(JsonObject savedConfig) {
+        addMissingOrderEntries(savedConfig, List.of("EVENT"));
+    }
+
+    private static void addMissingOrderEntries(JsonObject savedConfig, List<String> names) {
         if (!savedConfig.has("timers") || !savedConfig.get("timers").isJsonObject()) return;
 
         JsonObject timers = savedConfig.getAsJsonObject("timers");
         if (!timers.has("order") || !timers.get("order").isJsonArray()) return;
 
         JsonArray order = timers.getAsJsonArray("order");
-        for (String name : List.of("COMPACTOR_1", "COMPACTOR_2", "PLASMA_GEN_1", "PLASMA_GEN_2", "REFUEL")) {
+        for (String name : names) {
             boolean present = false;
             for (JsonElement element : order) {
                 if (element.isJsonPrimitive() && name.equals(element.getAsString())) {

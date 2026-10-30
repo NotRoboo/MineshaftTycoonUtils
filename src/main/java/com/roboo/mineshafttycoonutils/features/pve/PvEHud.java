@@ -2,6 +2,7 @@ package com.roboo.mineshafttycoonutils.features.pve;
 
 import com.roboo.mineshafttycoonutils.config.ConfigManager;
 import com.roboo.mineshafttycoonutils.config.categories.PvECategory;
+import com.roboo.mineshafttycoonutils.features.eggvalue.EggValueTracker;
 import com.roboo.mineshafttycoonutils.features.misc.HousingVerifier;
 import com.roboo.mineshafttycoonutils.hud.HudEditorRegistry;
 import com.roboo.mineshafttycoonutils.hud.HudScale;
@@ -88,6 +89,7 @@ public class PvEHud {
                     PvECategory cfg = cfg();
                     if (mc.player == null || !cfg.hudEnabled) return;
                     if (!HousingVerifier.isVerified()) return;
+                    if (EggValueTracker.isActive()) return;
                     if (cfg.hideInOtherZones && !HudZones.isInPveZone(mc.player.blockPosition())) return;
 
                     int totalHeight = Math.round(calcHeight() * HudScale.normalize(cfg.scale));

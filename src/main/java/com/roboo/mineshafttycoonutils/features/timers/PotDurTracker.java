@@ -14,6 +14,8 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PotDurTracker {
 
@@ -24,6 +26,9 @@ public class PotDurTracker {
     private static final int IDLE_TICKS = 20;
     private static final int TIMEOUT_TICKS = 100;
     private static final long MIN_INTERVAL_MS = 10_000L;
+    private static final long POLL_INTERVAL_MS = 180_000L;
+    private static final long GROWING_POLL_INTERVAL_MS = 60_000L;
+    private static final Pattern EVENT_PATTERN = Pattern.compile("(?i)^next\\s+(.+?)\\s+in\\s+(.+)$");
 
     private static final Set<BuffTracker.Buff> seenBuffs = EnumSet.noneOf(BuffTracker.Buff.class);
     private static final Set<CompactorTracker.Compactor> seenCompactors = EnumSet.noneOf(CompactorTracker.Compactor.class);
@@ -35,6 +40,8 @@ public class PotDurTracker {
     private static boolean inResponse = false;
     private static boolean hiding = false;
     private static boolean sawPaused = false;
+    private static boolean sawPet = false;
+    private static boolean sawEvent = false;
 
     private PotDurTracker() {}
 
@@ -47,6 +54,11 @@ public class PotDurTracker {
 
     public static void onVerified() {
         schedule(JOIN_DELAY_TICKS);
+    }
+
+    public static void scheduleDebounced(int delayTicks) {
+        queuedTicks = -1;
+        schedule(delayTicks);
     }
 
     private static void schedule(int delayTicks) {
@@ -62,8 +74,15 @@ public class PotDurTracker {
             queuedTicks = -1;
             send();
         }
+        if (queuedTicks < 0) pollIfDue();
         if (expectTicks > 0) expectTicks--;
         if (inResponse && --idleTicks <= 0) finish();
+    }
+
+    private static void pollIfDue() {
+        if (mc.player == null || !HousingVerifier.isVerified()) return;
+        long interval = GreenhouseTracker.anyGrowing() ? GROWING_POLL_INTERVAL_MS : POLL_INTERVAL_MS;
+        if (System.currentTimeMillis() - lastSentAt >= interval) schedule(1);
     }
 
     private static void send() {
@@ -115,6 +134,16 @@ public class PotDurTracker {
     }
 
     private static void parseLine(String body) {
+        Matcher event = EVENT_PATTERN.matcher(body);
+        if (event.matches()) {
+            long seconds = TimeParseUtils.parseSeconds(event.group(2));
+            if (seconds >= 0) {
+                EventTimerTracker.apply(event.group(1).trim(), seconds);
+                sawEvent = true;
+            }
+            return;
+        }
+
         String potions = valueOf(body, "potions:");
         if (potions != null) {
             parsePotions(potions);
@@ -140,7 +169,8 @@ public class PotDurTracker {
                 String[] words = unit.trim().split(" ");
                 if (words.length < 2 || words[0].length() != 2 || words[0].charAt(0) != 'C') continue;
                 CompactorTracker.Compactor compactor = CompactorTracker.Compactor.fromNumber(Character.digit(words[0].charAt(1), 10));
-                long seconds = TimeParseUtils.parseSeconds(words[1]);
+                String rest = unit.trim().substring(words[0].length()).trim();
+                long seconds = rest.equalsIgnoreCase("done") ? 0 : TimeParseUtils.parseSeconds(rest);
                 if (compactor == null || seconds < 0) continue;
                 CompactorTracker.applyPotdurReading(compactor, seconds);
                 seenCompactors.add(compactor);
@@ -150,10 +180,12 @@ public class PotDurTracker {
 
         String pet = valueOf(body, "pet adventure:");
         if (pet != null) {
+            sawPet = true;
             long seconds = TimeParseUtils.parseSeconds(pet);
             String t = pet.toLowerCase(Locale.ROOT);
-            if (seconds >= 0) PetAdTracker.applyReading(seconds);
-            else if (t.contains("none") || t.contains("ready") || t.contains("no active")) PetAdTracker.applyReading(0);
+            if (seconds > 0) PetAdTracker.applyReading(seconds);
+            else if (seconds == 0 || t.contains("finished")) PetAdTracker.applyReading(0);
+            else PetAdTracker.markInactive();
             return;
         }
 
@@ -197,20 +229,32 @@ public class PotDurTracker {
         if (!inResponse) return;
         BuffTracker.finishPotdur(seenBuffs, sawPaused);
         CompactorTracker.finishPotdur(seenCompactors);
+        if (!sawPet) PetAdTracker.markInactive();
+        if (!sawEvent) EventTimerTracker.clear();
         inResponse = false;
         hiding = false;
         sawPaused = false;
+        sawPet = false;
+        sawEvent = false;
         seenBuffs.clear();
         seenCompactors.clear();
     }
 
     private static void checkTriggers(String s) {
         String lower = s.toLowerCase(Locale.ROOT);
-        if (lower.contains("your parrot pet's potion echo triggered")
-                || lower.contains("* [npc] martian: 1 hour of")
-                || lower.contains("* you ate")
+        if (lower.contains("your parrot pet's potion echo triggered") // use pots
+                || lower.contains("* [npc] martian: 1 hour of") // use seed
+                || lower.contains("* you ate") // fih food
+                || lower.contains("it will return in") // sent petad
                 || lower.contains("[compactor]: you began compacting")) {
             schedule(BUFF_DELAY_TICKS);
+            return;
+        }
+
+        if ((lower.contains("is back from its adventure") && lower.contains("meet me to pick it up"))
+                || lower.contains("adventure timer is now")
+                || lower.contains("adventure time is now")){
+            scheduleDebounced(BUFF_DELAY_TICKS);
         }
     }
 
@@ -221,7 +265,15 @@ public class PotDurTracker {
         inResponse = false;
         hiding = false;
         sawPaused = false;
+        sawPet = false;
+        sawEvent = false;
         seenBuffs.clear();
         seenCompactors.clear();
+
+        BuffTracker.reset();
+        CompactorTracker.reset();
+        GreenhouseTracker.reset();
+        PetAdTracker.reset();
+        EventTimerTracker.reset();
     }
 }

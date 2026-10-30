@@ -23,4 +23,8 @@ public interface MovableHud {
     void setPosition(int x, int y);
 
     void render(GuiGraphics graphics);
+
+    default boolean usesFlip() {
+        return true;
+    }
 }

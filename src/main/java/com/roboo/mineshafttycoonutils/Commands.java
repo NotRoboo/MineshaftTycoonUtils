@@ -27,6 +27,8 @@ public class Commands {
 
     private static final Minecraft mc = Minecraft.getInstance();
 
+    private static final int DEFAULT_EGG_HUD_X = 10;
+    private static final int DEFAULT_EGG_HUD_Y = 80;
     private static final int DEFAULT_FISHING_HUD_X = 10;
     private static final int DEFAULT_FISHING_HUD_Y = 80;
     private static final int DEFAULT_PVE_HUD_X = 10;
@@ -149,6 +151,8 @@ public class Commands {
                 )
                 .then(ClientCommandManager.literal("hudpositionsreset")
                         .executes(ctx -> {
+                            ConfigManager.config.misc.eggValue.eggHudX = DEFAULT_EGG_HUD_X;
+                            ConfigManager.config.misc.eggValue.eggHudY = DEFAULT_EGG_HUD_Y;
                             ConfigManager.config.fishing.hudX = DEFAULT_FISHING_HUD_X;
                             ConfigManager.config.fishing.hudY = DEFAULT_FISHING_HUD_Y;
                             ConfigManager.config.pve.hudX = DEFAULT_PVE_HUD_X;
@@ -172,6 +176,7 @@ public class Commands {
                 )
                 .then(ClientCommandManager.literal("hudscalereset")
                         .executes(ctx -> {
+                            ConfigManager.config.misc.eggValue.eggHudScale = HudScale.DEFAULT;
                             ConfigManager.config.fishing.scale = HudScale.DEFAULT;
                             ConfigManager.config.pve.scale = HudScale.DEFAULT;
                             ConfigManager.config.profit.tracker.profitHudScale = HudScale.DEFAULT;

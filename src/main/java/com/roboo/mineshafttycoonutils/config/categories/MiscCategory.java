@@ -3,6 +3,7 @@ package com.roboo.mineshafttycoonutils.config.categories;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.roboo.mineshafttycoonutils.config.migration.ConfigJsonUtils;
+import com.roboo.mineshafttycoonutils.config.misc.EggValueConfig;
 import com.roboo.mineshafttycoonutils.config.misc.KeybindsConfig;
 import com.roboo.mineshafttycoonutils.config.misc.SlotLockingConfig;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
@@ -19,6 +20,10 @@ public class MiscCategory {
     @Expose
     @Category(name = "Slot Locking", desc = "Lock inventory slots")
     public SlotLockingConfig slotLocking = new SlotLockingConfig();
+
+    @Expose
+    @Category(name = "Egg Value", desc = "Shows the donate value of eggs")
+    public EggValueConfig eggValue = new EggValueConfig();
 
     @Expose
     @ConfigOption(

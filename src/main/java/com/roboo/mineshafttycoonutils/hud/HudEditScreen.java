@@ -117,7 +117,9 @@ public class HudEditScreen extends Screen {
         int newLeft = (int) Math.round(click.x() - dragOffsetX);
         int newTop = (int) Math.round(click.y() - dragOffsetY);
 
-        int anchorX = toAnchorX(newLeft, dragging.getWidth(), this.width);
+        int anchorX = dragging.usesFlip()
+                ? toAnchorX(newLeft, dragging.getWidth(), this.width)
+                : newLeft;
         dragging.setPosition(anchorX, newTop);
         return true;
     }

@@ -17,7 +17,7 @@ public class ConfigMigrations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("MineshaftTycoonUtils");
 
-    public static final int CURRENT_VERSION = 8;
+    public static final int CURRENT_VERSION = 9;
 
     private static final Map<Integer, Consumer<JsonObject>> UPGRADE_STEPS = new TreeMap<>();
 
@@ -29,6 +29,7 @@ public class ConfigMigrations {
         registerUpgradeStep(6, TimersCategory::onConfigFix);
         registerUpgradeStep(7, MiscCategory::onConfigFix);
         registerUpgradeStep(8, TimersCategory::onPotionMergeFix);
+        registerUpgradeStep(9, TimersCategory::onEventFix);
     }
 
     private static void renameZoneSettings(JsonObject savedConfig) {

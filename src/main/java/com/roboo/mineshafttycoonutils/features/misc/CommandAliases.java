@@ -33,6 +33,20 @@ public class CommandAliases {
                         return 1;
                     })
             );
+
+            dispatcher.register(ClientCommandManager.literal("dur")
+                    .executes(ctx -> {
+                        send("potdur");
+                        return 1;
+                    })
+            );
+
+            dispatcher.register(ClientCommandManager.literal("po")
+                    .executes(ctx -> {
+                        send("potsoff");
+                        return 1;
+                    })
+            );
         });
     }
 

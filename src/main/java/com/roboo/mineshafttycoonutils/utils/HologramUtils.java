@@ -1,3 +1,4 @@
+/*
 package com.roboo.mineshafttycoonutils.utils;
 
 import net.minecraft.client.Minecraft;
@@ -32,3 +33,4 @@ public class HologramUtils {
         return custom.getString().replaceAll("§[0-9a-fk-or]", "").trim();
     }
 }
+*/
