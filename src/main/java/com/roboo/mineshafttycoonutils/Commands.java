@@ -169,6 +169,8 @@ public class Commands {
                             ConfigManager.config.information.informationHudY = DEFAULT_INFORMATION_HUD_Y;
                             ConfigManager.config.scoreboard.hudX = ScoreboardCategory.AUTO_POSITION;
                             ConfigManager.config.scoreboard.hudY = ScoreboardCategory.AUTO_POSITION;
+                            ConfigManager.config.scoreboard.hudXFraction = -1f;
+                            ConfigManager.config.scoreboard.hudYFraction = -1f;
                             MineshaftTycoonUtils.configManager.saveConfig();
                             resetMsg("HUD positions");
                             return 1;

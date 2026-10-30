@@ -52,6 +52,12 @@ public class ScoreboardCategory {
     public int hudY = AUTO_POSITION;
 
     @Expose
+    public float hudXFraction = -1f;
+
+    @Expose
+    public float hudYFraction = -1f;
+
+    @Expose
     public float scale = HudScale.DEFAULT;
 
     @Expose

@@ -59,8 +59,17 @@ public class ScoreboardHud {
 
         @Override
         public void setPosition(int x, int y) {
-            ConfigManager.config.scoreboard.hudX = x;
-            ConfigManager.config.scoreboard.hudY = y;
+            ScoreboardCategory cfg = ConfigManager.config.scoreboard;
+            int width = getWidth();
+            int height = getHeight();
+            int screenWidth = mc.getWindow().getGuiScaledWidth();
+            int screenHeight = mc.getWindow().getGuiScaledHeight();
+            int left = HudTextUtils.isRightAligned(x) ? x - width : x;
+
+            cfg.hudX = x;
+            cfg.hudY = y;
+            cfg.hudXFraction = Math.clamp(left / (float) Math.max(1, screenWidth - width), 0f, 1f);
+            cfg.hudYFraction = Math.clamp(y / (float) Math.max(1, screenHeight - height), 0f, 1f);
         }
 
         @Override
@@ -107,22 +116,36 @@ public class ScoreboardHud {
 
     private static int resolveLeft(int width) {
         ScoreboardCategory cfg = ConfigManager.config.scoreboard;
+        int screenWidth = mc.getWindow().getGuiScaledWidth();
+        int maxLeft = Math.max(0, screenWidth - width);
+        int left;
 
         if (cfg.hudX == ScoreboardCategory.AUTO_POSITION) {
-            return mc.getWindow().getGuiScaledWidth() - 1 - width;
+            left = screenWidth - 1 - width;
+        } else if (cfg.hudXFraction >= 0f) {
+            left = Math.round(cfg.hudXFraction * maxLeft);
+        } else {
+            left = HudTextUtils.isRightAligned(cfg.hudX) ? cfg.hudX - width : cfg.hudX;
         }
 
-        return HudTextUtils.isRightAligned(cfg.hudX) ? cfg.hudX - width : cfg.hudX;
+        return Math.clamp(left, 0, maxLeft);
     }
 
     private static int resolveTop(int totalHeight) {
         ScoreboardCategory cfg = ConfigManager.config.scoreboard;
+        int screenHeight = mc.getWindow().getGuiScaledHeight();
+        int maxTop = Math.max(0, screenHeight - totalHeight);
+        int top;
 
         if (cfg.hudY == ScoreboardCategory.AUTO_POSITION) {
-            return (mc.getWindow().getGuiScaledHeight() - totalHeight) / 2;
+            top = (screenHeight - totalHeight) / 2;
+        } else if (cfg.hudYFraction >= 0f) {
+            top = Math.round(cfg.hudYFraction * maxTop);
+        } else {
+            top = cfg.hudY;
         }
 
-        return cfg.hudY;
+        return Math.clamp(top, 0, maxTop);
     }
 
     private static int calcWidth(List<String> lines) {
