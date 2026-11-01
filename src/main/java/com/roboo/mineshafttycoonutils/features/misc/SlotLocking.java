@@ -6,7 +6,6 @@ import com.roboo.mineshafttycoonutils.config.misc.SlotLockingConfig;
 import com.roboo.mineshafttycoonutils.mixin.AbstractContainerScreenAccessor;
 import com.roboo.mineshafttycoonutils.utils.SystemMessages;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -43,12 +42,6 @@ public class SlotLocking {
 
     public static void init() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> onTick());
-
-        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (!(screen instanceof AbstractContainerScreen<?> containerScreen)) return;
-            ScreenEvents.afterRender(screen).register((s, graphics, mouseX, mouseY, tickDelta) ->
-                    render(containerScreen, graphics));
-        });
     }
 
     private static void onTick() {
@@ -76,7 +69,7 @@ public class SlotLocking {
         MineshaftTycoonUtils.configManager.saveConfig();
     }
 
-    private static void render(AbstractContainerScreen<?> screen, GuiGraphics graphics) {
+    public static void render(AbstractContainerScreen<?> screen, GuiGraphics graphics) {
         SlotLockingConfig cfg = ConfigManager.config.misc.slotLocking;
         if (!cfg.enabled || cfg.iconType == SlotLockingConfig.IconType.NONE) return;
         if (cfg.lockedSlots.isEmpty() || mc.player == null) return;

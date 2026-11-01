@@ -12,7 +12,8 @@
     "NameTagGlyphMixin",
     "PlayerTabOverlayMixin",
     "ScoreboardMixin",
-    "SlotLockClickMixin"
+    "SlotLockClickMixin",
+    "SlotLockRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
