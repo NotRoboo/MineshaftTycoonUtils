@@ -15,7 +15,7 @@ public class PlayerMessagesCategory {
 
 
     @Expose
-    @ConfigOption(name = "Format System", desc = "Reformat [SYSTEM] chat bridge messages to strip the bot's name and show the real sender")
+    @ConfigOption(name = "Format System", desc = "Reformat [S] chat bridge messages to strip the bot's name and show the real sender")
     @ConfigEditorBoolean
     public boolean formatSystemMessages = false;
 
