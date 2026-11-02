@@ -36,7 +36,7 @@ public class PlayerMessageFormatter {
             "^\\d+$"
     );
 
-    private static final String SYSTEM_TIER_TAG = "SYSTEM";
+    private static final String SYSTEM_TIER_TAG = "S";
 
     private record BridgedPlayerMessage(String rankTag, String username, String message) {}
 
