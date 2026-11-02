@@ -71,13 +71,14 @@ public class WarpHelper {
         WARP_ITEMS.put("quartz", new WarpEntry("Quartz Ore Mine", WarpMenu.WARP));
         WARP_ITEMS.put("quartzblock", new WarpEntry("Quartz Block Mine", WarpMenu.WARP));
         WARP_ITEMS.put("erythrite", new WarpEntry("Erythrite Mine", WarpMenu.WARP));
+        WARP_ITEMS.put("witch", new WarpEntry("Witch", WarpMenu.WARP));
         WARP_ITEMS.put("pve", new WarpEntry("PvE Area", WarpMenu.WARP));
         WARP_ITEMS.put("ice", new WarpEntry("Ice Mine", WarpMenu.WARP));
         WARP_ITEMS.put("coalblock", new WarpEntry("Coal Block Mine", WarpMenu.WARP));
         WARP_ITEMS.put("ironblock", new WarpEntry("Iron Block Mine", WarpMenu.WARP));
         WARP_ITEMS.put("goldblock", new WarpEntry("Gold Block Mine", WarpMenu.WARP));
         WARP_ITEMS.put("castle", new WarpEntry("The Castle", WarpMenu.WARP));
-        WARP_ITEMS.put("armorshop", new WarpEntry("Armor Shop", WarpMenu.WARP));
+        WARP_ITEMS.put("imperialcollector", new WarpEntry("Imperial Collector", WarpMenu.WARP));
         WarpEntry t4pve = new WarpEntry("T4 PvE Area", WarpMenu.WARP);
         WARP_ITEMS.put("t4pve", t4pve);
         WARP_ITEMS.put("pvet4", t4pve);
